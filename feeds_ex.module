@@ -23,7 +23,7 @@ function feeds_ex_theme() {
  * Add JMESPath tests if they are supported.
  */
 function feeds_ex_registry_files_alter(&$files, $indexed_modules) {
-  if (!version_compare(phpversion(), '5.4.0', '>=') || !feeds_ex_library_path('jmespath.php', 'vendor/autoload.php')) {
+  if (!version_compare(PHP_VERSION, '5.4.0', '>=') || !feeds_ex_library_path('jmespath.php', 'vendor/autoload.php')) {
     return;
   }
 

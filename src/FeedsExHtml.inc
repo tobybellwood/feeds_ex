@@ -23,7 +23,7 @@ class FeedsExHtml extends FeedsExXml {
   public function __construct($id) {
     parent::__construct($id);
     // DOMDocument::saveHTML() cannot take $node as an argument prior to 5.3.6.
-    $this->useSaveHTML = version_compare(phpversion(), '5.3.6', '>=');
+    $this->useSaveHTML = version_compare(PHP_VERSION, '5.3.6', '>=');
   }
 
   /**
