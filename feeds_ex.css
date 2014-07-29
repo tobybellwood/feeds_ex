@@ -1,0 +1,14 @@
+/**
+ * @file
+ * CSS goodness for feeds_ex.
+ */
+
+#feeds-ex-source-table .form-item-add-machine-name .description {
+  margin-bottom: 0;
+  max-width: 250px;
+  white-space: normal;
+}
+
+#feeds-ex-source-table .form-item-add-name {
+  float: left;
+}

@@ -1,0 +1,50 @@
+<?php
+
+/**
+ * @file
+ * A Feeds framework used to create extensible parsers.
+ */
+
+/**
+ * Implements hook_theme().
+ */
+function feeds_ex_theme() {
+  return array(
+    'feeds_ex_configuration_table' => array(
+      'file' => 'feeds_ex.theme.inc',
+      'render element' => 'element',
+    ),
+  );
+}
+
+/**
+ * Strips the default namespaces from an XML string.
+ *
+ * @param string $xml
+ *   The XML string.
+ *
+ * @return string
+ *   The XML string with the default namespaces removed.
+ */
+function feeds_ex_remove_default_namespaces($xml) {
+  $element =
+    '[:A-Z_a-z\\xC0-\\xD6\\xD8-\\xF6\\xF8-\\x{2FF}\\x{370}-\\x{37D}' .
+    '\\x{37F}-\\x{1FFF}\\x{200C}-\\x{200D}\\x{2070}-\\x{218F}' .
+    '\\x{2C00}-\\x{2FEF}\\x{3001}-\\x{D7FF}\\x{F900}-\\x{FDCF}' .
+    '\\x{FDF0}-\\x{FFFD}\\x{10000}-\\x{EFFFF}]' .
+    '[:A-Z_a-z\\xC0-\\xD6\\xD8-\\xF6\\xF8-\\x{2FF}\\x{370}-\\x{37D}' .
+    '\\x{37F}-\\x{1FFF}\\x{200C}-\\x{200D}\\x{2070}-\\x{218F}' .
+    '\\x{2C00}-\\x{2FEF}\\x{3001}-\\x{D7FF}\\x{F900}-\\x{FDCF}' .
+    '\\x{FDF0}-\\x{FFFD}\\x{10000}-\\x{EFFFF}\\.\\-0-9\\xB7' .
+    '\\x{0300}-\\x{036F}\\x{203F}-\\x{2040}]*';
+
+  return preg_replace('/(<' . $element . '[^>]*)\s+xmlns\s*=\s*("|\').*?(\2)([^>]*>)/u', '$1$4', $xml);
+}
+
+/**
+ * Machine name exists callback.
+ */
+function feeds_ex_source_exists($source_id, array $element) {
+  $sources = feeds_importer($element['#feeds_importer'])->parser->getMappingSources();
+  return isset($sources[$source_id]) || $source_id === 'add';
+}
