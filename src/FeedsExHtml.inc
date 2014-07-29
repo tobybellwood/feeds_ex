@@ -8,7 +8,7 @@
 /**
  * Parses HTML documents with XPath.
  */
-class FeedsExHtml extends FeedsExXpathXml {
+class FeedsExHtml extends FeedsExXml {
 
   /**
    * Whether this version of PHP has the correct saveHTML() method.
@@ -29,22 +29,49 @@ class FeedsExHtml extends FeedsExXpathXml {
   /**
    * {@inheritdoc}
    */
+  protected function convertEncoding($data, $encoding = 'UTF-8') {
+    // Check for an encoding declaration in the XML prolog.
+    $matches = FALSE;
+    if (preg_match('/<meta[^>]+charset\s*=\s*["\']?([\w-]+)\b/i', $data, $matches)) {
+      $encoding = $matches[1];
+    }
+    elseif ($detected = parent::detectEncoding($data)) {
+      $encoding = $detected;
+    }
+
+    // Unsupported encodings are converted here into UTF-8.
+    $php_supported = array('utf-8', 'iso-8859-1', 'us-ascii', 'ascii');
+    if (in_array(strtolower($encoding), $php_supported)) {
+      return $data;
+    }
+
+    $data = parent::convertEncoding($data, $encoding);
+    if ($matches) {
+      $data = preg_replace('/(<meta[^>]+charset\s*=\s*["\']?)([\w-]+)\b/i', '$1UTF-8', $data, 1);
+    }
+
+    return $data;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   protected function prepareDocument(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
-    $document = new DOMDocument();
+    $document = new DOMDocument('1.0', 'UTF-8');
     $document->strictErrorChecking = FALSE;
     $document->resolveExternals = FALSE;
     // Libxml specific.
     $document->substituteEntities = FALSE;
     $document->recover = TRUE;
+    $document->encoding = 'UTF-8';
 
+    // Convert encoding.
+    $raw = $this->convertEncoding($fetcher_result->getRaw());
+    // Fun hack to force parsing as utf-8.
+    $raw = '<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />' . "\n" . $raw;
     $options = LIBXML_NOENT | LIBXML_NONET | defined('LIBXML_COMPACT') ? LIBXML_COMPACT : 0;
-    $success = $document->loadHTML($fetcher_result->getRaw());
-
+    $success = $document->loadHTML($raw, $options);
     if (!$success) {
-      // Always display errors on fatal.
-      $errors = $this->stopErrorHandling();
-      $this->printErrors($errors);
-      $this->logErrors($source, $errors);
       throw new RuntimeException(t('There was an error parsing the HTML document.'));
     }
 

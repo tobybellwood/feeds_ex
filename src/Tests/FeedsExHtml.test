@@ -1,0 +1,157 @@
+<?php
+
+/**
+ * @file
+ * Contains tests for FeedsExHtml.
+ */
+
+
+/**
+ * Unit tests for FeedsExHtml.
+ */
+class FeedsExHtmlUnitTests extends FeedsExUnitTestBase {
+
+  /**
+   * The mocked FeedsSource.
+   *
+   * @var FeedsSource
+   */
+  protected $source;
+
+  public static function getInfo() {
+    return array(
+      'name' => 'HTML parser unit tests',
+      'description' => 'Unit tests for FeedsExHtml.',
+      'group' => 'Feeds EX',
+    );
+  }
+
+  public function setUp() {
+    parent::setUp();
+
+    require_once $this->moduleDir . '/src/FeedsExXml.inc';
+    require_once $this->moduleDir . '/src/FeedsExHtml.inc';
+
+    $this->source = $this->getMockFeedsSource();
+  }
+
+  /**
+   * Tests simple parsing.
+   */
+  public function testSimpleParsing() {
+    $parser = FeedsConfigurable::instance('FeedsExHtml', 'test_parser');
+    $fetcher_result = new FeedsFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test.html'));
+
+    $parser->setConfig(array(
+      'context' => array(
+        'value' => '//div[@class="post"]',
+      ),
+      'sources' => array(
+        'title' => array(
+          'name' => 'Title',
+          'value' => 'h3',
+        ),
+        'description' => array(
+          'name' => 'Title',
+          'value' => 'p',
+        ),
+      ),
+    ));
+
+    $result = $parser->parse($this->source, $fetcher_result);
+
+    $this->assertEqual(count($result->items), 3, format_string('@count items parsed.', array('@count' => count($result->items))));
+
+    foreach ($result->items as $delta => $item) {
+      $this->assertEqual('I am a title' . $delta, $item['title']);
+      $this->assertEqual('I am a description' . $delta, $item['description']);
+    }
+  }
+
+  /**
+   * Tests parsing a CP866 (Russian) encoded file.
+   */
+  public function testCP866Encoded() {
+    $parser = FeedsConfigurable::instance('FeedsExHtml', 'test_parser');
+    $fetcher_result = new FeedsFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test_ru.html'));
+
+    $parser->setConfig(array(
+      'context' => array(
+        'value' => '//div[@class="post"]',
+      ),
+      'sources' => array(
+        'title' => array(
+          'name' => 'Title',
+          'value' => 'h3',
+        ),
+        'description' => array(
+          'name' => 'Title',
+          'value' => 'p',
+        ),
+      ),
+    ));
+
+    $result = $parser->parse($this->source, $fetcher_result);
+
+    $this->assertEqual(count($result->items), 3, format_string('@count items parsed.', array('@count' => count($result->items))));
+
+    foreach ($result->items as $delta => $item) {
+      $this->assertEqual('Я название' . $delta, $item['title']);
+      $this->assertEqual('Я описание' . $delta, $item['description']);
+    }
+  }
+
+  /**
+   * Tests a EUC-JP (Japanese) encoded file without the encoding declaration.
+   *
+   * This implicitly tests FeedsExBase's encoding conversion.
+   */
+  public function testEUCJPEncodedNoDeclaration() {
+    $parser = FeedsConfigurable::instance('FeedsExHtml', 'test_parser');
+    $fetcher_result = new FeedsFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test_jp.html'));
+
+    $parser->setConfig(array(
+      'context' => array(
+        'value' => '//div[@class="post"]',
+      ),
+      'sources' => array(
+        'title' => array(
+          'name' => 'Title',
+          'value' => 'h3',
+        ),
+        'description' => array(
+          'name' => 'Title',
+          'value' => 'p',
+        ),
+      ),
+      'source_encoding' => 'EUC-JP',
+    ));
+
+    $result = $parser->parse($this->source, $fetcher_result);
+
+    $this->assertEqual(count($result->items), 3, format_string('@count items parsed.', array('@count' => count($result->items))));
+
+    foreach ($result->items as $delta => $item) {
+      $this->assertEqual('私はタイトルです' . $delta, $item['title']);
+      $this->assertEqual('私が説明してい' . $delta, $item['description']);
+    }
+  }
+
+  /**
+   * Tests that the link propery is set.
+   */
+  public function testLinkIsSet() {
+    $this->setProtectedValue($this->source, 'config', array(
+      'FeedsFileFetcher' => array(
+        'source' => 'file fetcher source path',
+      ),
+    ));
+
+    $parser = FeedsConfigurable::instance('FeedsExHtml', 'test_parser');
+    $parser->setConfig(array('context' => array('value' => '/beep')));
+
+    $result = $parser->parse($this->source, new FeedsFetcherResult('<?xml version="1.0" encoding="UTF-8"?><item></item>'));
+    $this->assertEqual($result->link, 'file fetcher source path');
+  }
+
+}
