@@ -78,7 +78,7 @@ abstract class FeedsExUnitTestBase extends DrupalUnitTestCase {
     $properties = $reflector->getProperties();
     $defaults = $reflector->getDefaultProperties();
 
-    $serealized = 'O:' . strlen($class) . ":\"$class\":" . count($properties) . ':{';
+    $serialized = 'O:' . strlen($class) . ":\"$class\":" . count($properties) . ':{';
     foreach ($properties as $property) {
       $name = $property->getName();
       if ($property->isProtected()) {
@@ -88,18 +88,18 @@ abstract class FeedsExUnitTestBase extends DrupalUnitTestCase {
         $name = chr(0)  . $class .  chr(0) . $name;
       }
 
-      $serealized .= serialize($name);
+      $serialized .= serialize($name);
 
       if (array_key_exists($property->getName(), $defaults)) {
-        $serealized .= serialize($defaults[$property->getName()]);
+        $serialized .= serialize($defaults[$property->getName()]);
       }
       else {
-        $serealized .= serialize(NULL);
+        $serialized .= serialize(NULL);
       }
     }
-    $serealized .= '}';
+    $serialized .= '}';
 
-    return unserialize($serealized);
+    return unserialize($serialized);
   }
 
   /**
