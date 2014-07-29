@@ -42,8 +42,6 @@ class FeedsExXml extends FeedsExBase {
    * {@inheritdoc}
    */
   protected function setUp(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
-    $this->startErrorHandling();
-
     $document = $this->prepareDocument($source, $fetcher_result);
     $this->xpath = new FeedsExXpathDomXpath($document);
 
@@ -68,18 +66,6 @@ class FeedsExXml extends FeedsExBase {
    * {@inheritdoc}
    */
   protected function cleanUp(FeedsSource $source, FeedsParserResult $result) {
-    // @todo Add configuration option for showing errors.
-    $errors = $this->stopErrorHandling();
-    if ($this->config['display_errors']) {
-      $this->printErrors($errors, LIBXML_ERR_NONE);
-    }
-    else {
-      // Always print fatal errors.
-      $this->printErrors($errors);
-    }
-    // Log any fatal errors.
-    $this->logErrors($source, $errors);
-
     // Try to free up some memory. There shouldn't be any other references to
     // $this->xpath or the DOMDocument.
     unset($this->xpath);
@@ -203,15 +189,15 @@ class FeedsExXml extends FeedsExBase {
     $document->substituteEntities = FALSE;
     $document->recover = TRUE;
 
+    // Convert encoding.
+    $raw = $this->convertEncoding(trim($fetcher_result->getRaw()));
+    // Remove default namespaces. This has to run after the encoding conversion
+    // because a limited set of encodings are supported in regular expressions.
+    $raw = feeds_ex_remove_default_namespaces($raw);
+
     $options = LIBXML_NOENT | LIBXML_NONET | defined('LIBXML_COMPACT') ? LIBXML_COMPACT : 0;
-    $raw = feeds_ex_remove_default_namespaces(trim($fetcher_result->getRaw()));
-    $raw = $this->convertEncoding($raw);
     $success = $document->loadXML($raw, $options);
     if (!$success) {
-      // Always display errors on fatal.
-      $errors = $this->stopErrorHandling();
-      $this->printErrors($errors);
-      $this->logErrors($source, $errors);
       throw new RuntimeException(t('There was an error parsing the XML document.'));
     }
 
@@ -232,9 +218,11 @@ class FeedsExXml extends FeedsExBase {
   }
 
   /**
-   * Starts internal error handling.
+   * {@inheritdoc}
    */
   protected function startErrorHandling() {
+    parent::startErrorHandling();
+
     libxml_clear_errors();
     $this->handleXmlErrors = libxml_use_internal_errors(TRUE);
 
@@ -247,21 +235,40 @@ class FeedsExXml extends FeedsExBase {
   }
 
   /**
-   * Stops internal error handling.
-   *
-   * @return array
-   *   A list of loggable errors.
+   * {@inheritdoc}
    */
   protected function stopErrorHandling() {
-    $errors = libxml_get_errors();
+    parent::stopErrorHandling();
+
     libxml_clear_errors();
     libxml_use_internal_errors($this->handleXmlErrors);
     if (function_exists('libxml_disable_entity_loader')) {
       libxml_disable_entity_loader($this->entityLoader);
     }
+  }
 
+  /**
+   * {@inheritdoc}
+   */
+  protected function getErrors() {
     $return = array();
-    foreach ($errors as $error) {
+    foreach (libxml_get_errors() as $error) {
+
+      // Translate error values.
+      switch ($error->level) {
+        case LIBXML_ERR_FATAL:
+          $severity = WATCHDOG_ERROR;
+          break;
+
+        case LIBXML_ERR_ERROR:
+          $severity = WATCHDOG_WARNING;
+          break;
+
+        default:
+          $severity = WATCHDOG_NOTICE;
+          break;
+      }
+
       $return[] = array(
         'message' => '%error on line %num. Error code: %code',
         'args' => array(
@@ -269,34 +276,11 @@ class FeedsExXml extends FeedsExBase {
           '%num' => $error->line,
           '%code' => $error->code,
         ),
-        'level' => $error->level,
+        'level' => $severity,
       );
     }
 
     return $return;
-  }
-
-  /**
-   * Prints XML errors to the screen.
-   *
-   * @param array $errors
-   *   A list of errors as returned by stopErrorHandling().
-   * @param int $error_level
-   *   (optional) Limit to only errors of the specified level. One of:
-   *   - LIBXML_ERR_WARNING
-   *   - LIBXML_ERR_ERROR
-   *   - LIBXML_ERR_FATAL.
-   *   Defaults to LIBXML_ERR_FATAL.
-   *
-   * @see FeedsExXml::stopErrorHandling()
-   */
-  protected function printErrors(array $errors, $error_level = LIBXML_ERR_FATAL) {
-    foreach ($errors as $error) {
-      if ($error['level'] < $error_level) {
-        continue;
-      }
-      drupal_set_message(t($error['message'], $error['args']), $error['level'] == LIBXML_ERR_FATAL ? 'error' : 'warning');
-    }
   }
 
   /**

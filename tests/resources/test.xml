@@ -1,15 +1,15 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="CP932"?>
 <items>
   <item>
-    <title>I am a title</title>
-    <description>I am a description</description>
+    <title>I am a title0</title>
+    <description>I am a description0</description>
+  </item>
+  <item>
+    <title>I am a title1</title>
+    <description>I am a description1</description>
   </item>
   <item>
     <title>I am a title2</title>
     <description>I am a description2</description>
-  </item>
-  <item>
-    <title>I am a title3</title>
-    <description>I am a description3</description>
   </item>
 </items>

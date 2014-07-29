@@ -85,11 +85,88 @@ class FeedsExXmlUnitTests extends DrupalUnitTestCase {
           'name' => 'Title',
           'value' => 'title',
         ),
+        'description' => array(
+          'name' => 'Title',
+          'value' => 'description',
+        ),
       ),
     ));
 
     $result = $parser->parse($this->source, $fetcher_result);
-    $this->assertEqual(count($result->items), 3);
+
+    $this->assertEqual(count($result->items), 3, format_string('@count items parsed.', array('@count' => count($result->items))));
+
+    foreach ($result->items as $delta => $item) {
+      $this->assertEqual('I am a title' . $delta, $item['title']);
+      $this->assertEqual('I am a description' . $delta, $item['description']);
+    }
+  }
+
+  /**
+   * Tests parsing a CP866 (Russian) encoded file.
+   */
+  public function testCP866Encoded() {
+    $parser = FeedsConfigurable::instance('FeedsExXml', 'test_parser');
+    $fetcher_result = new FeedsFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test_ru.xml'));
+
+    $parser->setConfig(array(
+      'context' => array(
+        'value' => '/items/item',
+      ),
+      'sources' => array(
+        'title' => array(
+          'name' => 'Title',
+          'value' => 'title',
+        ),
+        'description' => array(
+          'name' => 'Title',
+          'value' => 'description',
+        ),
+      ),
+    ));
+
+    $result = $parser->parse($this->source, $fetcher_result);
+
+    $this->assertEqual(count($result->items), 3, format_string('@count items parsed.', array('@count' => count($result->items))));
+
+    foreach ($result->items as $delta => $item) {
+      $this->assertEqual('Я название' . $delta, $item['title']);
+      $this->assertEqual('Я описание' . $delta, $item['description']);
+    }
+  }
+
+  /**
+   * Tests a EUC-JP (Japanese) encoded file without the encoding declaration.
+   */
+  public function testEUCJPEncodedNoDeclaration() {
+    $parser = FeedsConfigurable::instance('FeedsExXml', 'test_parser');
+    $fetcher_result = new FeedsFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test_jp.xml'));
+
+    $parser->setConfig(array(
+      'context' => array(
+        'value' => '/items/item',
+      ),
+      'sources' => array(
+        'title' => array(
+          'name' => 'Title',
+          'value' => 'title',
+        ),
+        'description' => array(
+          'name' => 'Title',
+          'value' => 'description',
+        ),
+      ),
+      'source_encoding' => 'EUC-JP',
+    ));
+
+    $result = $parser->parse($this->source, $fetcher_result);
+
+    $this->assertEqual(count($result->items), 3, format_string('@count items parsed.', array('@count' => count($result->items))));
+
+    foreach ($result->items as $delta => $item) {
+      $this->assertEqual('私はタイトルです' . $delta, $item['title']);
+      $this->assertEqual('私が説明してい' . $delta, $item['description']);
+    }
   }
 
   /**

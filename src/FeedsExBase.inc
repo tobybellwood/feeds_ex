@@ -11,6 +11,13 @@
 abstract class FeedsExBase extends FeedsParser {
 
   /**
+   * The previous multibyte detection order.
+   *
+   * @var array
+   */
+  protected $previousDetectionOrder;
+
+  /**
    * Allows subclasses to prepare for parsing.
    *
    * @param FeedsSource $source
@@ -69,6 +76,8 @@ abstract class FeedsExBase extends FeedsParser {
    * {@inheritdoc}
    */
   public function parse(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
+    $this->startErrorHandling();
+
     $config = $this->getConfig();
     $result = new FeedsParserResult();
 
@@ -79,15 +88,38 @@ abstract class FeedsExBase extends FeedsParser {
     $expressions = $this->prepareExpressions();
     $variable_map = $this->prepareVariables($expressions);
 
-    $this->setUp($source, $fetcher_result);
+    try {
+      $this->setUp($source, $fetcher_result);
 
-    foreach ($this->executeContext() as $row) {
-      if ($item = $this->executeSources($row, $expressions, $variable_map)) {
-        $result->items[] = $item;
+      foreach ($this->executeContext() as $row) {
+        if ($item = $this->executeSources($row, $expressions, $variable_map)) {
+          $result->items[] = $item;
+        }
       }
+
+      $this->cleanUp($source, $result);
+    }
+    catch (Expcetion $exception) {
+      // Do nothing. Store for later.
     }
 
-    $this->cleanUp($source, $result);
+    // Show some warnings.
+    $errors = $this->getErrors();
+    if ($this->config['display_errors']) {
+      $this->printErrors($errors, WATCHDOG_DEBUG);
+    }
+    else {
+      // Always print errors.
+      $this->printErrors($errors);
+    }
+    // Log any fatal errors.
+    $this->logErrors($source, $errors);
+    $this->stopErrorHandling();
+
+    if (isset($exception)) {
+      throw $exception;
+    }
+
     return $result;
   }
 
@@ -398,6 +430,8 @@ abstract class FeedsExBase extends FeedsParser {
         form_set_error('sources][' . $machine_name . '][value', $message);
       }
     }
+
+    $values['source_encoding'] = trim($values['source_encoding']);
   }
 
   /**
@@ -408,6 +442,75 @@ abstract class FeedsExBase extends FeedsParser {
   }
 
   /**
+   * Starts internal error handling.
+   */
+  protected function startErrorHandling() {
+    // Add our encodings to the detection order.
+    if ($this->config['source_encoding'] === 'auto' || !function_exists('mb_detect_order')) {
+      return;
+    }
+
+    $this->previousDetectionOrder = mb_detect_order();
+
+    $detections = explode(',', $this->config['source_encoding']);
+
+    $detection = array_merge($detections, $this->previousDetectionOrder);
+    mb_detect_order(array_unique($detection));
+  }
+
+  /**
+   * Stops internal error handling.
+   */
+  protected function stopErrorHandling() {
+    if ($this->previousDetectionOrder) {
+      mb_detect_order($this->previousDetectionOrder);
+    }
+  }
+
+  /**
+   * Prints errors to the screen.
+   *
+   * @param array $errors
+   *   A list of errors as returned by stopErrorHandling().
+   * @param int $severity
+   *   (optional) Limit to only errors of the specified severity. Defaults to
+   *   WATCHDOG_ERROR.
+   *
+   * @see watchdog()
+   */
+  protected function printErrors(array $errors, $severity = WATCHDOG_ERROR) {
+    foreach ($errors as $error) {
+      if ($error['severity'] <= $severity) {
+        continue;
+      }
+      drupal_set_message(t($error['message'], $error['args']), $error['severity'] <= WATCHDOG_ERROR ? 'error' : 'warning');
+    }
+  }
+
+  /**
+   * Logs errors.
+   *
+   * @param FeedsSource $source
+   *   The feed source being importerd.
+   * @param array $errors
+   *   A list of errors as returned by stopErrorHandling().
+   * @param int $severity
+   *   (optional) Limit to only errors of the specified severity. Defaults to
+   *   WATCHDOG_ERROR.
+   *
+   * @see watchdog()
+   */
+  protected function logErrors(FeedsSource $source, array $errors, $severity = WATCHDOG_ERROR) {
+    foreach ($errors as $error) {
+      if ($error['severity'] <= $severity) {
+        continue;
+      }
+
+      $source->log('feeds_ex', $error['message'], $error['args'], $error['severity']);
+    }
+  }
+
+  /**
    * Detects the encoding of a string.
    *
    * @param string $data
@@ -415,20 +518,36 @@ abstract class FeedsExBase extends FeedsParser {
    *
    * @return string|bool
    *   Returns the encoding, or false if one could not be detected.
+   *
+   * @todo Add other methods of encoding detection.
    */
   protected function detectEncoding($data) {
     if (function_exists('mb_detect_encoding')) {
-      return mb_detect_encoding($data, $this->config['source_encoding']);
+      return mb_detect_encoding($data, $this->config['source_encoding'], TRUE);
     }
     return FALSE;
   }
 
+  /**
+   * Converts a string to UTF-8.
+   *
+   * Requires the iconv, GNU recode or mbstring PHP extension.
+   *
+   * @param string $data
+   *   The string to convert.
+   * @param string $encoding
+   *   The encoding to convert to.
+   *
+   * @return string
+   *   The encoded string, or the original string if encoding failed.
+   *
+   * @see drupal_convert_to_utf8()
+   */
   protected function convertEncoding($data, $encoding) {
     $converted = drupal_convert_to_utf8($data, $encoding);
     if ($converted === FALSE) {
       return $data;
     }
-
     return $converted;
   }
 
