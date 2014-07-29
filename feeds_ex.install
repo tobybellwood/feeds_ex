@@ -6,6 +6,13 @@
  */
 
 /**
+ * Implements hook_install().
+ */
+function feeds_ex_install() {
+  feeds_cache_clear(FALSE);
+}
+
+/**
  * Implements hook_enable().
  */
 function feeds_ex_enable() {
