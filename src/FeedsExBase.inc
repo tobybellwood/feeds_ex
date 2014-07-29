@@ -206,6 +206,7 @@ abstract class FeedsExBase extends FeedsParser {
       'context' => array(
         'value' => '',
       ),
+      'display_errors' => FALSE,
     );
   }
 
@@ -332,6 +333,13 @@ abstract class FeedsExBase extends FeedsParser {
       '#attributes' => array('class' => array('feeds-ex-source-weight')),
     );
 
+    $form['display_errors'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Display errors'),
+      '#description' => t('Display all error messages after parsing. Fatal errors will always be displayed.'),
+      '#default_value' => $config['display_errors'],
+    );
+
     $form['#attached']['drupal_add_tabledrag'][] = array('feeds-ex-source-table', 'order', 'sibling', 'feeds-ex-source-weight');
     $form['#attached']['css'][] = drupal_get_path('module', 'feeds_ex') . '/feeds_ex.css';
 
@@ -342,6 +350,9 @@ abstract class FeedsExBase extends FeedsParser {
    * {@inheritdoc}
    */
   public function configFormValidate(&$values) {
+    // @todo We should do this in Feeds automatically.
+    $values += $this->configDefaults();
+
     // Add new source.
     if (strlen($values['add']['machine_name']) && strlen($values['add']['name'])) {
       $values['sources'][$values['add']['machine_name']] = $values['add'];

@@ -73,6 +73,10 @@ class FeedsExXml extends FeedsExBase {
     if ($this->config['display_errors']) {
       $this->printErrors($errors, LIBXML_ERR_NONE);
     }
+    else {
+      // Always print fatal errors.
+      $this->printErrors($errors);
+    }
     // Log any fatal errors.
     $this->logErrors($source, $errors);
 
