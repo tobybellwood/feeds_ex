@@ -165,7 +165,6 @@ class FeedsExXml extends FeedsExBase {
     $data = parent::convertEncoding($data, $encoding);
     if ($matches) {
       $data = preg_replace('/^(<\?xml[^>]+encoding\s*=\s*("|\'))(.+?)(\2)/', '$1UTF-8$4', $data);
-      debug($data);
     }
 
     return $data;
