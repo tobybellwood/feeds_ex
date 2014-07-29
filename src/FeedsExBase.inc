@@ -73,6 +73,19 @@ abstract class FeedsExBase extends FeedsParser {
   abstract protected function validateExpression(&$expression);
 
   /**
+   * Returns the errors after parsing.
+   *
+   * @return array
+   *   A structured array array with keys:
+   *   - message: The error message.
+   *   - variables: The variables for the message.
+   *   - severity: The severity of the message.
+   *
+   * @see watchdog()
+   */
+  abstract protected function getErrors();
+
+  /**
    * {@inheritdoc}
    */
   public function parse(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
@@ -196,6 +209,120 @@ abstract class FeedsExBase extends FeedsParser {
     }
 
     return $item;
+  }
+
+  /**
+   * Starts internal error handling.
+   */
+  protected function startErrorHandling() {
+    // Add our encodings to the detection order.
+    if ($this->config['source_encoding'] === 'auto' || !function_exists('mb_detect_order')) {
+      return;
+    }
+
+    $this->previousDetectionOrder = mb_detect_order();
+
+    $detections = explode(',', $this->config['source_encoding']);
+
+    $detection = array_merge($detections, $this->previousDetectionOrder);
+    mb_detect_order(array_unique($detection));
+  }
+
+  /**
+   * Stops internal error handling.
+   */
+  protected function stopErrorHandling() {
+    if ($this->previousDetectionOrder) {
+      mb_detect_order($this->previousDetectionOrder);
+    }
+  }
+
+  /**
+   * Prints errors to the screen.
+   *
+   * @param array $errors
+   *   A list of errors as returned by stopErrorHandling().
+   * @param int $severity
+   *   (optional) Limit to only errors of the specified severity. Defaults to
+   *   WATCHDOG_ERROR.
+   *
+   * @see watchdog()
+   */
+  protected function printErrors(array $errors, $severity = WATCHDOG_ERROR) {
+    foreach ($errors as $error) {
+      if ($error['severity'] > $severity) {
+        continue;
+      }
+      drupal_set_message(t($error['message'], $error['args']), $error['severity'] <= WATCHDOG_ERROR ? 'error' : 'warning', FALSE);
+    }
+  }
+
+  /**
+   * Logs errors.
+   *
+   * @param FeedsSource $source
+   *   The feed source being importerd.
+   * @param array $errors
+   *   A list of errors as returned by stopErrorHandling().
+   * @param int $severity
+   *   (optional) Limit to only errors of the specified severity. Defaults to
+   *   WATCHDOG_ERROR.
+   *
+   * @see watchdog()
+   */
+  protected function logErrors(FeedsSource $source, array $errors, $severity = WATCHDOG_ERROR) {
+    foreach ($errors as $error) {
+      if ($error['severity'] > $severity) {
+        continue;
+      }
+
+      $source->log('feeds_ex', $error['message'], $error['args'], $error['severity']);
+    }
+  }
+
+  /**
+   * Detects the encoding of a string.
+   *
+   * @param string $data
+   *   The string to guess the encoding for.
+   *
+   * @return string|bool
+   *   Returns the encoding, or false if one could not be detected.
+   *
+   * @todo Add other methods of encoding detection.
+   */
+  protected function detectEncoding($data) {
+    if (function_exists('mb_detect_encoding')) {
+      return mb_detect_encoding($data, $this->config['source_encoding'], TRUE);
+    }
+    return FALSE;
+  }
+
+  /**
+   * Converts a string to UTF-8.
+   *
+   * Requires the iconv, GNU recode or mbstring PHP extension.
+   *
+   * @param string $data
+   *   The string to convert.
+   * @param string $encoding
+   *   The encoding to convert to.
+   *
+   * @return string
+   *   The encoded string, or the original string if encoding failed.
+   *
+   * @see drupal_convert_to_utf8()
+   */
+  protected function convertEncoding($data, $encoding) {
+    $php_supported = array('utf-8', 'iso-8859-1', 'us-ascii', 'ascii');
+    if (in_array(strtolower($encoding), $php_supported)) {
+      return $data;
+    }
+    $converted = drupal_convert_to_utf8($data, $encoding);
+    if ($converted === FALSE) {
+      return $data;
+    }
+    return $converted;
   }
 
   /**
@@ -439,116 +566,6 @@ abstract class FeedsExBase extends FeedsParser {
    */
   public function hasConfigForm() {
     return TRUE;
-  }
-
-  /**
-   * Starts internal error handling.
-   */
-  protected function startErrorHandling() {
-    // Add our encodings to the detection order.
-    if ($this->config['source_encoding'] === 'auto' || !function_exists('mb_detect_order')) {
-      return;
-    }
-
-    $this->previousDetectionOrder = mb_detect_order();
-
-    $detections = explode(',', $this->config['source_encoding']);
-
-    $detection = array_merge($detections, $this->previousDetectionOrder);
-    mb_detect_order(array_unique($detection));
-  }
-
-  /**
-   * Stops internal error handling.
-   */
-  protected function stopErrorHandling() {
-    if ($this->previousDetectionOrder) {
-      mb_detect_order($this->previousDetectionOrder);
-    }
-  }
-
-  /**
-   * Prints errors to the screen.
-   *
-   * @param array $errors
-   *   A list of errors as returned by stopErrorHandling().
-   * @param int $severity
-   *   (optional) Limit to only errors of the specified severity. Defaults to
-   *   WATCHDOG_ERROR.
-   *
-   * @see watchdog()
-   */
-  protected function printErrors(array $errors, $severity = WATCHDOG_ERROR) {
-    foreach ($errors as $error) {
-      if ($error['severity'] <= $severity) {
-        continue;
-      }
-      drupal_set_message(t($error['message'], $error['args']), $error['severity'] <= WATCHDOG_ERROR ? 'error' : 'warning');
-    }
-  }
-
-  /**
-   * Logs errors.
-   *
-   * @param FeedsSource $source
-   *   The feed source being importerd.
-   * @param array $errors
-   *   A list of errors as returned by stopErrorHandling().
-   * @param int $severity
-   *   (optional) Limit to only errors of the specified severity. Defaults to
-   *   WATCHDOG_ERROR.
-   *
-   * @see watchdog()
-   */
-  protected function logErrors(FeedsSource $source, array $errors, $severity = WATCHDOG_ERROR) {
-    foreach ($errors as $error) {
-      if ($error['severity'] <= $severity) {
-        continue;
-      }
-
-      $source->log('feeds_ex', $error['message'], $error['args'], $error['severity']);
-    }
-  }
-
-  /**
-   * Detects the encoding of a string.
-   *
-   * @param string $data
-   *   The string to guess the encoding for.
-   *
-   * @return string|bool
-   *   Returns the encoding, or false if one could not be detected.
-   *
-   * @todo Add other methods of encoding detection.
-   */
-  protected function detectEncoding($data) {
-    if (function_exists('mb_detect_encoding')) {
-      return mb_detect_encoding($data, $this->config['source_encoding'], TRUE);
-    }
-    return FALSE;
-  }
-
-  /**
-   * Converts a string to UTF-8.
-   *
-   * Requires the iconv, GNU recode or mbstring PHP extension.
-   *
-   * @param string $data
-   *   The string to convert.
-   * @param string $encoding
-   *   The encoding to convert to.
-   *
-   * @return string
-   *   The encoded string, or the original string if encoding failed.
-   *
-   * @see drupal_convert_to_utf8()
-   */
-  protected function convertEncoding($data, $encoding) {
-    $converted = drupal_convert_to_utf8($data, $encoding);
-    if ($converted === FALSE) {
-      return $data;
-    }
-    return $converted;
   }
 
 }

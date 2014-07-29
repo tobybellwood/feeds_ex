@@ -149,22 +149,23 @@ class FeedsExXml extends FeedsExBase {
   protected function convertEncoding($data, $encoding = 'UTF-8') {
     // Check for an encoding declaration in the XML prolog.
     $matches = FALSE;
-    if (preg_match('/^<\?xml[^>]+encoding="(.+?)"/', $data, $matches)) {
-      $encoding = $matches[1];
+    if (preg_match('/^<\?xml[^>]+encoding\s*=\s*("|\')(.+?)(\1)/', $data, $matches)) {
+      $encoding = $matches[2];
     }
     elseif ($detected = parent::detectEncoding($data)) {
       $encoding = $detected;
     }
 
     // Unsupported encodings are converted here into UTF-8.
-    $php_supported = array('utf-8', 'iso-8859-1', 'us-ascii');
+    $php_supported = array('utf-8', 'iso-8859-1', 'us-ascii', 'ascii');
     if (in_array(strtolower($encoding), $php_supported)) {
       return $data;
     }
 
     $data = parent::convertEncoding($data, $encoding);
     if ($matches) {
-      $data = preg_replace('/^(<\?xml[^>]+encoding)="(.+?)"/', '\\1="UTF-8"', $data);
+      $data = preg_replace('/^(<\?xml[^>]+encoding\s*=\s*("|\'))(.+?)(\2)/', '$1UTF-8$4', $data);
+      debug($data);
     }
 
     return $data;
@@ -188,6 +189,7 @@ class FeedsExXml extends FeedsExBase {
     // Libxml specific.
     $document->substituteEntities = FALSE;
     $document->recover = TRUE;
+    $document->encoding = 'UTF-8';
 
     // Convert encoding.
     $raw = $this->convertEncoding(trim($fetcher_result->getRaw()));
@@ -271,62 +273,22 @@ class FeedsExXml extends FeedsExBase {
 
       $return[] = array(
         'message' => '%error on line %num. Error code: %code',
-        'args' => array(
+        'variables' => array(
           '%error' => trim($error->message),
           '%num' => $error->line,
           '%code' => $error->code,
         ),
-        'level' => $severity,
+        'severity' => $severity,
       );
     }
 
     return $return;
   }
 
-  /**
-   * Logs XML errors.
-   *
-   * @param FeedsSource $source
-   *   The feed source being importerd.
-   * @param array $errors
-   *   A list of errors as returned by stopErrorHandling().
-   * @param int $error_level
-   *   (optional) Limit to only errors of the specified level. One of:
-   *   - LIBXML_ERR_WARNING
-   *   - LIBXML_ERR_ERROR
-   *   - LIBXML_ERR_FATAL.
-   *   Defaults to LIBXML_ERR_FATAL.
-   *
-   * @see FeedsExXml::stopErrorHandling()
-   */
-  protected function logErrors(FeedsSource $source, array $errors, $error_level = LIBXML_ERR_FATAL) {
-    foreach ($errors as $error) {
-      if ($error['level'] < $error_level) {
-        continue;
-      }
-
-      switch ($error['level']) {
-        case LIBXML_ERR_FATAL:
-          $severity = WATCHDOG_ERROR;
-          break;
-
-        case LIBXML_ERR_ERROR:
-          $severity = WATCHDOG_WARNING;
-          break;
-
-        default:
-          $severity = WATCHDOG_NOTICE;
-          break;
-      }
-
-      $source->log('feeds_ex', $error['message'], $error['args'], $severity);
-    }
-  }
-
 }
 
 /**
- * A wrapper around DOMXPath that simplifies usage.
+ * Wraps DOMXPath simplifying usage.
  */
 class FeedsExXpathDomXpath {
 
