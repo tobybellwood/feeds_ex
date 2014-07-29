@@ -11,7 +11,7 @@
 function feeds_ex_feeds_plugins() {
   $path = drupal_get_path('module', 'feeds_ex') . '/src';
 
-  return array(
+  $plugins = array(
     'FeedsExBase' => array(
       'hidden' => TRUE,
       'handler' => array(
@@ -41,5 +41,30 @@ function feeds_ex_feeds_plugins() {
         'path' => $path,
       ),
     ),
+    'FeedsExQueryPathXml' => array(
+      'name' => 'XML QueryPath parser',
+      'description' => 'Parse XML with QueryPath.',
+      'handler' => array(
+        'parent' => 'FeedsExXml',
+        'class' => 'FeedsExQueryPathXml',
+        'file' => 'FeedsExQueryPathXml.inc',
+        'path' => $path,
+      ),
+    ),
   );
+
+  if (feeds_ex_library_path('jmespath.php', 'vendor/autoload.php')) {
+    $plugins['FeedsExJmesPath'] = array(
+      'name' => 'JSON JMESPath parser',
+      'description' => 'Parse JSON with JMESPath.',
+      'handler' => array(
+        'parent' => 'FeedsExBase',
+        'class' => 'FeedsExJmesPath',
+        'file' => 'FeedsExJmesPath.inc',
+        'path' => $path,
+      ),
+    );
+  }
+
+  return $plugins;
 }

@@ -18,6 +18,29 @@ function feeds_ex_theme() {
 }
 
 /**
+ * Returns the path of a library.
+ *
+ * @param string $file
+ *   The filename to search for.
+ * @param string $library
+ *   The name of the library. If libraries module is installed, look for
+ *   libraries with this name managed by libraries module.
+ *
+ * @return string|bool
+ *   Returns the path of the library, or false if it does not exist.
+ */
+function feeds_ex_library_path($library, $file) {
+  if (module_exists('libraries') && file_exists(libraries_get_path($library) . '/' . $file)) {
+    return libraries_get_path($library) . '/' . $file;
+  }
+  elseif (file_exists(DRUPAL_ROOT . '/sites/all/libraries/' . $library . '/' . $file)) {
+    return 'sites/all/libraries/' . $library . '/' . $file;
+  }
+
+  return FALSE;
+}
+
+/**
  * Strips the default namespaces from an XML string.
  *
  * @param string $xml
