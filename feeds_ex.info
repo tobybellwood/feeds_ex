@@ -4,6 +4,5 @@ package = Feeds
 dependencies[] = feeds
 files[] = src/Tests/FeedsExUnitTests.test
 files[] = src/Tests/FeedsExHtml.test
-files[] = src/Tests/FeedsExJmesPath.test
 files[] = src/Tests/FeedsExXml.test
 core = 7.x

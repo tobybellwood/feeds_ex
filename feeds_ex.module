@@ -18,6 +18,23 @@ function feeds_ex_theme() {
 }
 
 /**
+ * Implements hook_registry_files_alter().
+ *
+ * Add JMESPath tests if they are supported.
+ */
+function feeds_ex_registry_files_alter(&$files, $indexed_modules) {
+  if (!version_compare(phpversion(), '5.4.0', '>=') || !feeds_ex_library_path('jmespath.php', 'vendor/autoload.php')) {
+    return;
+  }
+
+  $path = drupal_get_path('module', 'feeds_ex') . '/src/Tests/FeedsExJmesPath.test';
+  $files[$path] = array(
+    'module' => 'feeds_ex',
+    'weight' => 1,
+  );
+}
+
+/**
  * Returns the path of a library.
  *
  * @param string $file
