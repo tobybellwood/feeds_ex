@@ -6,6 +6,122 @@
  */
 
 /**
+ * Base class for units tests.
+ */
+abstract class FeedsExUnitTestBase extends DrupalUnitTestCase {
+
+  /**
+   * The module directory.
+   *
+   * @var string
+   */
+  protected $moduleDir;
+
+  public function setUp() {
+    parent::setUp();
+
+    // Isn't this fun!
+    drupal_load('module', 'feeds');
+    $feeds = DRUPAL_ROOT . '/' . drupal_get_path('module', 'feeds');
+    require_once $feeds . '/includes/FeedsConfigurable.inc';
+    require_once $feeds . '/includes/FeedsSource.inc';
+    require_once $feeds . '/includes/FeedsImporter.inc';
+    require_once $feeds . '/plugins/FeedsPlugin.inc';
+    require_once $feeds . '/plugins/FeedsFetcher.inc';
+    require_once $feeds . '/plugins/FeedsFileFetcher.inc';
+    require_once $feeds . '/plugins/FeedsParser.inc';
+    require_once $feeds . '/plugins/FeedsProcessor.inc';
+    require_once $feeds . '/plugins/FeedsNodeProcessor.inc';
+
+    drupal_load('module', 'feeds_ex');
+    $this->moduleDir = DRUPAL_ROOT . '/' . drupal_get_path('module', 'feeds_ex');
+    require_once $this->moduleDir . '/src/FeedsExBase.inc';
+  }
+
+  /**
+   * Returns a mocked FeedsSource object.
+   *
+   * @param string $fetcher
+   *   (optional) The fetcher class. Defaults to FeedsFileFetcher
+   * @param string $processor
+   *   (optional) The processor class. Defaults to FeedsNodeProcessor.
+   *
+   * @return FeedsSource
+   *   The mocked FeedsSource object,
+   */
+  protected function getMockFeedsSource($fetcher = 'FeedsFileFetcher', $processor = 'FeedsNodeProcessor') {
+    $importer = $this->createInstanceWithoutConstructor('FeedsImporter');
+
+    $fetcher = $this->createInstanceWithoutConstructor($fetcher);
+    $this->setProtectedValue($importer, 'fetcher', $fetcher);
+
+    $processor = $this->createInstanceWithoutConstructor($processor);
+    $this->setProtectedValue($importer, 'processor', $processor);
+
+    $source = $this->createInstanceWithoutConstructor('FeedsSource');
+    $this->setProtectedValue($source, 'importer', $importer);
+
+    return $source;
+  }
+
+  /**
+   * Creates a class without calling its constructor.
+   *
+   * @param string $class
+   *   The class instance to create.
+   *
+   * @return object
+   *   An instance of the class.
+   */
+  protected function createInstanceWithoutConstructor($class) {
+    $reflector = new ReflectionClass($class);
+    $properties = $reflector->getProperties();
+    $defaults = $reflector->getDefaultProperties();
+
+    $serealized = 'O:' . strlen($class) . ":\"$class\":" . count($properties) . ':{';
+    foreach ($properties as $property) {
+      $name = $property->getName();
+      if ($property->isProtected()) {
+        $name = chr(0) . '*' . chr(0) . $name;
+      }
+      elseif ($property->isPrivate()) {
+        $name = chr(0)  . $class .  chr(0) . $name;
+      }
+
+      $serealized .= serialize($name);
+
+      if (array_key_exists($property->getName(), $defaults)) {
+        $serealized .= serialize($defaults[$property->getName()]);
+      }
+      else {
+        $serealized .= serialize(NULL);
+      }
+    }
+    $serealized .= '}';
+
+    return unserialize($serealized);
+  }
+
+  /**
+   * Sets a protected or private property of an object.
+   *
+   * @param object $object
+   *   The object to set the property.
+   * @param string $property
+   *   The name of the property.
+   * @param mixed $value
+   *   The value of the property.
+   */
+  protected function setProtectedValue($object, $property, $value) {
+    $reflector = new ReflectionObject($object);
+    $property = $reflector->getProperty($property);
+    $property->setAccessible(TRUE);
+    $property->setValue($object, $value);
+  }
+
+}
+
+/**
  * Tests stripping default namespaces.
  */
 class FeedsExRemoveDefaultNamespaces extends DrupalUnitTestCase {

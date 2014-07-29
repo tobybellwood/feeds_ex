@@ -9,21 +9,14 @@
 /**
  * Unit tests for FeedsExXml.
  */
-class FeedsExXmlUnitTests extends DrupalUnitTestCase {
-
-  /**
-   * The module directory.
-   *
-   * @var string
-   */
-  protected $moduleDir;
+class FeedsExXmlUnitTests extends FeedsExUnitTestBase {
 
   /**
    * The mocked FeedsSource.
    *
    * @var FeedsSource
    */
-  protected $feedSource;
+  protected $source;
 
   public static function getInfo() {
     return array(
@@ -33,40 +26,12 @@ class FeedsExXmlUnitTests extends DrupalUnitTestCase {
     );
   }
 
-  /**
-   * @todo Move this into a base class.
-   */
   public function setUp() {
     parent::setUp();
 
-    // Isn't this fun!
-    drupal_load('module', 'feeds');
-    $feeds = DRUPAL_ROOT . '/' . drupal_get_path('module', 'feeds');
-    require_once $feeds . '/includes/FeedsConfigurable.inc';
-    require_once $feeds . '/includes/FeedsSource.inc';
-    require_once $feeds . '/includes/FeedsImporter.inc';
-    require_once $feeds . '/plugins/FeedsPlugin.inc';
-    require_once $feeds . '/plugins/FeedsFetcher.inc';
-    require_once $feeds . '/plugins/FeedsFileFetcher.inc';
-    require_once $feeds . '/plugins/FeedsParser.inc';
-    require_once $feeds . '/plugins/FeedsProcessor.inc';
-    require_once $feeds . '/plugins/FeedsNodeProcessor.inc';
-
-    drupal_load('module', 'feeds_ex');
-    $this->moduleDir = DRUPAL_ROOT . '/' . drupal_get_path('module', 'feeds_ex');
-    require_once $this->moduleDir . '/src/FeedsExBase.inc';
     require_once $this->moduleDir . '/src/FeedsExXml.inc';
 
-    $importer = $this->createInstanceWithoutConstructor('FeedsImporter');
-
-    $fetcher = $this->createInstanceWithoutConstructor('FeedsFileFetcher');
-    $this->setProtectedValue($importer, 'fetcher', $fetcher);
-
-    $processor = $this->createInstanceWithoutConstructor('FeedsNodeProcessor');
-    $this->setProtectedValue($importer, 'processor', $processor);
-
-    $this->source = $this->createInstanceWithoutConstructor('FeedsSource');
-    $this->setProtectedValue($this->source, 'importer', $importer);
+    $this->source = $this->getMockFeedsSource();
   }
 
   /**
@@ -137,6 +102,8 @@ class FeedsExXmlUnitTests extends DrupalUnitTestCase {
 
   /**
    * Tests a EUC-JP (Japanese) encoded file without the encoding declaration.
+   *
+   * This implicitly tests FeedsExBase's encoding conversion.
    */
   public function testEUCJPEncodedNoDeclaration() {
     $parser = FeedsConfigurable::instance('FeedsExXml', 'test_parser');
@@ -172,7 +139,7 @@ class FeedsExXmlUnitTests extends DrupalUnitTestCase {
   /**
    * Tests that the link propery is set.
    */
-  protected function testLinkIsSet() {
+  public function testLinkIsSet() {
     $this->setProtectedValue($this->source, 'config', array(
       'FeedsFileFetcher' => array(
         'source' => 'file fetcher source path',
@@ -184,61 +151,6 @@ class FeedsExXmlUnitTests extends DrupalUnitTestCase {
 
     $result = $parser->parse($this->source, new FeedsFetcherResult('<?xml version="1.0" encoding="UTF-8"?><item></item>'));
     $this->assertEqual($result->link, 'file fetcher source path');
-  }
-
-  /**
-   * Creates a class without calling its constructor.
-   *
-   * @param string $class
-   *   The class instance to create.
-   *
-   * @return object
-   *   An instance of the class.
-   */
-  protected function createInstanceWithoutConstructor($class) {
-    $reflector = new ReflectionClass($class);
-    $properties = $reflector->getProperties();
-    $defaults = $reflector->getDefaultProperties();
-
-    $serealized = 'O:' . strlen($class) . ":\"$class\":" . count($properties) . ':{';
-    foreach ($properties as $property) {
-      $name = $property->getName();
-      if ($property->isProtected()) {
-        $name = chr(0) . '*' . chr(0) . $name;
-      }
-      elseif ($property->isPrivate()) {
-        $name = chr(0)  . $class .  chr(0) . $name;
-      }
-
-      $serealized .= serialize($name);
-
-      if (array_key_exists($property->getName(), $defaults)) {
-        $serealized .= serialize($defaults[$property->getName()]);
-      }
-      else {
-        $serealized .= serialize(NULL);
-      }
-    }
-    $serealized .= '}';
-
-    return unserialize($serealized);
-  }
-
-  /**
-   * Sets a protected or private property of an object.
-   *
-   * @param object $object
-   *   The object to set the property.
-   * @param string $property
-   *   The name of the property.
-   * @param mixed $value
-   *   The value of the property.
-   */
-  protected function setProtectedValue($object, $property, $value) {
-    $reflector = new ReflectionObject($object);
-    $property = $reflector->getProperty($property);
-    $property->setAccessible(TRUE);
-    $property->setValue($object, $value);
   }
 
 }
