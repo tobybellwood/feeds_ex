@@ -1,0 +1,386 @@
+<?php
+
+/**
+ * @file
+ * Contains FeedsExXml.
+ */
+
+/**
+ * Parses XML documents with XPath.
+ */
+class FeedsExXml extends FeedsExBase {
+
+  /**
+   * The FeedsExXpathDomXpath object used for parsing.
+   *
+   * @var FeedsExXpathDomXpath
+   */
+  protected $xpath;
+
+  /**
+   * The previous value for XML error handling.
+   *
+   * @var bool
+   */
+  protected $handleXmlErrors;
+
+  /**
+   * The previous value for the entity loader.
+   *
+   * @var bool
+   */
+  protected $entityLoader;
+
+  /**
+   * The context query to execute; after preparation.
+   *
+   * @var string
+   */
+  protected $contextQuery;
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
+    $this->startErrorHandling();
+
+    $document = $this->prepareDocument($source, $fetcher_result);
+    $this->xpath = new FeedsExXpathDomXpath($document);
+
+    $state = $source->state(FEEDS_PARSE);
+
+    // Calculate the total once. If the total is zero, this will only execute
+    // once anyway.
+    if (!$state->total) {
+      $state->total = $this->xpath->evaluate('count(' . $this->config['context']['value'] . ')');
+    }
+
+    $start = $state->pointer ? $state->pointer : 0;
+    $limit = $start + $source->importer->getLimit();
+    $end = $limit > $state->total ? $state->total : $limit;
+    $state->pointer = $end;
+
+    // A batched XPath expression.
+    $this->contextQuery = '(' . $this->config['context']['value'] . ")[position() > $start and position() <= $end]";
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function cleanUp(FeedsSource $source, FeedsParserResult $result) {
+    // @todo Add configuration option for showing errors.
+    $errors = $this->stopErrorHandling();
+    if ($this->config['display_errors']) {
+      $this->printErrors($errors, LIBXML_ERR_NONE);
+    }
+    // Log any fatal errors.
+    $this->logErrors($source, $errors);
+
+    // Try to free up some memory. There shouldn't be any other references to
+    // $this->xpath or the DOMDocument.
+    unset($this->xpath);
+
+    // Calculate progress.
+    $state = $source->state(FEEDS_PARSE);
+    $state->progress($state->total, $state->pointer);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function executeContext() {
+    return $this->xpath->query($this->contextQuery);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function executeSourceExpression($machine_name, $expression, $row) {
+    $result = $this->xpath->evaluate($expression, $row);
+
+    if (!$result instanceof DOMNodeList) {
+      return $result;
+    }
+    if ($result->length == 0) {
+      return;
+    }
+
+    $return = array();
+    if (!empty($this->config['sources'][$machine_name]['raw'])) {
+      foreach ($result as $node) {
+        $return[] = $this->getRaw($node);
+      }
+    }
+    else {
+      foreach ($result as $node) {
+        $return[] = $node->nodeValue;
+      }
+    }
+
+    // Return a single value if there's only one value.
+    return count($return) === 1 ? $return[0] : $return;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function validateExpression(&$expression) {
+    $expression = trim($expression);
+    $message = NULL;
+
+    if (!$expression) {
+      return $message;
+    }
+
+    $this->startErrorHandling();
+    $xml = new SimpleXMLElement("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<items></items>");
+    $xml->xpath($expression);
+
+    if ($error = libxml_get_last_error()) {
+      // Our variable substitution options can cause syntax errors, check if
+      // we're doing that.
+      if ($error->code == 1207 && strpos($expression, '$') !== FALSE) {
+        // Do nothing.
+      }
+      // Error code 1219 is an undefined namespace prefix.
+      // Our sample doc doesn't have any namespaces.
+      elseif ($error->code != 1219) {
+        $message = t('There was an error with the XPath expression: %error', array('%error' => $error->message));
+      }
+    }
+
+    $this->stopErrorHandling();
+    return $message;
+  }
+
+  /**
+   * Prepares the DOM document.
+   *
+   * @param FeedsSource $source
+   *   The feed source.
+   * @param FeedsFetcherResult $fetcher_result
+   *   The fetcher result.
+   *
+   * @return DOMDocument
+   *   The DOM document.
+   */
+  protected function prepareDocument(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
+    $document = new DOMDocument();
+    $document->strictErrorChecking = FALSE;
+    $document->resolveExternals = FALSE;
+    // Libxml specific.
+    $document->substituteEntities = FALSE;
+    $document->recover = TRUE;
+
+    $options = LIBXML_NOENT | LIBXML_NONET | defined('LIBXML_COMPACT') ? LIBXML_COMPACT : 0;
+    $success = $document->loadXML(feeds_ex_remove_default_namespaces(trim($fetcher_result->getRaw())), $options);
+    if (!$success) {
+      // Always display errors on fatal.
+      $errors = $this->stopErrorHandling();
+      $this->printErrors($errors);
+      $this->logErrors($source, $errors);
+      throw new RuntimeException(t('There was an error parsing the XML document.'));
+    }
+
+    return $document;
+  }
+
+  /**
+   * Returns the raw XML of a DOM node.
+   *
+   * @param DOMNode $node
+   *   The node to convert to raw XML.
+   *
+   * @return string
+   *   The raw XML.
+   */
+  protected function getRaw(DOMNode $node) {
+    return $node->ownerDocument->saveXML($node);
+  }
+
+  /**
+   * Starts internal error handling.
+   */
+  protected function startErrorHandling() {
+    libxml_clear_errors();
+    $this->handleXmlErrors = libxml_use_internal_errors(TRUE);
+
+    // Only available in PHP >= 5.2.11.
+    // See http://symfony.com/blog/security-release-symfony-2-0-17-released for
+    // details.
+    if (function_exists('libxml_disable_entity_loader')) {
+      $this->entityLoader = libxml_disable_entity_loader(TRUE);
+    }
+  }
+
+  /**
+   * Stops internal error handling.
+   *
+   * @return array
+   *   A list of loggable errors.
+   */
+  protected function stopErrorHandling() {
+    $errors = libxml_get_errors();
+    libxml_clear_errors();
+    libxml_use_internal_errors($this->handleXmlErrors);
+    if (function_exists('libxml_disable_entity_loader')) {
+      libxml_disable_entity_loader($this->entityLoader);
+    }
+
+    $return = array();
+    foreach ($errors as $error) {
+      $return[] = array(
+        'message' => '%error on line %num. Error code: %code',
+        'args' => array(
+          '%error' => trim($error->message),
+          '%num' => $error->line,
+          '%code' => $error->code,
+        ),
+        'level' => $error->level,
+      );
+    }
+
+    return $return;
+  }
+
+  /**
+   * Prints XML errors to the screen.
+   *
+   * @param array $errors
+   *   A list of errors as returned by stopErrorHandling().
+   * @param int $error_level
+   *   (optional) Limit to only errors of the specified level. One of:
+   *   - LIBXML_ERR_WARNING
+   *   - LIBXML_ERR_ERROR
+   *   - LIBXML_ERR_FATAL.
+   *   Defaults to LIBXML_ERR_FATAL.
+   *
+   * @see FeedsExXml::stopErrorHandling()
+   */
+  protected function printErrors(array $errors, $error_level = LIBXML_ERR_FATAL) {
+    foreach ($errors as $error) {
+      if ($error['level'] < $error_level) {
+        continue;
+      }
+      drupal_set_message(t($error['message'], $error['args']), $error['level'] == LIBXML_ERR_FATAL ? 'error' : 'warning');
+    }
+  }
+
+  /**
+   * Logs XML errors.
+   *
+   * @param FeedsSource $source
+   *   The feed source being importerd.
+   * @param array $errors
+   *   A list of errors as returned by stopErrorHandling().
+   * @param int $error_level
+   *   (optional) Limit to only errors of the specified level. One of:
+   *   - LIBXML_ERR_WARNING
+   *   - LIBXML_ERR_ERROR
+   *   - LIBXML_ERR_FATAL.
+   *   Defaults to LIBXML_ERR_FATAL.
+   *
+   * @see FeedsExXml::stopErrorHandling()
+   */
+  protected function logErrors(FeedsSource $source, array $errors, $error_level = LIBXML_ERR_FATAL) {
+    $definition = $this->pluginDefinition();
+
+    foreach ($errors as $error) {
+      if ($error['level'] < $error_level) {
+        continue;
+      }
+
+      switch ($error['level']) {
+        case LIBXML_ERR_FATAL:
+          $severity = WATCHDOG_ERROR;
+          break;
+
+        case LIBXML_ERR_ERROR:
+          $severity = WATCHDOG_WARNING;
+          break;
+
+        default:
+          $severity = WATCHDOG_NOTICE;
+          break;
+      }
+
+      $source->log($definition['id'], $error['message'], $error['args'], $severity);
+    }
+  }
+
+}
+
+/**
+ * A wrapper around DOMXPath that simplifies usage.
+ */
+class FeedsExXpathDomXpath {
+
+  /**
+   * The XPath query object.
+   *
+   * @var DOMXPath
+   */
+  protected $xpath;
+
+  /**
+   * Constructs a FeedsExXpathDomXpath object.
+   *
+   * @param DOMDocument $document
+   *   The DOM document to parse.
+   *
+   * @todo Add an option to force a deep scan of namespaces.
+   */
+  public function __construct(DOMDocument $document) {
+    $this->xpath = new DOMXPath($document);
+
+    // Find all namespaces.
+    // Calling simplexml_import_dom() and SimpleXML::getNamespaces() is several
+    // orders of magnitude faster than searching for the namespaces ourselves
+    // using XPath.
+    $simple = simplexml_import_dom($document);
+    // An empty DOMDocument will make $simple NULL.
+    if ($simple === NULL) {
+      return;
+    }
+    foreach ($simple->getNamespaces(TRUE) as $prefix => $namespace) {
+      $this->xpath->registerNamespace($prefix, $namespace);
+    }
+  }
+
+  /**
+   * Evaluates the XPath expression and returns a typed result if possible.
+   *
+   * @param string $expression
+   *   The XPath expression to execute.
+   * @param DOMNode $context_node
+   *   (optional) The optional contextnode can be specified for doing relative
+   *   XPath queries. Defaults to the root element.
+   *
+   * @see DOMXPath::evaluate()
+   */
+  public function evaluate($expression, DOMNode $context_node = NULL) {
+    if ($context_node === NULL) {
+      $context_node = $this->xpath->document;
+    }
+    return $this->xpath->evaluate($expression, $context_node);
+  }
+
+  /**
+   * Evaluates the given XPath expression.
+   *
+   * @param string $expression
+   *   The XPath expression to execute.
+   * @param DOMNode $context_node
+   *   (optional) The optional contextnode can be specified for doing relative
+   *   XPath queries. Defaults to the root element.
+   *
+   * @see DOMXPath::query()
+   */
+  public function query($expression, DOMNode $context_node = NULL) {
+    if ($context_node === NULL) {
+      $context_node = $this->xpath->document;
+    }
+    return $this->xpath->query($expression, $context_node);
+  }
+
+}
