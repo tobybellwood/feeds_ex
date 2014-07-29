@@ -11,7 +11,15 @@
 function theme_feeds_ex_configuration_table(array $variables) {
   $element = $variables['element'];
 
-  $header = array(t('Name'), t('Machine name'), t('Value'), t('Raw'), t('Debug'), t('Remove'), t('Weight'));
+  $header = array(
+    t('Name'),
+    t('Machine name'),
+    t('Value'),
+    t('Raw'),
+    t('Debug'),
+    t('Remove'),
+    t('Weight'),
+  );
 
   $rows = array();
 

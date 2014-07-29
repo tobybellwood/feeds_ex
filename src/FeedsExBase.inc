@@ -57,7 +57,7 @@ abstract class FeedsExBase extends FeedsParser {
   /**
    * Validates an expression.
    *
-   * @param string $expressions
+   * @param string &$expression
    *   The expression to validate.
    *
    * @return string|null
