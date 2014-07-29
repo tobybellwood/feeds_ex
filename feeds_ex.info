@@ -1,0 +1,6 @@
+name = Feeds extensible parser
+description = A generic Feeds parser used to create extensible parsers.
+package = Feeds
+dependencies[] = feeds
+files[] = src/Tests/FeedsExUnitTests.test
+core = 7.x
