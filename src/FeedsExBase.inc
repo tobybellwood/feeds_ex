@@ -207,6 +207,7 @@ abstract class FeedsExBase extends FeedsParser {
         'value' => '',
       ),
       'display_errors' => FALSE,
+      'source_encoding' => 'auto',
     );
   }
 
@@ -340,6 +341,13 @@ abstract class FeedsExBase extends FeedsParser {
       '#default_value' => $config['display_errors'],
     );
 
+    $form['source_encoding'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Source encoding'),
+      '#description' => t('The encoding of the source file.'),
+      '#default_value' => $config['source_encoding'],
+    );
+
     $form['#attached']['drupal_add_tabledrag'][] = array('feeds-ex-source-table', 'order', 'sibling', 'feeds-ex-source-weight');
     $form['#attached']['css'][] = drupal_get_path('module', 'feeds_ex') . '/feeds_ex.css';
 
@@ -397,6 +405,31 @@ abstract class FeedsExBase extends FeedsParser {
    */
   public function hasConfigForm() {
     return TRUE;
+  }
+
+  /**
+   * Detects the encoding of a string.
+   *
+   * @param string $data
+   *   The string to guess the encoding for.
+   *
+   * @return string|bool
+   *   Returns the encoding, or false if one could not be detected.
+   */
+  protected function detectEncoding($data) {
+    if (function_exists('mb_detect_encoding')) {
+      return mb_detect_encoding($data, $this->config['source_encoding']);
+    }
+    return FALSE;
+  }
+
+  protected function convertEncoding($data, $encoding) {
+    $converted = drupal_convert_to_utf8($data, $encoding);
+    if ($converted === FALSE) {
+      return $data;
+    }
+
+    return $converted;
   }
 
 }

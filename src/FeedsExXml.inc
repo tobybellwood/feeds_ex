@@ -158,6 +158,33 @@ class FeedsExXml extends FeedsExBase {
   }
 
   /**
+   * {@inheritdoc}
+   */
+  protected function convertEncoding($data, $encoding = 'UTF-8') {
+    // Check for an encoding declaration in the XML prolog.
+    $matches = FALSE;
+    if (preg_match('/^<\?xml[^>]+encoding="(.+?)"/', $data, $matches)) {
+      $encoding = $matches[1];
+    }
+    elseif ($detected = parent::detectEncoding($data)) {
+      $encoding = $detected;
+    }
+
+    // Unsupported encodings are converted here into UTF-8.
+    $php_supported = array('utf-8', 'iso-8859-1', 'us-ascii');
+    if (in_array(strtolower($encoding), $php_supported)) {
+      return $data;
+    }
+
+    $data = parent::convertEncoding($data, $encoding);
+    if ($matches) {
+      $data = preg_replace('/^(<\?xml[^>]+encoding)="(.+?)"/', '\\1="UTF-8"', $data);
+    }
+
+    return $data;
+  }
+
+  /**
    * Prepares the DOM document.
    *
    * @param FeedsSource $source
@@ -169,7 +196,7 @@ class FeedsExXml extends FeedsExBase {
    *   The DOM document.
    */
   protected function prepareDocument(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
-    $document = new DOMDocument();
+    $document = new DOMDocument('1.0', 'UTF-8');
     $document->strictErrorChecking = FALSE;
     $document->resolveExternals = FALSE;
     // Libxml specific.
@@ -177,7 +204,9 @@ class FeedsExXml extends FeedsExBase {
     $document->recover = TRUE;
 
     $options = LIBXML_NOENT | LIBXML_NONET | defined('LIBXML_COMPACT') ? LIBXML_COMPACT : 0;
-    $success = $document->loadXML(feeds_ex_remove_default_namespaces(trim($fetcher_result->getRaw())), $options);
+    $raw = feeds_ex_remove_default_namespaces(trim($fetcher_result->getRaw()));
+    $raw = $this->convertEncoding($raw);
+    $success = $document->loadXML($raw, $options);
     if (!$success) {
       // Always display errors on fatal.
       $errors = $this->stopErrorHandling();
@@ -287,8 +316,6 @@ class FeedsExXml extends FeedsExBase {
    * @see FeedsExXml::stopErrorHandling()
    */
   protected function logErrors(FeedsSource $source, array $errors, $error_level = LIBXML_ERR_FATAL) {
-    $definition = $this->pluginDefinition();
-
     foreach ($errors as $error) {
       if ($error['level'] < $error_level) {
         continue;
@@ -308,7 +335,7 @@ class FeedsExXml extends FeedsExBase {
           break;
       }
 
-      $source->log($definition['id'], $error['message'], $error['args'], $severity);
+      $source->log('feeds_ex', $error['message'], $error['args'], $severity);
     }
   }
 

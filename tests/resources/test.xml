@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<items>
+  <item>
+    <title>I am a title</title>
+    <description>I am a description</description>
+  </item>
+  <item>
+    <title>I am a title2</title>
+    <description>I am a description2</description>
+  </item>
+  <item>
+    <title>I am a title3</title>
+    <description>I am a description3</description>
+  </item>
+</items>

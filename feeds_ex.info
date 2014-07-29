@@ -3,4 +3,5 @@ description = A generic Feeds parser used to create extensible parsers.
 package = Feeds
 dependencies[] = feeds
 files[] = src/Tests/FeedsExUnitTests.test
+files[] = src/Tests/FeedsExXml.test
 core = 7.x
