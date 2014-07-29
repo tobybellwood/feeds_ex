@@ -9,10 +9,5 @@
  * Implements hook_enable().
  */
 function feeds_ex_enable() {
-  cache_clear_all('_feeds_importer_digest', 'cache');
-  drupal_static_reset('_feeds_importer_digest');
   cache_clear_all('plugins:feeds:plugins', 'cache');
-  ctools_include('export');
-  ctools_export_load_object_reset('feeds_importer');
-  drupal_static_reset('_node_types_build');
 }
