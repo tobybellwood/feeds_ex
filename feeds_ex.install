@@ -1,0 +1,13 @@
+<?php
+
+/**
+ * @file
+ * Install/enable/update hooks for feeds_ex.
+ */
+
+/**
+ * Implements hook_enable().
+ */
+function feeds_ex_enable() {
+  feeds_cache_clear(FALSE);
+}

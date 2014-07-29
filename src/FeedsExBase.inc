@@ -314,7 +314,7 @@ abstract class FeedsExBase extends FeedsParser {
    * @see drupal_convert_to_utf8()
    */
   protected function convertEncoding($data, $encoding) {
-    $php_supported = array('utf-8', 'iso-8859-1', 'us-ascii', 'ascii');
+    $php_supported = array('utf-8', 'us-ascii', 'ascii');
     if (in_array(strtolower($encoding), $php_supported)) {
       return $data;
     }

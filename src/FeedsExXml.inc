@@ -157,7 +157,7 @@ class FeedsExXml extends FeedsExBase {
     }
 
     // Unsupported encodings are converted here into UTF-8.
-    $php_supported = array('utf-8', 'iso-8859-1', 'us-ascii', 'ascii');
+    $php_supported = array('utf-8', 'us-ascii', 'ascii');
     if (in_array(strtolower($encoding), $php_supported)) {
       return $data;
     }

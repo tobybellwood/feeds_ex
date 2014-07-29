@@ -160,6 +160,9 @@ class FeedsExRemoveDefaultNamespaces extends DrupalUnitTestCase {
 
     // Test other namespaces.
     $this->check('<name href="http://google.com" xmlns:h="http://www.w3.org/2005/Atom"></name>', '<name href="http://google.com" xmlns:h="http://www.w3.org/2005/Atom"></name>');
+
+    // Test multiple default namespaces.
+    $this->check('<name xmlns="http://www.w3.org/2005/Atom"></name><name xmlns="http://www.w3.org/2005/Atom"></name>', '<name></name><name></name>');
   }
 
   /**

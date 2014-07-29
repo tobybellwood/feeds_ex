@@ -30,7 +30,7 @@ class FeedsExHtml extends FeedsExXml {
    * {@inheritdoc}
    */
   protected function convertEncoding($data, $encoding = 'UTF-8') {
-    // Check for an encoding declaration in the XML prolog.
+    // Check for an encoding declaration.
     $matches = FALSE;
     if (preg_match('/<meta[^>]+charset\s*=\s*["\']?([\w-]+)\b/i', $data, $matches)) {
       $encoding = $matches[1];
@@ -40,7 +40,7 @@ class FeedsExHtml extends FeedsExXml {
     }
 
     // Unsupported encodings are converted here into UTF-8.
-    $php_supported = array('utf-8', 'iso-8859-1', 'us-ascii', 'ascii');
+    $php_supported = array('utf-8', 'us-ascii', 'ascii');
     if (in_array(strtolower($encoding), $php_supported)) {
       return $data;
     }
@@ -69,8 +69,15 @@ class FeedsExHtml extends FeedsExXml {
     $raw = $this->convertEncoding($fetcher_result->getRaw());
     // Fun hack to force parsing as utf-8.
     $raw = '<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />' . "\n" . $raw;
-    $options = LIBXML_NOENT | LIBXML_NONET | defined('LIBXML_COMPACT') ? LIBXML_COMPACT : 0;
-    $success = $document->loadHTML($raw, $options);
+    // Pass in options if available.
+    if (version_compare(PHP_VERSION, '5.4.0', '>=')) {
+      $options = LIBXML_NOENT | LIBXML_NONET | defined('LIBXML_COMPACT') ? LIBXML_COMPACT : 0;
+      $success = $document->loadHTML($raw, $options);
+    }
+    else {
+      $success = $document->loadHTML($raw);
+    }
+
     if (!$success) {
       throw new RuntimeException(t('There was an error parsing the HTML document.'));
     }
