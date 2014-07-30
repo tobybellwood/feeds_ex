@@ -28,6 +28,9 @@ class FeedsExQueryPathXmlUnitTests extends FeedsExUnitTestBase {
   public function setUp() {
     parent::setUp();
 
+    $query_path = drupal_get_path('module', 'querypath');
+    require_once DRUPAL_ROOT . '/' . $query_path .  '/QueryPath/QueryPath.php';
+
     require_once $this->moduleDir . '/src/FeedsExXml.inc';
     require_once $this->moduleDir . '/src/FeedsExQueryPathXml.inc';
 
@@ -49,10 +52,12 @@ class FeedsExQueryPathXmlUnitTests extends FeedsExUnitTestBase {
         'title' => array(
           'name' => 'Title',
           'value' => 'title',
+          'attribute' => '',
         ),
         'description' => array(
           'name' => 'Title',
           'value' => 'description',
+          'attribute' => '',
         ),
       ),
     ));
@@ -63,6 +68,41 @@ class FeedsExQueryPathXmlUnitTests extends FeedsExUnitTestBase {
 
     foreach ($result->items as $delta => $item) {
       $this->assertEqual('I am a title' . $delta, $item['title']);
+      $this->assertEqual('I am a description' . $delta, $item['description']);
+    }
+  }
+
+  /**
+   * Tests grabbing an attribute.
+   */
+  public function testAttributeParsing() {
+    $parser = FeedsConfigurable::instance('FeedsExQueryPathXml', 'test_parser');
+    $fetcher_result = new FeedsFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test.xml'));
+
+    $parser->setConfig(array(
+      'context' => array(
+        'value' => 'items item',
+      ),
+      'sources' => array(
+        'title' => array(
+          'name' => 'Title',
+          'value' => 'title',
+          'attribute' => 'attr'
+        ),
+        'description' => array(
+          'name' => 'Title',
+          'value' => 'description',
+          'attribute' => '',
+        ),
+      ),
+    ));
+
+    $result = $parser->parse($this->source, $fetcher_result);
+
+    $this->assertEqual(count($result->items), 3, format_string('@count items parsed.', array('@count' => count($result->items))));
+
+    foreach ($result->items as $delta => $item) {
+      $this->assertEqual('attribute' . $delta, $item['title']);
       $this->assertEqual('I am a description' . $delta, $item['description']);
     }
   }
@@ -82,10 +122,12 @@ class FeedsExQueryPathXmlUnitTests extends FeedsExUnitTestBase {
         'title' => array(
           'name' => 'Title',
           'value' => 'title',
+          'attribute' => '',
         ),
         'description' => array(
           'name' => 'Title',
           'value' => 'description',
+          'attribute' => '',
         ),
       ),
     ));
@@ -117,10 +159,12 @@ class FeedsExQueryPathXmlUnitTests extends FeedsExUnitTestBase {
         'title' => array(
           'name' => 'Title',
           'value' => 'title',
+          'attribute' => '',
         ),
         'description' => array(
           'name' => 'Title',
           'value' => 'description',
+          'attribute' => '',
         ),
       ),
       'source_encoding' => 'EUC-JP',

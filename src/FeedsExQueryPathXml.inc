@@ -61,8 +61,12 @@ class FeedsExQueryPathXml extends FeedsExXml {
   protected function executeSourceExpression($machine_name, $expression, $row) {
     $result = new QueryPath($row, $expression, $this->queryPathOptions);
 
-    if ($result->size() === 0) {
+    if ($result->size() == 0) {
       return;
+    }
+
+    if (strlen($this->config['sources'][$machine_name]['attribute'])) {
+      return $result->attr($this->config['sources'][$machine_name]['attribute']);
     }
 
     $return = array();
