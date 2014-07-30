@@ -62,5 +62,6 @@ function theme_feeds_ex_configuration_table(array $variables) {
 
   $output = theme('table', array('header' => $header, 'rows' => $rows, 'attributes' => array('id' => $element['sources']['#id'])));
   $output .= drupal_render_children($element);
+
   return $output;
 }

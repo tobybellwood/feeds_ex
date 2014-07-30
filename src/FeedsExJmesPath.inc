@@ -76,7 +76,6 @@ class FeedsExJmesPath extends FeedsExBase {
    */
   protected function validateExpression(&$expression) {
     $expression = trim($expression);
-    return;
   }
 
   /**
@@ -92,35 +91,36 @@ class FeedsExJmesPath extends FeedsExBase {
         return array();
 
       case JSON_ERROR_DEPTH:
-        $message = 'Maximum stack depth exceeded';
+        $message_text = 'Maximum stack depth exceeded';
         break;
 
       case JSON_ERROR_STATE_MISMATCH:
-        $message = 'Underflow or the modes mismatch';
+        $message_text = 'Underflow or the modes mismatch';
         break;
 
       case JSON_ERROR_CTRL_CHAR:
-        $message = 'Unexpected control character found';
+        $message_text = 'Unexpected control character found';
         break;
 
       case JSON_ERROR_SYNTAX:
-        $message = 'Syntax error, malformed JSON';
+        $message_text = 'Syntax error, malformed JSON';
         break;
 
       case JSON_ERROR_UTF8:
-        $message = 'Malformed UTF-8 characters, possibly incorrectly encoded';
+        $message_text = 'Malformed UTF-8 characters, possibly incorrectly encoded';
         break;
 
       default:
-        $message = 'Unknown error';
+        $message_text = 'Unknown error';
         break;
     }
 
-    return array(array(
-      'message' => $message,
+    $message = array(
+      'message' => $message_text,
       'variables' => array(),
       'severity' => WATCHDOG_ERROR,
-    ));
+    );
+    return array($message);
   }
 
 }
