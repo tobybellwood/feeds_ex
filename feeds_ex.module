@@ -58,6 +58,38 @@ function feeds_ex_library_path($library, $file) {
 }
 
 /**
+ * Returns the path of the JSONPath library.
+ *
+ * @return string|bool
+ *   The relative path of the JSONPath directory, or false if not found.
+ */
+function feeds_ex_jsonpath_library_path() {
+  if (module_exists('libraries') && file_exists(libraries_get_path('jsonpath'))) {
+    $path = libraries_get_path('jsonpath');
+  }
+  elseif (file_exists(DRUPAL_ROOT . '/sites/all/libraries/jsonpath')) {
+    $path = 'sites/all/libraries/jsonpath';
+  }
+  elseif (defined('FEEDS_EX_LIBRARY_PATH')) {
+    $path = FEEDS_EX_LIBRARY_PATH . '/jsonpath';
+  }
+
+  if (!isset($path)) {
+    return FALSE;
+  }
+
+  if (file_exists($path . '/vendor/autoload.php')) {
+    return $path . '/vendor/autoload.php';
+  }
+
+  foreach (glob($path . '/jsonpath*.php') as $file) {
+    return $file;
+  }
+
+  return FALSE;
+}
+
+/**
  * Strips the default namespaces from an XML string.
  *
  * @param string $xml

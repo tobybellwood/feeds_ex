@@ -69,5 +69,19 @@ function feeds_ex_feeds_plugins() {
     );
   }
 
+  if (feeds_ex_jsonpath_library_path()) {
+    // FeedsExJsonPath
+    $plugins['FeedsExJsonPath'] = array(
+      'name' => 'JSON JSONPath parser',
+      'description' => 'Parse JSON with JSONPath.',
+      'handler' => array(
+        'parent' => 'FeedsExBase',
+        'class' => 'FeedsExJsonPath',
+        'file' => 'FeedsExJsonPath.inc',
+        'path' => $path,
+      ),
+    );
+  }
+
   return $plugins;
 }
