@@ -85,5 +85,5 @@ function feeds_ex_remove_default_namespaces($xml) {
  */
 function feeds_ex_source_exists($source_id, array $element) {
   $sources = feeds_importer($element['#feeds_importer'])->parser->getMappingSources();
-  return isset($sources[$source_id]) || $source_id === 'add';
+  return isset($sources[$source_id]);
 }

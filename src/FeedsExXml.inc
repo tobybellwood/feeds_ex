@@ -114,6 +114,28 @@ class FeedsExXml extends FeedsExBase {
   /**
    * {@inheritdoc}
    */
+  protected function configFormTableHeader() {
+    return array('raw' => t('Raw'));
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function configFormTableColumn(array &$form_state, $column_name, array $source) {
+    switch ($column_name) {
+      case 'raw':
+        return array(
+          '#type' => 'checkbox',
+          '#title' => t('Raw value'),
+          '#title_display' => 'invisible',
+          '#default_value' => !empty($source['raw']) ? $source['raw'] : 0,
+        );
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   protected function validateExpression(&$expression) {
     $expression = trim($expression);
     $message = NULL;

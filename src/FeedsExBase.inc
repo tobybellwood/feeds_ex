@@ -371,6 +371,33 @@ abstract class FeedsExBase extends FeedsParser {
   }
 
   /**
+   * Reuturns the list of table headers.
+   *
+   * @return []string
+   *   A list of header names.
+   */
+  protected function configFormTableHeader() {
+    return array();
+  }
+
+  /**
+   * Returns a form element for a specific column.
+   *
+   * @param array &$form_state
+   *   The current form state.
+   * @param string $column_name
+   *   The name of the column.
+   * @param array $source
+   *   The individual source item.
+   *
+   * @return array
+   *   A single form element.
+   */
+  protected function configFormTableColumn(array &$form_state, $column_name, array $source) {
+    return array();
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function configForm(&$form_state) {
@@ -400,17 +427,17 @@ abstract class FeedsExBase extends FeedsParser {
 
     $max_weight = 0;
     foreach ($config['sources'] as $machine_name => $source) {
-      $form['sources'][$machine_name]['machine_name'] = array(
-        '#title' => t('Machine name'),
-        '#title_display' => 'invisible',
-        '#markup' => $machine_name,
-      );
       $form['sources'][$machine_name]['name'] = array(
         '#type' => 'textfield',
         '#title' => t('Name'),
         '#title_display' => 'invisible',
         '#default_value' => $source['name'],
         '#size' => 20,
+      );
+      $form['sources'][$machine_name]['machine_name'] = array(
+        '#title' => t('Machine name'),
+        '#title_display' => 'invisible',
+        '#markup' => $machine_name,
       );
       $form['sources'][$machine_name]['value'] = array(
         '#type' => 'textfield',
@@ -419,12 +446,11 @@ abstract class FeedsExBase extends FeedsParser {
         '#default_value' => $source['value'],
         '#size' => 50,
       );
-      $form['sources'][$machine_name]['raw'] = array(
-        '#type' => 'checkbox',
-        '#title' => t('Raw value'),
-        '#title_display' => 'invisible',
-        '#default_value' => $source['raw'],
-      );
+
+      foreach ($this->configFormTableHeader() as $column => $name) {
+        $form['sources'][$machine_name][$column] = $this->configFormTableColumn($form_state, $column, $source);
+      }
+
       $form['sources'][$machine_name]['debug'] = array(
         '#type' => 'checkbox',
         '#title' => t('Debug'),
@@ -445,6 +471,13 @@ abstract class FeedsExBase extends FeedsParser {
       $max_weight = $source['weight'];
     }
 
+    $form['add']['name'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Add new source'),
+      '#id' => 'edit-sources-add-name',
+      '#description' => t('Name'),
+      '#size' => 20,
+    );
     $form['add']['machine_name'] = array(
       '#title' => t('Machine name'),
       '#title_display' => 'invisible',
@@ -463,24 +496,15 @@ abstract class FeedsExBase extends FeedsParser {
       '#size' => 15,
       '#description' => t('A unique machine-readable name containing letters, numbers, and underscores.'),
     );
-    $form['add']['name'] = array(
-      '#type' => 'textfield',
-      '#title' => t('Add new source'),
-      '#id' => 'edit-sources-add-name',
-      '#description' => t('Name'),
-      '#size' => 20,
-    );
     $form['add']['value'] = array(
       '#type' => 'textfield',
       '#description' => t('Value'),
       '#title' => '&nbsp;',
       '#size' => 50,
     );
-    $form['add']['raw'] = array(
-      '#type' => 'checkbox',
-      '#title' => t('Raw'),
-      '#title_display' => 'invisible',
-    );
+    foreach ($this->configFormTableHeader() as $column => $name) {
+      $form['add'][$column] = $this->configFormTableColumn($form_state, $column, array());
+    }
     $form['add']['debug'] = array(
       '#type' => 'checkbox',
       '#title' => t('Debug'),
@@ -510,6 +534,18 @@ abstract class FeedsExBase extends FeedsParser {
     $form['#attached']['drupal_add_tabledrag'][] = array('feeds-ex-source-table', 'order', 'sibling', 'feeds-ex-source-weight');
     $form['#attached']['css'][] = drupal_get_path('module', 'feeds_ex') . '/feeds_ex.css';
 
+    $form['#header'] = array(
+      'name' => t('Name'),
+      'machine_name' => t('Machine name'),
+      'value' => t('Value'),
+    );
+    $form['#header'] += $this->configFormTableHeader();
+    $form['#header'] += array(
+      'debug' => t('Debug'),
+      'remove' => t('Remove'),
+      'weight' => t('Weight'),
+    );
+
     return $form;
   }
 
@@ -519,6 +555,9 @@ abstract class FeedsExBase extends FeedsParser {
   public function configFormValidate(&$values) {
     // @todo We should do this in Feeds automatically.
     $values += $this->configDefaults();
+    $columns = array('name', 'value');
+    $columns = array_merge($columns, array_keys($this->configFormTableHeader()));
+    $columns = array_merge($columns, array('debug', 'weight'));
 
     // Add new source.
     if (strlen($values['add']['machine_name']) && strlen($values['add']['name'])) {
@@ -534,13 +573,11 @@ abstract class FeedsExBase extends FeedsParser {
 
     // Rebuild sources to keep the configuration values clean.
     foreach ($values['sources'] as $machine_name => $source) {
-      $values['sources'][$machine_name] = array(
-        'name' => $source['name'],
-        'value' => $source['value'],
-        'raw' => $source['raw'],
-        'debug' => $source['debug'],
-        'weight' => $source['weight'],
-      );
+      $new_value = array();
+      foreach ($columns as $column) {
+        $new_value[$column] = $source[$column];
+      }
+      $values['sources'][$machine_name] = $new_value;
     }
 
     // Sort by weight.
