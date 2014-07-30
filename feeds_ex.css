@@ -12,3 +12,7 @@
 #feeds-ex-source-table .form-item-add-name {
   float: left;
 }
+
+#feeds-ex-source-table .form-item-context-value {
+  display: inline-block;
+}

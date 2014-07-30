@@ -415,10 +415,13 @@ abstract class FeedsExBase extends FeedsParser {
     );
     $form['context']['value'] = array(
       '#type' => 'textfield',
-      '#title' => t('Value'),
+      '#title' => t('Context value'),
       '#title_display' => 'invisible',
       '#default_value' => $config['context']['value'],
       '#size' => 50,
+      '#required' => TRUE,
+      // We're hiding the title, so add a little hint.
+      '#suffix' => '<span class="form-required">*</span>'
     );
 
     $form['sources'] = array(
