@@ -1,8 +1,13 @@
 name = Feeds extensible parser
 description = A generic Feeds parser used to create extensible parsers.
 package = Feeds
+
 dependencies[] = feeds
+test_dependencies[] = querypath
+
 files[] = src/Tests/FeedsExUnitTests.test
 files[] = src/Tests/FeedsExHtml.test
+files[] = src/Tests/FeedsExQueryPathXml.test
 files[] = src/Tests/FeedsExXml.test
+
 core = 7.x

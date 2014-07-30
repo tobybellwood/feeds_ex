@@ -41,16 +41,6 @@ function feeds_ex_feeds_plugins() {
         'path' => $path,
       ),
     ),
-    'FeedsExQueryPathXml' => array(
-      'name' => 'XML QueryPath parser',
-      'description' => 'Parse XML with QueryPath.',
-      'handler' => array(
-        'parent' => 'FeedsExXml',
-        'class' => 'FeedsExQueryPathXml',
-        'file' => 'FeedsExQueryPathXml.inc',
-        'path' => $path,
-      ),
-    ),
   );
 
   if (feeds_ex_library_path('jmespath.php', 'vendor/autoload.php')) {
@@ -61,6 +51,19 @@ function feeds_ex_feeds_plugins() {
         'parent' => 'FeedsExBase',
         'class' => 'FeedsExJmesPath',
         'file' => 'FeedsExJmesPath.inc',
+        'path' => $path,
+      ),
+    );
+  }
+
+  if (module_exists('querypath')) {
+    $plugins['FeedsExQueryPathXml'] = array(
+      'name' => 'QueryPath XML parser',
+      'description' => 'Parse XML with QueryPath.',
+      'handler' => array(
+        'parent' => 'FeedsExXml',
+        'class' => 'FeedsExQueryPathXml',
+        'file' => 'FeedsExQueryPathXml.inc',
         'path' => $path,
       ),
     );

@@ -2,13 +2,13 @@
 
 /**
  * @file
- * Contains tests for FeedsExXml.
+ * Contains tests for FeedsExQueryPathXml.
  */
 
 /**
- * Unit tests for FeedsExXml.
+ * Unit tests for FeedsExQueryPathXml.
  */
-class FeedsExXmlUnitTests extends FeedsExUnitTestBase {
+class FeedsExQueryPathXmlUnitTests extends FeedsExUnitTestBase {
 
   /**
    * The mocked FeedsSource.
@@ -19,8 +19,8 @@ class FeedsExXmlUnitTests extends FeedsExUnitTestBase {
 
   public static function getInfo() {
     return array(
-      'name' => 'XML parser unit tests',
-      'description' => 'Unit tests for FeedsExXml.',
+      'name' => 'QueryPath XML parser unit tests',
+      'description' => 'Unit tests for FeedsExQueryPathXml.',
       'group' => 'Feeds EX',
     );
   }
@@ -29,6 +29,7 @@ class FeedsExXmlUnitTests extends FeedsExUnitTestBase {
     parent::setUp();
 
     require_once $this->moduleDir . '/src/FeedsExXml.inc';
+    require_once $this->moduleDir . '/src/FeedsExQueryPathXml.inc';
 
     $this->source = $this->getMockFeedsSource();
   }
@@ -37,12 +38,12 @@ class FeedsExXmlUnitTests extends FeedsExUnitTestBase {
    * Tests simple parsing.
    */
   public function testSimpleParsing() {
-    $parser = FeedsConfigurable::instance('FeedsExXml', 'test_parser');
+    $parser = FeedsConfigurable::instance('FeedsExQueryPathXml', 'test_parser');
     $fetcher_result = new FeedsFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test.xml'));
 
     $parser->setConfig(array(
       'context' => array(
-        'value' => '/items/item',
+        'value' => 'items item',
       ),
       'sources' => array(
         'title' => array(
@@ -70,12 +71,12 @@ class FeedsExXmlUnitTests extends FeedsExUnitTestBase {
    * Tests parsing a CP866 (Russian) encoded file.
    */
   public function testCP866Encoded() {
-    $parser = FeedsConfigurable::instance('FeedsExXml', 'test_parser');
+    $parser = FeedsConfigurable::instance('FeedsExQueryPathXml', 'test_parser');
     $fetcher_result = new FeedsFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test_ru.xml'));
 
     $parser->setConfig(array(
       'context' => array(
-        'value' => '/items/item',
+        'value' => 'items item',
       ),
       'sources' => array(
         'title' => array(
@@ -105,12 +106,12 @@ class FeedsExXmlUnitTests extends FeedsExUnitTestBase {
    * This implicitly tests FeedsExBase's encoding conversion.
    */
   public function testEUCJPEncodedNoDeclaration() {
-    $parser = FeedsConfigurable::instance('FeedsExXml', 'test_parser');
+    $parser = FeedsConfigurable::instance('FeedsExQueryPathXml', 'test_parser');
     $fetcher_result = new FeedsFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test_jp.xml'));
 
     $parser->setConfig(array(
       'context' => array(
-        'value' => '/items/item',
+        'value' => 'items item',
       ),
       'sources' => array(
         'title' => array(
@@ -133,23 +134,6 @@ class FeedsExXmlUnitTests extends FeedsExUnitTestBase {
       $this->assertEqual('私はタイトルです' . $delta, $item['title']);
       $this->assertEqual('私が説明してい' . $delta, $item['description']);
     }
-  }
-
-  /**
-   * Tests that the link propery is set.
-   */
-  public function testLinkIsSet() {
-    $this->setProtectedValue($this->source, 'config', array(
-      'FeedsFileFetcher' => array(
-        'source' => 'file fetcher source path',
-      ),
-    ));
-
-    $parser = FeedsConfigurable::instance('FeedsExXml', 'test_parser');
-    $parser->setConfig(array('context' => array('value' => '/beep')));
-
-    $result = $parser->parse($this->source, new FeedsFetcherResult('<?xml version="1.0" encoding="UTF-8"?><item></item>'));
-    $this->assertEqual($result->link, 'file fetcher source path');
   }
 
 }
