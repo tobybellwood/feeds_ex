@@ -3,6 +3,7 @@ description = A generic Feeds parser used to create extensible parsers.
 package = Feeds
 
 dependencies[] = feeds
+test_dependencies[] = tunit
 test_dependencies[] = querypath
 
 files[] = src/Json/Utility.php

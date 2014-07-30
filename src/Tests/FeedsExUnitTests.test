@@ -8,7 +8,7 @@
 /**
  * Base class for units tests.
  */
-abstract class FeedsExUnitTestBase extends DrupalUnitTestCase {
+abstract class FeedsExUnitTestBase extends TUnit {
 
   /**
    * The module directory.
@@ -51,93 +51,18 @@ abstract class FeedsExUnitTestBase extends DrupalUnitTestCase {
    *   The mocked FeedsSource object,
    */
   protected function getMockFeedsSource($fetcher = 'FeedsFileFetcher', $processor = 'FeedsNodeProcessor') {
-    $importer = $this->createInstanceWithoutConstructor('FeedsImporter');
+    $importer = $this->newInstanceWithoutConstructor('FeedsImporter');
 
-    $fetcher = $this->createInstanceWithoutConstructor($fetcher);
-    $this->setProtectedValue($importer, 'fetcher', $fetcher);
+    $fetcher = $this->newInstanceWithoutConstructor($fetcher);
+    $this->setProperty($importer, 'fetcher', $fetcher);
 
-    $processor = $this->createInstanceWithoutConstructor($processor);
-    $this->setProtectedValue($importer, 'processor', $processor);
+    $processor = $this->newInstanceWithoutConstructor($processor);
+    $this->setProperty($importer, 'processor', $processor);
 
-    $source = $this->createInstanceWithoutConstructor('FeedsSource');
-    $this->setProtectedValue($source, 'importer', $importer);
+    $source = $this->newInstanceWithoutConstructor('FeedsSource');
+    $this->setProperty($source, 'importer', $importer);
 
     return $source;
-  }
-
-  /**
-   * Creates a class without calling its constructor.
-   *
-   * @param string $class
-   *   The class instance to create.
-   *
-   * @return object
-   *   An instance of the class.
-   */
-  protected function createInstanceWithoutConstructor($class) {
-    $reflector = new ReflectionClass($class);
-    $properties = $reflector->getProperties();
-    $defaults = $reflector->getDefaultProperties();
-
-    $serialized = 'O:' . strlen($class) . ":\"$class\":" . count($properties) . ':{';
-    foreach ($properties as $property) {
-      $name = $property->getName();
-      if ($property->isProtected()) {
-        $name = chr(0) . '*' . chr(0) . $name;
-      }
-      elseif ($property->isPrivate()) {
-        $name = chr(0)  . $class .  chr(0) . $name;
-      }
-
-      $serialized .= serialize($name);
-
-      if (array_key_exists($property->getName(), $defaults)) {
-        $serialized .= serialize($defaults[$property->getName()]);
-      }
-      else {
-        $serialized .= serialize(NULL);
-      }
-    }
-    $serialized .= '}';
-
-    return unserialize($serialized);
-  }
-
-  /**
-   * Sets a protected or private property of an object.
-   *
-   * @param object $object
-   *   The object to set the property.
-   * @param string $property
-   *   The name of the property.
-   * @param mixed $value
-   *   The value of the property.
-   */
-  protected function setProtectedValue($object, $property, $value) {
-    $reflector = new ReflectionObject($object);
-    $property = $reflector->getProperty($property);
-    $property->setAccessible(TRUE);
-    $property->setValue($object, $value);
-  }
-
-  /**
-   * Calls a private or protected method on an object.
-   *
-   * @param object $object
-   *   The object to invoke a method on.
-   * @param string $method
-   *   The name of the method.
-   * @param array $arguments
-   *   (optioanl) The arguments to provide to the method. Defaults to an empty
-   *   array.
-   *
-   * @return mixed
-   *   Whatever the method returns.
-   */
-  protected function invokeMethod($object, $method, array $arguments = array()) {
-    $reflector = new ReflectionMethod($object, $method);
-    $reflector->setAccessible(TRUE);
-    return $reflector->invokeArgs($object, $arguments);
   }
 
 }

@@ -139,7 +139,7 @@ class FeedsExXmlUnitTests extends FeedsExUnitTestBase {
    * Tests that the link propery is set.
    */
   public function testLinkIsSet() {
-    $this->setProtectedValue($this->source, 'config', array(
+    $this->setProperty($this->source, 'config', array(
       'FeedsFileFetcher' => array(
         'source' => 'file fetcher source path',
       ),

@@ -22,6 +22,7 @@ class FeedsExQueryPathXmlUnitTests extends FeedsExUnitTestBase {
       'name' => 'QueryPath XML parser unit tests',
       'description' => 'Unit tests for FeedsExQueryPathXml.',
       'group' => 'Feeds EX',
+      'dependencies' => array('querypath'),
     );
   }
 
