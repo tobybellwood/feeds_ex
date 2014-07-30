@@ -78,37 +78,12 @@ class FeedsExJsonPath extends FeedsExBase {
       return array();
     }
 
-    switch (json_last_error()) {
-      case JSON_ERROR_NONE:
-        return array();
-
-      case JSON_ERROR_DEPTH:
-        $message_text = 'Maximum stack depth exceeded';
-        break;
-
-      case JSON_ERROR_STATE_MISMATCH:
-        $message_text = 'Underflow or the modes mismatch';
-        break;
-
-      case JSON_ERROR_CTRL_CHAR:
-        $message_text = 'Unexpected control character found';
-        break;
-
-      case JSON_ERROR_SYNTAX:
-        $message_text = 'Syntax error, malformed JSON';
-        break;
-
-      case JSON_ERROR_UTF8:
-        $message_text = 'Malformed UTF-8 characters, possibly incorrectly encoded';
-        break;
-
-      default:
-        $message_text = 'Unknown error';
-        break;
+    if (!$error = json_last_error()) {
+      return array();
     }
 
     $message = array(
-      'message' => $message_text,
+      'message' => FeedsExJsonUtility::translateError($error),
       'variables' => array(),
       'severity' => WATCHDOG_ERROR,
     );

@@ -35,6 +35,7 @@ abstract class FeedsExUnitTestBase extends DrupalUnitTestCase {
 
     drupal_load('module', 'feeds_ex');
     $this->moduleDir = DRUPAL_ROOT . '/' . drupal_get_path('module', 'feeds_ex');
+    require_once $this->moduleDir . '/src/Json/Utility.php';
     require_once $this->moduleDir . '/src/FeedsExBase.inc';
   }
 
@@ -117,6 +118,26 @@ abstract class FeedsExUnitTestBase extends DrupalUnitTestCase {
     $property = $reflector->getProperty($property);
     $property->setAccessible(TRUE);
     $property->setValue($object, $value);
+  }
+
+  /**
+   * Calls a private or protected method on an object.
+   *
+   * @param object $object
+   *   The object to invoke a method on.
+   * @param string $method
+   *   The name of the method.
+   * @param array $arguments
+   *   (optioanl) The arguments to provide to the method. Defaults to an empty
+   *   array.
+   *
+   * @return mixed
+   *   Whatever the method returns.
+   */
+  protected function invokeMethod($object, $method, array $arguments = array()) {
+    $reflector = new ReflectionMethod($object, $method);
+    $reflector->setAccessible(TRUE);
+    return $reflector->invokeArgs($object, $arguments);
   }
 
 }

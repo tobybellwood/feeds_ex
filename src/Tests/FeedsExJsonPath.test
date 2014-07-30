@@ -68,9 +68,24 @@ class FeedsExJsonPathUnitTests extends FeedsExUnitTestBase {
   }
 
   /**
+   * Tests parsing error handling.
+   */
+  public function testErrorHandling() {
+    // Parse some invalid JSON.
+    json_decode('\\"asdfasfd');
+
+    $parser = FeedsConfigurable::instance('FeedsExJsonPath', 'test_parser');
+    $errors = $this->invokeMethod($parser, 'getErrors');
+    $this->assertEqual(3, $errors[0]['severity']);
+  }
+
+  /**
    * Downloads and extracts JSONPath.
    */
   protected function downloadExtractJsonPath() {
+    if (defined('FEEDS_EX_LIBRARY_PATH')) {
+      return;
+    }
     $url = 'https://jsonpath.googlecode.com/svn/trunk/src/php/jsonpath.php';
     $filename = 'jsonpath.php';
 

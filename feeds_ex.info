@@ -5,6 +5,7 @@ package = Feeds
 dependencies[] = feeds
 test_dependencies[] = querypath
 
+files[] = src/Json/Utility.php
 files[] = src/Tests/FeedsExUnitTests.test
 files[] = src/Tests/FeedsExHtml.test
 files[] = src/Tests/FeedsExJsonPath.test
