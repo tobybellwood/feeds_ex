@@ -2,13 +2,13 @@
 
 /**
  * @file
- * Contains tests for FeePath.
+ * Contains tests for FeedsExJsonPath.
  */
 
 /**
- * Unit tests for FeePath.
+ * Unit tests for FeedsExJsonPath.
  */
-class FPathUnitTests extends FeedsExUnitTestBase {
+class FeedsExJsonPathUnitTests extends FeedsExUnitTestBase {
 
   /**
    * The mocked FeedsSource.

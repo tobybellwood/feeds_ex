@@ -530,9 +530,14 @@ abstract class FeedsExBase extends FeedsParser {
     $form['source_encoding'] = array(
       '#type' => 'textfield',
       '#title' => t('Source encoding'),
-      '#description' => t('The encoding of the source file.'),
+      '#description' => t('The possible encodings of the source files.'),
       '#default_value' => $config['source_encoding'],
     );
+
+    if (function_exists('mb_detect_order')) {
+      $args = array('%encodings' => implode(', ', mb_detect_order()));
+      $form['source_encoding']['#description'] .= ' ' . t('auto: %encodings', $args);
+    }
 
     $form['#attached']['drupal_add_tabledrag'][] = array('feeds-ex-source-table', 'order', 'sibling', 'feeds-ex-source-weight');
     $form['#attached']['css'][] = drupal_get_path('module', 'feeds_ex') . '/feeds_ex.css';
