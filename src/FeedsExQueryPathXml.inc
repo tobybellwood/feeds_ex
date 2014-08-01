@@ -103,6 +103,15 @@ class FeedsExQueryPathXml extends FeedsExXml {
    */
   protected function validateExpression(&$expression) {
     $expression = trim($expression);
+    if (!$expression) {
+      return;
+    }
+    try {
+      $parser = new QueryPath(NULL, $expression);
+    }
+    catch (CSSParseException $e) {
+      return check_plain($e->getMessage());
+    }
   }
 
   /**
