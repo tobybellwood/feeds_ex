@@ -43,7 +43,6 @@ function feeds_ex_registry_files_alter(&$files, $indexed_modules) {
   if (!version_compare(PHP_VERSION, '5.4.0', '>=') || !feeds_ex_library_path('jmespath.php', 'vendor/autoload.php')) {
     return;
   }
-
   $path = drupal_get_path('module', 'feeds_ex') . '/src/Tests/FeedsExJmesPath.test';
   $files[$path] = array(
     'module' => 'feeds_ex',

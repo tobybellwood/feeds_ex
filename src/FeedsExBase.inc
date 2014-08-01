@@ -574,15 +574,32 @@ abstract class FeedsExBase extends FeedsParser {
     $columns = array_merge($columns, array_keys($this->configFormTableHeader()));
     $columns = array_merge($columns, array('debug', 'weight'));
 
-    // Add new source.
-    if (strlen($values['add']['machine_name']) && strlen($values['add']['name'])) {
-      $values['sources'][$values['add']['machine_name']] = $values['add'];
-    }
-
     // Remove sources.
     foreach ($values['sources'] as $machine_name => $source) {
       if (!empty($source['remove'])) {
         unset($values['sources'][$machine_name]);
+      }
+    }
+
+    // Validate context.
+    if ($message = $this->validateExpression($values['context']['value'])) {
+      form_set_error('context', $message);
+    }
+
+    // Validate expressions.
+    foreach (array_keys($values['sources']) as $machine_name) {
+      if ($message = $this->validateExpression($values['sources'][$machine_name]['value'])) {
+        form_set_error('sources][' . $machine_name . '][value', $message);
+      }
+    }
+
+    // Add new source.
+    if (strlen($values['add']['machine_name']) && strlen($values['add']['name'])) {
+      if ($message = $this->validateExpression($values['add']['value'])) {
+        form_set_error('add][value', $message);
+      }
+      else {
+        $values['sources'][$values['add']['machine_name']] = $values['add'];
       }
     }
 
@@ -597,18 +614,6 @@ abstract class FeedsExBase extends FeedsParser {
 
     // Sort by weight.
     uasort($values['sources'], 'ctools_plugin_sort');
-
-    // Validate context.
-    if ($message = $this->validateExpression($values['context']['value'])) {
-      form_set_error('context', $message);
-    }
-
-    // Validate expressions.
-    foreach (array_keys($values['sources']) as $machine_name) {
-      if ($message = $this->validateExpression($values['sources'][$machine_name]['value'])) {
-        form_set_error('sources][' . $machine_name . '][value', $message);
-      }
-    }
 
     if (!$this->isMultibyte) {
       return;

@@ -6,6 +6,7 @@
  */
 
 use JmesPath\Runtime\AstRuntime;
+use JmesPath\SyntaxErrorException;
 
 /**
  * Parses JSON documents with JMESPath.
@@ -29,9 +30,20 @@ class FeedsExJmesPath extends FeedsExBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
-    require_once DRUPAL_ROOT . '/' . feeds_ex_library_path('jmespath.php', 'vendor/autoload.php');
+  protected function __construct($id) {
+    parent::__construct($id);
+    if (!$path = feeds_ex_library_path('jmespath.php', 'vendor/autoload.php')) {
+      drupal_set_message(t('The JMESPath library is not installed.'), 'error', FALSE);
+      return;
+    }
 
+    require_once DRUPAL_ROOT . '/' . $path;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
     $this->jmesPath = new AstRuntime();
 
     $raw = $fetcher_result->getRaw();
@@ -76,6 +88,13 @@ class FeedsExJmesPath extends FeedsExBase {
    */
   protected function validateExpression(&$expression) {
     $expression = trim($expression);
+    $parser = new AstRuntime();
+    try {
+      $parser->search($expression, array());
+    }
+    catch (SyntaxErrorException $e) {
+      return check_plain($e->getMessage());
+    }
   }
 
   /**
