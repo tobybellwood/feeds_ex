@@ -6,6 +6,23 @@
  */
 
 /**
+ * Implements hook_menu().
+ */
+function feeds_ex_menu() {
+  $items = array();
+
+  $items['_feds_ex/encoding_autocomplete'] = array(
+    'title' => 'Encoding autocomplete',
+    'page callback' => 'feeds_ex_encoding_autocomplete',
+    'access arguments' => array('administer feeds'),
+    'type' => MENU_CALLBACK,
+    'file' => 'feeds_ex.pages.inc',
+  );
+
+  return $items;;
+}
+
+/**
  * Implements hook_theme().
  */
 function feeds_ex_theme() {

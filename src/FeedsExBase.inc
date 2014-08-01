@@ -216,15 +216,12 @@ abstract class FeedsExBase extends FeedsParser {
    */
   protected function startErrorHandling() {
     // Add our encodings to the detection order.
-    if ($this->config['source_encoding'] === 'auto' || !function_exists('mb_detect_order')) {
+    if (!$this->config['source_encoding'] || !function_exists('mb_detect_order')) {
       return;
     }
 
     $this->previousDetectionOrder = mb_detect_order();
-
-    $detections = explode(',', $this->config['source_encoding']);
-
-    $detection = array_merge($detections, $this->previousDetectionOrder);
+    $detection = array_merge($this->config['source_encoding'], $this->previousDetectionOrder);
     mb_detect_order(array_unique($detection));
   }
 
@@ -366,7 +363,7 @@ abstract class FeedsExBase extends FeedsParser {
         'value' => '',
       ),
       'display_errors' => FALSE,
-      'source_encoding' => 'auto',
+      'source_encoding' => array('auto'),
     );
   }
 
@@ -527,16 +524,15 @@ abstract class FeedsExBase extends FeedsParser {
       '#default_value' => $config['display_errors'],
     );
 
-    $form['source_encoding'] = array(
-      '#type' => 'textfield',
-      '#title' => t('Source encoding'),
-      '#description' => t('The possible encodings of the source files.'),
-      '#default_value' => $config['source_encoding'],
-    );
-
     if (function_exists('mb_detect_order')) {
       $args = array('%encodings' => implode(', ', mb_detect_order()));
-      $form['source_encoding']['#description'] .= ' ' . t('auto: %encodings', $args);
+      $form['source_encoding'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Source encoding'),
+        '#description' => t('The possible encodings of the source files. auto: %encodings', $args),
+        '#default_value' => implode(', ', $config['source_encoding']),
+        '#autocomplete_path' => '_feds_ex/encoding_autocomplete',
+      );
     }
 
     $form['#attached']['drupal_add_tabledrag'][] = array('feeds-ex-source-table', 'order', 'sibling', 'feeds-ex-source-weight');
@@ -603,7 +599,22 @@ abstract class FeedsExBase extends FeedsParser {
       }
     }
 
-    $values['source_encoding'] = trim($values['source_encoding']);
+    if (!function_exists('mb_list_encodings')) {
+      return;
+    }
+
+    // Normalize encodings. Make them exactly as they are defined in
+    // mb_list_encodings(), but maintain user-defined order.
+    $encodings = array_map('drupal_strtolower', array_map('trim', explode(',', $values['source_encoding'])));
+    $values['source_encoding'] = array();
+    foreach (mb_list_encodings() as $encoding) {
+      // Maintain order.
+      $pos = array_search(drupal_strtolower($encoding), $encodings);
+      if ($pos !== FALSE) {
+        $values['source_encoding'][$pos] = $encoding;
+      }
+    }
+    ksort($values['source_encoding']);
   }
 
   /**

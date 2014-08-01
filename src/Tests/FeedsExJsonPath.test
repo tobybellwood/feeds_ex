@@ -89,7 +89,7 @@ class FeedsExJsonPathUnitTests extends FeedsExUnitTestBase {
     $url = 'https://jsonpath.googlecode.com/svn/trunk/src/php/jsonpath.php';
     $filename = 'jsonpath.php';
 
-    // Avoid downloading the file dozens of times
+    // Avoid downloading the file dozens of times.
     $library_dir = $this->originalFileDirectory . '/simpletest/feeds_ex';
     $jsonpath_library_dir = DRUPAL_ROOT . '/' . $library_dir . '/jsonpath';
 
@@ -120,7 +120,7 @@ class FeedsExJsonPathUnitTests extends FeedsExUnitTestBase {
     }
 
     // Verify that files were successfully extracted.
-    $this->assertTrue(file_exists($local_file), t('@file found.', array('@file' => $local_file)));
+    $this->assertTrue(file_exists($local_file), format_string('@file found.', array('@file' => $local_file)));
 
     // Set the library directory.
     define('FEEDS_EX_LIBRARY_PATH', $library_dir);
