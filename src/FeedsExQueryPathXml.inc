@@ -18,6 +18,20 @@ class FeedsExQueryPathXml extends FeedsExXml {
   protected $queryPath;
 
   /**
+   * The starting position for batch parsing.
+   *
+   * @var int
+   */
+  protected $start;
+
+  /**
+   * The number of items to parse in one batch.
+   *
+   * @var int
+   */
+  protected $parseCount;
+
+  /**
    * Options passed to QueryPath.
    *
    * @var array
@@ -35,8 +49,21 @@ class FeedsExQueryPathXml extends FeedsExXml {
    */
   protected function setUp(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
     $document = $this->prepareDocument($source, $fetcher_result);
+    $parser = new QueryPath($document, NULL, $this->queryPathOptions);
+    $this->queryPath = $parser->find($this->config['context']['value']);
 
-    $this->queryPath = new QueryPath($document, NULL, $this->queryPathOptions);
+    $state = $source->state(FEEDS_PARSE);
+
+    // Calculate the total once. If the total is zero, this will only execute
+    // once anyway.
+    if (!$state->total) {
+      $state->total = $this->queryPath->size();
+    }
+
+    $this->start = $state->pointer ? $state->pointer : 0;
+    $limit = $this->start + $source->importer->getLimit();
+    $state->pointer = $limit > $state->total ? $state->total : $limit;
+    $this->parseCount = $source->importer->getLimit();
   }
 
   /**
@@ -52,7 +79,7 @@ class FeedsExQueryPathXml extends FeedsExXml {
    * {@inheritdoc}
    */
   protected function executeContext() {
-    return $this->queryPath->find($this->config['context']['value']);
+    return $this->queryPath->slice($this->start, $this->parseCount);
   }
 
   /**
