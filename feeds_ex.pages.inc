@@ -11,7 +11,7 @@
 function feeds_ex_encoding_autocomplete($string = '') {
   $matches = array();
 
-  if (!strlen($string) || !function_exists('mb_list_encodings')) {
+  if (!strlen($string) || $GLOBALS['multibyte'] != UNICODE_MULTIBYTE) {
     drupal_json_output($matches);
     return;
   }

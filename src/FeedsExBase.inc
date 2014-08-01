@@ -11,6 +11,13 @@
 abstract class FeedsExBase extends FeedsParser {
 
   /**
+   * Whether the current system handles mb_* functions.
+   *
+   * @var bool
+   */
+  protected $isMultibyte;
+
+  /**
    * Allows subclasses to prepare for parsing.
    *
    * @param FeedsSource $source
@@ -77,6 +84,14 @@ abstract class FeedsExBase extends FeedsParser {
    * @see watchdog()
    */
   abstract protected function getErrors();
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function __construct($id) {
+    parent::__construct($id);
+    $this->isMultibyte = $GLOBALS['multibyte'] == UNICODE_MULTIBYTE;
+  }
 
   /**
    * {@inheritdoc}
@@ -277,7 +292,7 @@ abstract class FeedsExBase extends FeedsParser {
    * @todo Add other methods of encoding detection.
    */
   protected function detectEncoding($data) {
-    if (function_exists('mb_detect_encoding')) {
+    if ($this->isMultibyte) {
       return mb_detect_encoding($data, $this->config['source_encoding'], TRUE);
     }
     return FALSE;
@@ -512,7 +527,7 @@ abstract class FeedsExBase extends FeedsParser {
       '#default_value' => $config['display_errors'],
     );
 
-    if (function_exists('mb_detect_order')) {
+    if ($this->isMultibyte) {
       $args = array('%encodings' => implode(', ', mb_detect_order()));
       $form['source_encoding'] = array(
         '#type' => 'textfield',
@@ -587,7 +602,7 @@ abstract class FeedsExBase extends FeedsParser {
       }
     }
 
-    if (!function_exists('mb_list_encodings')) {
+    if (!$this->isMultibyte) {
       return;
     }
     // Normalize encodings. Make them exactly as they are defined in
@@ -613,6 +628,18 @@ abstract class FeedsExBase extends FeedsParser {
    */
   public function hasConfigForm() {
     return TRUE;
+  }
+
+  /**
+   * Sets the multibyte handling.
+   *
+   * @param bool $is_multibyte
+   *   Whether this parser should assume multibyte handling exists.
+   *
+   * @internal Used only during testing to force handling.
+   */
+  public function setMultibyte($is_multibyte) {
+    $this->isMultibyte = $is_multibyte;
   }
 
 }
