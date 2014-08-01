@@ -22,18 +22,15 @@ function feeds_ex_encoding_autocomplete($string = '') {
 
   // Filter out items already added. Do it case insensitively without changing
   // the suggested case.
-  $prefix = array();
+  $prefix = '';
   $encodings = array();
   foreach (mb_list_encodings() as $suggestion) {
     if (in_array(drupal_strtolower($suggestion), $lower_added)) {
-      $prefix[] = $suggestion;
+      $prefix .= $suggestion . ', ';
       continue;
     }
     $encodings[] = $suggestion;
   }
-
-  $prefix = implode(', ', $prefix);
-  $prefix = $prefix ? $prefix . ', ' : '';
 
   // Find starts with first.
   foreach ($encodings as $delta => $encoding) {
