@@ -122,7 +122,7 @@ class FeedsExXmlUnitTests extends FeedsExUnitTestBase {
           'value' => 'description',
         ),
       ),
-      'source_encoding' => 'EUC-JP',
+      'source_encoding' => array('EUC-JP'),
     ));
 
     $result = $parser->parse($this->source, $fetcher_result);

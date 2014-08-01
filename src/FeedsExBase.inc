@@ -11,13 +11,6 @@
 abstract class FeedsExBase extends FeedsParser {
 
   /**
-   * The previous multibyte detection order.
-   *
-   * @var array
-   */
-  protected $previousDetectionOrder;
-
-  /**
    * Allows subclasses to prepare for parsing.
    *
    * @param FeedsSource $source
@@ -213,25 +206,20 @@ abstract class FeedsExBase extends FeedsParser {
 
   /**
    * Starts internal error handling.
+   *
+   * Subclasses can override this to do error handling.
    */
   protected function startErrorHandling() {
-    // Add our encodings to the detection order.
-    if (!$this->config['source_encoding'] || !function_exists('mb_detect_order')) {
-      return;
-    }
-
-    $this->previousDetectionOrder = mb_detect_order();
-    $detection = array_merge($this->config['source_encoding'], $this->previousDetectionOrder);
-    mb_detect_order(array_unique($detection));
+    // No default error handling.
   }
 
   /**
    * Stops internal error handling.
+   *
+   * Subclasses can override this to do error handling.
    */
   protected function stopErrorHandling() {
-    if ($this->previousDetectionOrder) {
-      mb_detect_order($this->previousDetectionOrder);
-    }
+    // No default error handling.
   }
 
   /**
@@ -602,7 +590,6 @@ abstract class FeedsExBase extends FeedsParser {
     if (!function_exists('mb_list_encodings')) {
       return;
     }
-
     // Normalize encodings. Make them exactly as they are defined in
     // mb_list_encodings(), but maintain user-defined order.
     $encodings = array_map('drupal_strtolower', array_map('trim', explode(',', $values['source_encoding'])));
@@ -615,6 +602,10 @@ abstract class FeedsExBase extends FeedsParser {
       }
     }
     ksort($values['source_encoding']);
+    // Make sure there's some value set.
+    if (!$values['source_encoding']) {
+      $values['source_encoding'][] = 'auto';
+    }
   }
 
   /**
