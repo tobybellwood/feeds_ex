@@ -77,6 +77,9 @@ function feeds_ex_library_path($library, $file) {
 /**
  * Returns the path of the JSONPath library.
  *
+ * We can't use feeds_ex_library_path() becuase we look in multiple locations.
+ * It's truly a kindness.
+ *
  * @return string|bool
  *   The relative path of the JSONPath directory, or false if not found.
  */
@@ -87,6 +90,7 @@ function feeds_ex_jsonpath_library_path() {
   elseif (file_exists(DRUPAL_ROOT . '/sites/all/libraries/jsonpath')) {
     $path = 'sites/all/libraries/jsonpath';
   }
+  // This is defined when simpletest downloads the library for us.
   elseif (defined('FEEDS_EX_LIBRARY_PATH')) {
     $path = FEEDS_EX_LIBRARY_PATH . '/jsonpath';
   }
@@ -95,10 +99,11 @@ function feeds_ex_jsonpath_library_path() {
     return FALSE;
   }
 
+  // Newer forks of JSONPath are all modern and fancy with their autoloaders.
   if (file_exists($path . '/vendor/autoload.php')) {
     return $path . '/vendor/autoload.php';
   }
-
+  // Old school. Look for multiple versions.
   foreach (glob($path . '/jsonpath*.php') as $file) {
     return $file;
   }

@@ -31,7 +31,7 @@ class FeedsExJsonPathUnitTests extends FeedsExUnitTestBase {
     require_once $this->moduleDir . '/src/FeedsExJsonPath.inc';
 
     $this->source = $this->getMockFeedsSource();
-    $this->downloadExtractJsonPath();
+    $this->downloadJsonPath();
   }
 
   /**
@@ -80,9 +80,10 @@ class FeedsExJsonPathUnitTests extends FeedsExUnitTestBase {
   }
 
   /**
-   * Downloads and extracts JSONPath.
+   * Downloads JSONPath.
    */
-  protected function downloadExtractJsonPath() {
+  protected function downloadJsonPath() {
+    // We don't use a variable_set() here since we want this to be a unit test.
     if (defined('FEEDS_EX_LIBRARY_PATH')) {
       return;
     }
@@ -119,7 +120,7 @@ class FeedsExJsonPathUnitTests extends FeedsExUnitTestBase {
       sem_release($semaphore);
     }
 
-    // Verify that files were successfully extracted.
+    // Verify that the file was successfully downloaded.
     $this->assertTrue(file_exists($local_file), format_string('@file found.', array('@file' => $local_file)));
 
     // Set the library directory.
