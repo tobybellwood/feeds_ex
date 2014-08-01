@@ -216,7 +216,7 @@ class FeedsExXml extends FeedsExBase {
     $raw = $this->convertEncoding(trim($fetcher_result->getRaw()));
     // Remove default namespaces. This has to run after the encoding conversion
     // because a limited set of encodings are supported in regular expressions.
-    $raw = feeds_ex_remove_default_namespaces($raw);
+    $raw = FeedsExXmlUtility::removeDefaultNamespaces($raw);
 
     $options = LIBXML_NOENT | LIBXML_NONET | defined('LIBXML_COMPACT') ? LIBXML_COMPACT : 0;
     $success = $document->loadXML($raw, $options);

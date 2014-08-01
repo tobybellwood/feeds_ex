@@ -7,9 +7,12 @@ test_dependencies[] = tunit
 test_dependencies[] = querypath
 
 files[] = src/Json/Utility.php
+files[] = src/Xml/Utility.php
+
 files[] = src/Tests/FeedsExUnitTests.test
 files[] = src/Tests/FeedsExHtml.test
 files[] = src/Tests/FeedsExJsonPath.test
+files[] = src/Tests/FeedsExQueryPathHtml.test
 files[] = src/Tests/FeedsExQueryPathXml.test
 files[] = src/Tests/FeedsExXml.test
 

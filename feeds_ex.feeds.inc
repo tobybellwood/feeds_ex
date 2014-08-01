@@ -67,6 +67,16 @@ function feeds_ex_feeds_plugins() {
         'path' => $path,
       ),
     );
+    $plugins['FeedsExQueryPathHtml'] = array(
+      'name' => 'QueryPath HTML parser',
+      'description' => 'Parse HTML with QueryPath.',
+      'handler' => array(
+        'parent' => 'FeedsExQueryPathXml',
+        'class' => 'FeedsExQueryPathHtml',
+        'file' => 'FeedsExQueryPathHtml.inc',
+        'path' => $path,
+      ),
+    );
   }
 
   if (feeds_ex_jsonpath_library_path()) {

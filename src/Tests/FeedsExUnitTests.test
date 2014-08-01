@@ -36,6 +36,7 @@ abstract class FeedsExUnitTestBase extends TUnit {
     drupal_load('module', 'feeds_ex');
     $this->moduleDir = DRUPAL_ROOT . '/' . drupal_get_path('module', 'feeds_ex');
     require_once $this->moduleDir . '/src/Json/Utility.php';
+    require_once $this->moduleDir . '/src/Xml/Utility.php';
     require_once $this->moduleDir . '/src/FeedsExBase.inc';
   }
 
@@ -81,7 +82,7 @@ class FeedsExRemoveDefaultNamespaces extends DrupalUnitTestCase {
 
   public function setUp() {
     parent::setUp();
-    drupal_load('module', 'feeds_ex');
+    require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'feeds_ex') . '/src/Xml/Utility.php';
   }
 
   /**
@@ -115,7 +116,7 @@ class FeedsExRemoveDefaultNamespaces extends DrupalUnitTestCase {
    * Checks that the input and output are equal.
    */
   protected function check($in, $out) {
-    $this->assertEqual(feeds_ex_remove_default_namespaces($in), $out);
+    $this->assertEqual(FeedsExXmlUtility::removeDefaultNamespaces($in), $out);
   }
 
 }

@@ -72,7 +72,7 @@ class FeedsExQueryPathXml extends FeedsExXml {
     $return = array();
     if (!empty($this->config['sources'][$machine_name]['raw'])) {
       foreach ($result as $node) {
-        $return[] = $node->xml();
+        $return[] = $this->getRawValue($node);
       }
     }
     else {
@@ -83,6 +83,19 @@ class FeedsExQueryPathXml extends FeedsExXml {
 
     // Return a single value if there's only one value.
     return count($return) === 1 ? $return[0] : $return;
+  }
+
+  /**
+   * Returns the raw value.
+   *
+   * @param QueryPath $node
+   *   The QueryPath object to return a raw value for.
+   *
+   * @return string
+   *   A raw string value.
+   */
+  protected function getRawValue(QueryPath $node) {
+    return $node->xml();
   }
 
   /**
