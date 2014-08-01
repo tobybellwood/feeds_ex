@@ -367,6 +367,7 @@ abstract class FeedsExBase extends FeedsParser {
       ),
       'display_errors' => FALSE,
       'source_encoding' => array('auto'),
+      'debug_mode' => FALSE,
     );
   }
 
@@ -421,7 +422,8 @@ abstract class FeedsExBase extends FeedsParser {
       '#size' => 50,
       '#required' => TRUE,
       // We're hiding the title, so add a little hint.
-      '#suffix' => '<span class="form-required">*</span>'
+      '#description' => '<span class="form-required">*</span>',
+      '#attributes' => array('class' => array('feeds-ex-context-value')),
     );
 
     $form['sources'] = array(
@@ -526,6 +528,12 @@ abstract class FeedsExBase extends FeedsParser {
       '#description' => t('Display all error messages after parsing. Fatal errors will always be displayed.'),
       '#default_value' => $config['display_errors'],
     );
+    $form['debug_mode'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Enable debug mode'),
+      '#description' => t('Displays the configuration form on the feed source page to ease figuring out the expressions. Any values entered on that page will be saved here.'),
+      '#default_value' => $config['debug_mode'],
+    );
 
     if ($this->isMultibyte) {
       $args = array('%encodings' => implode(', ', mb_detect_order()));
@@ -628,6 +636,54 @@ abstract class FeedsExBase extends FeedsParser {
    */
   public function hasConfigForm() {
     return TRUE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function sourceDefaults() {
+    return array();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function sourceForm($source_config) {
+    if (!$this->hasSourceConfig()) {
+      return array();
+    }
+    $form_state = array();
+    $form = $this->configForm($form_state);
+    $form['add']['machine_name']['#machine_name']['source'] = array('feeds', get_class($this), 'add', 'name');
+
+    return $form;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function sourceFormValidate(&$source_config) {
+    $this->configFormValidate($source_config);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function sourceSave(FeedsSource $source) {
+    $config = $source->getConfigFor($this);
+    $source->setConfigFor($this, array());
+
+    if ($this->hasSourceConfig() && $config) {
+      $this->setConfig($config);
+      $this->save();
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function hasSourceConfig() {
+    return !empty($this->config['debug_mode']);
   }
 
   /**
