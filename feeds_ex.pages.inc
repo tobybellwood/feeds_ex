@@ -49,5 +49,7 @@ function feeds_ex_encoding_autocomplete($string = '') {
     }
   }
 
+  // Only send back 10 suggestions.
+  $matches = array_slice($matches, 0, 10, TRUE);
   drupal_json_output($matches);
 }
