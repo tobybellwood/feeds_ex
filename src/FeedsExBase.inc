@@ -38,12 +38,17 @@ abstract class FeedsExBase extends FeedsParser {
   protected abstract function cleanUp(FeedsSource $source, FeedsParserResult $parser_result);
 
   /**
-   * Executes the context expression.
+   * Returns rows to be parsed.
+   *
+   * @param FeedsSource $source
+   *   Source information.
+   * @param FeedsFetcherResult $fetcher_result
+   *   The result returned by the fetcher.
    *
    * @return array|Traversable
-   *   A list of un-parsed feed items.
+   *   Some iterable that returns rows.
    */
-  protected abstract function executeContext();
+  abstract protected function executeContext(FeedsSource $source, FeedsFetcherResult $fetcher_result);
 
   /**
    * Executes a single source expression.
@@ -86,6 +91,36 @@ abstract class FeedsExBase extends FeedsParser {
   abstract protected function getErrors();
 
   /**
+   * Starts internal error handling.
+   *
+   * Subclasses can override this to do error handling.
+   */
+  protected function startErrorHandling() {
+    // No default error handling.
+  }
+
+  /**
+   * Stops internal error handling.
+   *
+   * Subclasses can override this to do error handling.
+   */
+  protected function stopErrorHandling() {
+    // No default error handling.
+  }
+
+  /**
+   * Returns whether or not this parser uses a context query.
+   *
+   * Sub-classes can return false here if they don't require a context query.
+   *
+   * @return bool
+   *   True if the parser uses a context query and false if not.
+   */
+  protected function hasConfigurableContext() {
+    return TRUE;
+  }
+
+  /**
    * {@inheritdoc}
    */
   protected function __construct($id) {
@@ -112,7 +147,7 @@ abstract class FeedsExBase extends FeedsParser {
     try {
       $this->setUp($source, $fetcher_result);
 
-      foreach ($this->executeContext() as $row) {
+      foreach ($this->executeContext($source, $fetcher_result) as $row) {
         if ($item = $this->executeSources($row, $expressions, $variable_map)) {
           $result->items[] = $item;
         }
@@ -217,24 +252,6 @@ abstract class FeedsExBase extends FeedsParser {
     }
 
     return $item;
-  }
-
-  /**
-   * Starts internal error handling.
-   *
-   * Subclasses can override this to do error handling.
-   */
-  protected function startErrorHandling() {
-    // No default error handling.
-  }
-
-  /**
-   * Stops internal error handling.
-   *
-   * Subclasses can override this to do error handling.
-   */
-  protected function stopErrorHandling() {
-    // No default error handling.
   }
 
   /**
@@ -410,21 +427,23 @@ abstract class FeedsExBase extends FeedsParser {
     );
     $config = $this->getConfig();
 
-    $form['context']['name'] = array(
-      '#type' => 'markup',
-      '#markup' => t('Context'),
-    );
-    $form['context']['value'] = array(
-      '#type' => 'textfield',
-      '#title' => t('Context value'),
-      '#title_display' => 'invisible',
-      '#default_value' => $config['context']['value'],
-      '#size' => 50,
-      '#required' => TRUE,
-      // We're hiding the title, so add a little hint.
-      '#description' => '<span class="form-required">*</span>',
-      '#attributes' => array('class' => array('feeds-ex-context-value')),
-    );
+    if ($this->hasConfigurableContext()) {
+      $form['context']['name'] = array(
+        '#type' => 'markup',
+        '#markup' => t('Context'),
+      );
+      $form['context']['value'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Context value'),
+        '#title_display' => 'invisible',
+        '#default_value' => $config['context']['value'],
+        '#size' => 50,
+        '#required' => TRUE,
+        // We're hiding the title, so add a little hint.
+        '#description' => '<span class="form-required">*</span>',
+        '#attributes' => array('class' => array('feeds-ex-context-value')),
+      );
+    }
 
     $form['sources'] = array(
       '#id' => 'feeds-ex-source-table',
@@ -701,6 +720,106 @@ abstract class FeedsExBase extends FeedsParser {
    */
   public function setMultibyte($is_multibyte) {
     $this->isMultibyte = $is_multibyte;
+  }
+
+}
+
+/**
+ * Text lines from file iterator.
+ */
+class FeedsExLineIterator implements Iterator {
+
+  /**
+   * The open file handle.
+   *
+   * @var resource
+   */
+  protected $handle;
+
+  /**
+   * The current line being read.
+   *
+   * @var int
+   */
+  protected $currentLine;
+
+  /**
+   * The current position in the file.
+   *
+   * @var int
+   */
+  protected $currentPos;
+
+  /**
+   * Constructs a FeedsExLineIterator object.
+   *
+   * @param string $filepath
+   *   The path to the file to iterate.
+   */
+  public function __construct($filepath) {
+    $this->handle = fopen($filepath, 'r');
+    $this->currentLine = NULL;
+    $this->currentPos = NULL;
+  }
+
+  /**
+   * Destructs a FeedsExLineIterator object.
+   */
+  public function __destruct() {
+    if ($this->handle) {
+      fclose($this->handle);
+    }
+  }
+
+  /**
+   * Implements Iterator::reqind().
+   */
+  public function rewind($pos = 0) {
+    if ($this->handle) {
+      fseek($this->handle, $pos);
+      $this->next();
+    }
+  }
+
+  /**
+   * Implements Iterator::next().
+   */
+  public function next() {
+    if ($this->handle) {
+      $this->currentLine = feof($this->handle) ? NULL : fgets($this->handle);
+      $this->currentPos = ftell($this->handle);
+    }
+  }
+
+  /**
+   * Implements Iterator::valid().
+   */
+  public function valid() {
+    return isset($this->currentLine);
+  }
+
+  /**
+   * Implements Iterator::current().
+   */
+  public function current() {
+    return $this->currentLine;
+  }
+
+  /**
+   * Implements Iterator::key().
+   */
+  public function key() {
+    return 'line';
+  }
+
+  /**
+   * Returns the current position in the file.
+   *
+   * @return int
+   *   The current position in the file.
+   */
+  public function currentPos() {
+    return $this->currentPos;
   }
 
 }

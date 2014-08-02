@@ -20,13 +20,20 @@ class FeedsExJsonPath extends FeedsExBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
+  protected function __construct($id) {
+    parent::__construct($id);
     if (!$path = feeds_ex_jsonpath_library_path()) {
+      drupal_set_message(t('The JSONPath library is not installed.'), 'error', FALSE);
       return;
     }
 
     require_once DRUPAL_ROOT . '/' . $path;
+  }
 
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
     $raw = $fetcher_result->getRaw();
     if ($encoding = $this->detectEncoding($raw)) {
       $raw = $this->convertEncoding($raw, $encoding);
@@ -45,7 +52,7 @@ class FeedsExJsonPath extends FeedsExBase {
   /**
    * {@inheritdoc}
    */
-  protected function executeContext() {
+  protected function executeContext(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
     return jsonPath($this->parsedJson, $this->config['context']['value']);
   }
 

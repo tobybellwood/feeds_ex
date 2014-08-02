@@ -13,12 +13,14 @@ function theme_feeds_ex_configuration_table(array $variables) {
 
   $rows = array();
 
-  // Render the context at the top.
-  $context_row = array();
-  foreach (array_keys($element['#header']) as $column) {
-    $context_row[] = drupal_render($element['context'][$column]);
+  // Render the context at the top. Context is optional.
+  if (!empty($element['context'])) {
+    $context_row = array();
+    foreach (array_keys($element['#header']) as $column) {
+      $context_row[] = drupal_render($element['context'][$column]);
+    }
+    $rows[] = $context_row;
   }
-  $rows[] = $context_row;
 
   // Render the sources.
   foreach (element_children($element['sources']) as $source_key) {

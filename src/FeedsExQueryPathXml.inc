@@ -78,7 +78,7 @@ class FeedsExQueryPathXml extends FeedsExXml {
   /**
    * {@inheritdoc}
    */
-  protected function executeContext() {
+  protected function executeContext(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
     return $this->queryPath->slice($this->start, $this->parseCount);
   }
 

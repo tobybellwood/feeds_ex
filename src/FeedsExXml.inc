@@ -78,7 +78,7 @@ class FeedsExXml extends FeedsExBase {
   /**
    * {@inheritdoc}
    */
-  protected function executeContext() {
+  protected function executeContext(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
     return $this->xpath->query($this->contextQuery);
   }
 

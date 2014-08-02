@@ -91,6 +91,16 @@ function feeds_ex_feeds_plugins() {
         'path' => $path,
       ),
     );
+    $plugins['FeedsExJsonPathLines'] = array(
+      'name' => 'JSON Lines JSONPath parser',
+      'description' => 'Parse JSON Lines with JSONPath.',
+      'handler' => array(
+        'parent' => 'FeedsExJsonPath',
+        'class' => 'FeedsExJsonPathLines',
+        'file' => 'FeedsExJsonPathLines.inc',
+        'path' => $path,
+      ),
+    );
   }
 
   return $plugins;

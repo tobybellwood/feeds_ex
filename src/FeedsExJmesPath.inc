@@ -65,7 +65,7 @@ class FeedsExJmesPath extends FeedsExBase {
   /**
    * {@inheritdoc}
    */
-  protected function executeContext() {
+  protected function executeContext(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
     return $this->jmesPath->search($this->config['context']['value'], $this->parsedJson);
   }
 
