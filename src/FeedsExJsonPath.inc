@@ -11,13 +11,6 @@
 class FeedsExJsonPath extends FeedsExBase {
 
   /**
-   * The parsed JSON.
-   *
-   * @var array
-   */
-  protected $parsedJson;
-
-  /**
    * {@inheritdoc}
    */
   protected function __construct($id) {
@@ -33,27 +26,14 @@ class FeedsExJsonPath extends FeedsExBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
+  protected function executeContext(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
     $raw = $fetcher_result->getRaw();
     if ($encoding = $this->detectEncoding($raw)) {
       $raw = $this->convertEncoding($raw, $encoding);
     }
 
-    $this->parsedJson = drupal_json_decode($raw);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function cleanUp(FeedsSource $source, FeedsParserResult $result) {
-    unset($this->parsedJson);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function executeContext(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
-    return jsonPath($this->parsedJson, $this->config['context']['value']);
+    $parsed = drupal_json_decode($raw);
+    return jsonPath($parsed, $this->config['context']['value']);
   }
 
   /**

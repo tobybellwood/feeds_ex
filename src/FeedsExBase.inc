@@ -18,26 +18,6 @@ abstract class FeedsExBase extends FeedsParser {
   protected $isMultibyte;
 
   /**
-   * Allows subclasses to prepare for parsing.
-   *
-   * @param FeedsSource $source
-   *   The feed source.
-   * @param FeedsFetcherResult $fetcher_result
-   *   The result of the fetching stage.
-   */
-  protected abstract function setUp(FeedsSource $source, FeedsFetcherResult $fetcher_result);
-
-  /**
-   * Allows subclasses to cleanup.
-   *
-   * @param FeedsSource $source
-   *   The feed source.
-   * @param FeedsParserResult $parser_result
-   *   The result of parsing.
-   */
-  protected abstract function cleanUp(FeedsSource $source, FeedsParserResult $parser_result);
-
-  /**
    * Returns rows to be parsed.
    *
    * @param FeedsSource $source
@@ -89,6 +69,28 @@ abstract class FeedsExBase extends FeedsParser {
    * @see watchdog()
    */
   abstract protected function getErrors();
+
+  /**
+   * Allows subclasses to prepare for parsing.
+   *
+   * @param FeedsSource $source
+   *   The feed source.
+   * @param FeedsFetcherResult $fetcher_result
+   *   The result of the fetching stage.
+   */
+  protected function setUp(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
+  }
+
+  /**
+   * Allows subclasses to cleanup.
+   *
+   * @param FeedsSource $source
+   *   The feed source.
+   * @param FeedsParserResult $parser_result
+   *   The result of parsing.
+   */
+  protected function cleanUp(FeedsSource $source, FeedsParserResult $parser_result) {
+  }
 
   /**
    * Starts internal error handling.

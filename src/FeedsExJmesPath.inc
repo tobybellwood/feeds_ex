@@ -21,13 +21,6 @@ class FeedsExJmesPath extends FeedsExBase {
   protected $jmesPath;
 
   /**
-   * The parsed JSON.
-   *
-   * @var array
-   */
-  protected $parsedJson;
-
-  /**
    * {@inheritdoc}
    */
   protected function __construct($id) {
@@ -45,13 +38,6 @@ class FeedsExJmesPath extends FeedsExBase {
    */
   protected function setUp(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
     $this->jmesPath = new AstRuntime();
-
-    $raw = $fetcher_result->getRaw();
-    if ($encoding = $this->detectEncoding($raw)) {
-      $raw = $this->convertEncoding($raw, $encoding);
-    }
-
-    $this->parsedJson = drupal_json_decode($raw);
   }
 
   /**
@@ -59,14 +45,19 @@ class FeedsExJmesPath extends FeedsExBase {
    */
   protected function cleanUp(FeedsSource $source, FeedsParserResult $result) {
     unset($this->jmesPath);
-    unset($this->parsedJson);
   }
 
   /**
    * {@inheritdoc}
    */
   protected function executeContext(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
-    return $this->jmesPath->search($this->config['context']['value'], $this->parsedJson);
+    $raw = $fetcher_result->getRaw();
+    if ($encoding = $this->detectEncoding($raw)) {
+      $raw = $this->convertEncoding($raw, $encoding);
+    }
+
+    $parsed = drupal_json_decode($raw);
+    return $this->jmesPath->search($this->config['context']['value'], $parsed);
   }
 
   /**

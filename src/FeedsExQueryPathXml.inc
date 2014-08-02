@@ -18,20 +18,6 @@ class FeedsExQueryPathXml extends FeedsExXml {
   protected $queryPath;
 
   /**
-   * The starting position for batch parsing.
-   *
-   * @var int
-   */
-  protected $start;
-
-  /**
-   * The number of items to parse in one batch.
-   *
-   * @var int
-   */
-  protected $parseCount;
-
-  /**
    * Options passed to QueryPath.
    *
    * @var array
@@ -60,10 +46,9 @@ class FeedsExQueryPathXml extends FeedsExXml {
       $state->total = $this->queryPath->size();
     }
 
-    $this->start = $state->pointer ? $state->pointer : 0;
-    $limit = $this->start + $source->importer->getLimit();
+    $state->start = $state->pointer ? $state->pointer : 0;
+    $limit = $state->start + $source->importer->getLimit();
     $state->pointer = $limit > $state->total ? $state->total : $limit;
-    $this->parseCount = $source->importer->getLimit();
   }
 
   /**
@@ -79,7 +64,8 @@ class FeedsExQueryPathXml extends FeedsExXml {
    * {@inheritdoc}
    */
   protected function executeContext(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
-    return $this->queryPath->slice($this->start, $this->parseCount);
+    $state = $source->state(FEEDS_PARSE);
+    return $this->queryPath->slice($state->start, $source->importer->getLimit());
   }
 
   /**
