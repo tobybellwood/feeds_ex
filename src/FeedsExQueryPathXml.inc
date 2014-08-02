@@ -28,6 +28,7 @@ class FeedsExQueryPathXml extends FeedsExXml {
     'strip_low_ascii' => FALSE,
     'replace_entities' => FALSE,
     'omit_xml_declaration' => TRUE,
+    'encoding' => 'UTF-8',
   );
 
   /**

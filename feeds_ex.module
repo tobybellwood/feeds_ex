@@ -40,14 +40,30 @@ function feeds_ex_theme() {
  * Add JMESPath tests if they are supported.
  */
 function feeds_ex_registry_files_alter(&$files, $indexed_modules) {
-  if (!version_compare(PHP_VERSION, '5.4.0', '>=') || !feeds_ex_library_path('jmespath.php', 'vendor/autoload.php')) {
+  if (version_compare(PHP_VERSION, '5.4.0', '<')) {
     return;
   }
-  $path = drupal_get_path('module', 'feeds_ex') . '/src/Tests/FeedsExJmesPath.test';
-  $files[$path] = array(
+  if (!feeds_ex_library_path('jmespath.php', 'vendor/autoload.php')) {
+    return;
+  }
+
+  $path = drupal_get_path('module', 'feeds_ex');
+
+  $files[$path . '/src/Tests/FeedsExJmesPath.test'] = array(
     'module' => 'feeds_ex',
     'weight' => 1,
   );
+  $files[$path . '/src/Tests/FeedsExJmesPathLines.test'] = array(
+    'module' => 'feeds_ex',
+    'weight' => 1,
+  );
+}
+
+/**
+ * Implements hook_modules_enabled().
+ */
+function feeds_ex_modules_enabled(array $modules) {
+  cache_clear_all('plugins:feeds:plugins', 'cache');
 }
 
 /**

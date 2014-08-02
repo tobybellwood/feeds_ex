@@ -54,6 +54,16 @@ function feeds_ex_feeds_plugins() {
         'path' => $path,
       ),
     );
+    $plugins['FeedsExJmesPathLines'] = array(
+      'name' => 'JSON Lines JMESPath parser',
+      'description' => 'Parse JSON Lines with JMESPath.',
+      'handler' => array(
+        'parent' => 'FeedsExJmesPath',
+        'class' => 'FeedsExJmesPathLines',
+        'file' => 'FeedsExJmesPathLines.inc',
+        'path' => $path,
+      ),
+    );
   }
 
   if (module_exists('querypath')) {
