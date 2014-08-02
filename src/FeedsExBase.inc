@@ -270,7 +270,7 @@ abstract class FeedsExBase extends FeedsParser {
       if ($error['severity'] > $severity) {
         continue;
       }
-      drupal_set_message(t($error['message'], $error['args']), $error['severity'] <= WATCHDOG_ERROR ? 'error' : 'warning', FALSE);
+      drupal_set_message(t($error['message'], $error['variables']), $error['severity'] <= WATCHDOG_ERROR ? 'error' : 'warning', FALSE);
     }
   }
 
@@ -293,7 +293,7 @@ abstract class FeedsExBase extends FeedsParser {
         continue;
       }
 
-      $source->log('feeds_ex', $error['message'], $error['args'], $error['severity']);
+      $source->log('feeds_ex', $error['message'], $error['variables'], $error['severity']);
     }
   }
 
