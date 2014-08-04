@@ -90,7 +90,6 @@ function feeds_ex_feeds_plugins() {
   }
 
   if (feeds_ex_jsonpath_library_path()) {
-    // FeedsExJsonPath
     $plugins['FeedsExJsonPath'] = array(
       'name' => 'JSON JSONPath parser',
       'description' => 'Parse JSON with JSONPath.',

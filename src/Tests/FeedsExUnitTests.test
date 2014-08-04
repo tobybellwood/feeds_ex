@@ -37,6 +37,7 @@ abstract class FeedsExUnitTestBase extends TUnit {
     $this->moduleDir = DRUPAL_ROOT . '/' . drupal_get_path('module', 'feeds_ex');
     require_once $this->moduleDir . '/src/Json/Utility.php';
     require_once $this->moduleDir . '/src/Xml/Utility.php';
+    require_once $this->moduleDir . '/src/File/FeedsExLineIterator.php';
     require_once $this->moduleDir . '/src/FeedsExBase.inc';
   }
 
@@ -165,6 +166,48 @@ class FeedsExRemoveDefaultNamespaces extends DrupalUnitTestCase {
    */
   protected function check($in, $out) {
     $this->assertEqual(FeedsExXmlUtility::removeDefaultNamespaces($in), $out);
+  }
+
+}
+
+/**
+ * Reading a line from a file.
+ */
+class FeedsExLineIteratorUnitTests extends DrupalUnitTestCase {
+
+  /**
+   * The module directory path.
+   *
+   * @var string
+   */
+  protected $moduleDir;
+
+  public static function getInfo() {
+    return array(
+      'name' => 'Unit tests for the line reading iterator',
+      'description' => 'Unit tests for FeedsExLineIterator.',
+      'group' => 'Feeds EX',
+    );
+  }
+
+  public function setUp() {
+    parent::setUp();
+    $this->moduleDir = drupal_get_path('module', 'feeds_ex');
+    require_once DRUPAL_ROOT . '/' . $this->moduleDir . '/src/File/FeedsExLineIterator.php';
+  }
+
+  /**
+   * Test basic iteration.
+   */
+  public function test() {
+    $iterator = new FeedsExLineIterator($this->moduleDir . '/tests/resources/test.jsonl');
+    $this->assertEqual(count(iterator_to_array($iterator)), 4);
+
+    foreach (range(1, 4) as $limit) {
+      $iterator = new FeedsExLineIterator($this->moduleDir . '/tests/resources/test.jsonl');
+      $iterator->setLineLimit($limit);
+      $this->assertEqual(count(iterator_to_array($iterator)), $limit);
+    }
   }
 
 }

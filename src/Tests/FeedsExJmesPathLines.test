@@ -59,4 +59,20 @@ class FeedsExJmesPathLinesUnitTests extends FeedsExUnitTestBase {
     }
   }
 
+  /**
+   * Tests batch parsing.
+   */
+  public function testBatching() {
+    $this->variableSet('feeds_process_limit', 1);
+
+    $parser = FeedsConfigurable::instance('FeedsExJmesPathLines', 'test_parser');
+    $fetcher_result = new FeedsFileFetcherResult($this->moduleDir . '/tests/resources/test.jsonl');
+
+    foreach (array('Gilbert', 'Alexa', 'May', 'Deloise') as $name) {
+      $result = $parser->parse($this->source, $fetcher_result);
+      $this->assertEqual(count($result->items), 1, format_string('@count items parsed.', array('@count' => count($result->items))));
+      $this->assertEqual($result->items[0]['title'], $name);
+    }
+  }
+
 }

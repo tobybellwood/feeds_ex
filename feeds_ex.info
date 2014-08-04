@@ -6,6 +6,7 @@ dependencies[] = feeds
 test_dependencies[] = tunit
 test_dependencies[] = querypath
 
+files[] = src/File/FeedsExLineIterator.php
 files[] = src/Json/Utility.php
 files[] = src/Xml/Utility.php
 
