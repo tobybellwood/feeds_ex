@@ -65,7 +65,7 @@ class FeedsExJsonPathLinesUnitTests extends FeedsExUnitTestBase {
   public function testBatching() {
     $this->variableSet('feeds_process_limit', 1);
 
-    $parser = FeedsConfigurable::instance('FeedsExJmesPathLines', 'test_parser');
+    $parser = FeedsConfigurable::instance('FeedsExJsonPathLines', 'test_parser');
     $fetcher_result = new FeedsFileFetcherResult($this->moduleDir . '/tests/resources/test.jsonl');
 
     foreach (array('Gilbert', 'Alexa', 'May', 'Deloise') as $name) {

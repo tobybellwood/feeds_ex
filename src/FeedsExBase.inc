@@ -603,8 +603,10 @@ abstract class FeedsExBase extends FeedsParser {
     }
 
     // Validate context.
-    if ($message = $this->validateExpression($values['context']['value'])) {
-      form_set_error('context', $message);
+    if ($this->hasConfigurableContext()) {
+      if ($message = $this->validateExpression($values['context']['value'])) {
+        form_set_error('context', $message);
+      }
     }
 
     // Validate expressions.

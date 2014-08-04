@@ -79,7 +79,12 @@ class FeedsExJmesPath extends FeedsExBase {
    */
   protected function validateExpression(&$expression) {
     $expression = trim($expression);
+    if (!$expression) {
+      return;
+    }
+
     $parser = new AstRuntime();
+
     try {
       $parser->search($expression, array());
     }
