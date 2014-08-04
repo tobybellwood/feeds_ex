@@ -40,15 +40,12 @@ class FeedsExJmesPathLines extends FeedsExJmesPath {
     $this->iterator->setLineLimit($source->importer->getLimit());
 
     $state = $source->state(FEEDS_PARSE);
-
-    // Calculate the total once. If the total is zero, this will only execute
-    // once anyway.
     if (!$state->total) {
       $state->total = $this->iterator->getSize();
     }
 
     $state->start = $state->pointer ? $state->pointer : 0;
-    $this->iterator->setStartLine($state->start);
+    $this->iterator->setStartPosition($state->start);
   }
 
   /**
@@ -56,9 +53,10 @@ class FeedsExJmesPathLines extends FeedsExJmesPath {
    */
   protected function cleanUp(FeedsSource $source, FeedsParserResult $result) {
     parent::cleanUp($source, $result);
-    $state = $source->state(FEEDS_PARSE);
 
-    $state->pointer = $this->iterator->getLinePosition();
+    $state = $source->state(FEEDS_PARSE);
+    $state->pointer = $this->iterator->ftell();
+
     unset($this->iterator);
   }
 

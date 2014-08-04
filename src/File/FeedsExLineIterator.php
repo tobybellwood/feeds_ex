@@ -15,7 +15,7 @@ class FeedsExLineIterator extends SplFileObject {
    *
    * @var int
    */
-  protected $startLine = 0;
+  protected $startPosition = 0;
 
   /**
    * The number of lines to read.
@@ -35,11 +35,9 @@ class FeedsExLineIterator extends SplFileObject {
    * Implements Iterator::rewind().
    */
   public function rewind() {
-    $this->setFlags(self::SKIP_EMPTY | self::READ_AHEAD);
-
     parent::rewind();
-    if ($this->startLine) {
-      $this->seek($this->startLine);
+    if ($this->startPosition) {
+      $this->fseek($this->startPosition);
     }
     $this->linesRead = 0;
   }
@@ -56,7 +54,7 @@ class FeedsExLineIterator extends SplFileObject {
    * Implements Iterator::valid().
    */
   public function valid() {
-    return (!$this->lineLimit || $this->linesRead < $this->lineLimit) && parent::valid();
+    return (!$this->lineLimit || $this->linesRead < $this->lineLimit) && parent::valid() && parent::current();
   }
 
   /**
@@ -70,23 +68,23 @@ class FeedsExLineIterator extends SplFileObject {
   }
 
   /**
-   * Returns the line position in the file.
+   * Returns the number of lines read.
    *
    * @return int
-   *   The line position in the file.
+   *   The number of lines read.
    */
-  public function getLinePosition() {
-    return $this->linesRead + $this->startLine;
+  public function getLinesRead() {
+    return $this->linesRead;
   }
 
   /**
-   * Sets the starting line.
+   * Sets the starting position.
    *
-   * @param int $line_num
-   *   The line to start parsing on.
+   * @param int $position
+   *   The position to start in the file.
    */
-  public function setStartLine($line_num) {
-    $this->startLine = (int) $line_num;
+  public function setStartPosition($position) {
+    $this->startPosition = (int) $position;
   }
 
 }

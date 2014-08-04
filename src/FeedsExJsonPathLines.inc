@@ -10,7 +10,6 @@
  */
 class FeedsExJsonPathLines extends FeedsExJsonPath {
 
-
   /**
    * The file iterator.
    *
@@ -40,15 +39,12 @@ class FeedsExJsonPathLines extends FeedsExJsonPath {
     $this->iterator->setLineLimit($source->importer->getLimit());
 
     $state = $source->state(FEEDS_PARSE);
-
-    // Calculate the total once. If the total is zero, this will only execute
-    // once anyway.
     if (!$state->total) {
       $state->total = $this->iterator->getSize();
     }
 
     $state->start = $state->pointer ? $state->pointer : 0;
-    $this->iterator->setStartLine($state->start);
+    $this->iterator->setStartPosition($state->start);
   }
 
   /**
@@ -56,8 +52,8 @@ class FeedsExJsonPathLines extends FeedsExJsonPath {
    */
   protected function cleanUp(FeedsSource $source, FeedsParserResult $result) {
     $state = $source->state(FEEDS_PARSE);
+    $state->pointer = $this->iterator->ftell();
 
-    $state->pointer = $this->iterator->getLinePosition();
     unset($this->iterator);
   }
 
