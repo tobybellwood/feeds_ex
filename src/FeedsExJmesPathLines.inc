@@ -55,7 +55,7 @@ class FeedsExJmesPathLines extends FeedsExJmesPath {
    * {@inheritdoc}
    */
   protected function cleanUp(FeedsSource $source, FeedsParserResult $result) {
-    parent::cleanUp($source, $fetcher_result);
+    parent::cleanUp($source, $result);
     $state = $source->state(FEEDS_PARSE);
 
     $state->pointer = $this->iterator->getLinePosition();
