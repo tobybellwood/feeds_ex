@@ -72,6 +72,10 @@ class FeedsExHtml extends FeedsExXml {
     // Pass in options if available.
     if (version_compare(PHP_VERSION, '5.4.0', '>=')) {
       $options = LIBXML_NOENT | LIBXML_NONET | defined('LIBXML_COMPACT') ? LIBXML_COMPACT : 0;
+
+      if (version_compare(LIBXML_DOTTED_VERSION, '2.7.0', '>=')) {
+        $options = $options | LIBXML_PARSEHUGE;
+      }
       $success = $document->loadHTML($raw, $options);
     }
     else {

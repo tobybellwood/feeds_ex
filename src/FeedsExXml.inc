@@ -219,7 +219,14 @@ class FeedsExXml extends FeedsExBase {
     $raw = FeedsExXmlUtility::removeDefaultNamespaces($raw);
 
     $options = LIBXML_NOENT | LIBXML_NONET | defined('LIBXML_COMPACT') ? LIBXML_COMPACT : 0;
+
+    if ((version_compare(PHP_VERSION, '5.3.2', '>=') || version_compare(PHP_VERSION, '5.2.12', '>='))
+      && version_compare(LIBXML_DOTTED_VERSION, '2.7.0', '>=')) {
+      $options = $options | LIBXML_PARSEHUGE;
+    }
+
     $success = $document->loadXML($raw, $options);
+
     if (!$success) {
       throw new RuntimeException(t('There was an error parsing the XML document.'));
     }
