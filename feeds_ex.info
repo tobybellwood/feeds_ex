@@ -16,6 +16,7 @@ files[] = src/Tests/FeedsExJsonPath.test
 files[] = src/Tests/FeedsExJsonPathLines.test
 files[] = src/Tests/FeedsExQueryPathHtml.test
 files[] = src/Tests/FeedsExQueryPathXml.test
+files[] = src/Tests/FeedsExUi.test
 files[] = src/Tests/FeedsExXml.test
 
 core = 7.x
