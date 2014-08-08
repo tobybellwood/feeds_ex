@@ -58,4 +58,49 @@ class FeedsExUi extends FeedsWebTestCase {
     $this->assertNoFieldByName('sources[new_value][name]');
   }
 
+  /**
+   * Tests debug mode.
+   */
+  public function testDebugMode() {
+    $path = 'admin/structure/feeds/syndication/settings/FeedsExTestUi';
+
+    // Set context.
+    $edit = array(
+      'context[value]' => 'context value',
+      'debug_mode' => 1,
+    );
+    $this->drupalPost($path, $edit, t('Save'));
+    $this->assertFieldByName('context[value]', 'context value', 'Context value set.');
+    $this->assertFieldByName('debug_mode', 1, 'Debug mode set.');
+
+    $path = 'import/syndication';
+
+    // Set context.
+    $edit = array(
+      'feeds[FeedsHTTPFetcher][source]' => 'http://example.com',
+      'feeds[FeedsExTestUi][context][value]' => 'new context value',
+    );
+    $this->drupalPost($path, $edit, t('Import'));
+    $this->assertFieldByName(key($edit), reset($edit), 'Context value set.');
+
+    // Add a value.
+    $edit = array(
+      'feeds[FeedsExTestUi][add][name]' => 'new name',
+      'feeds[FeedsExTestUi][add][machine_name]' => 'new_value',
+      'feeds[FeedsExTestUi][add][value]' => 'new value',
+      'feeds[FeedsExTestUi][add][debug]' => 1,
+    );
+    $this->drupalPost(NULL, $edit, t('Import'));
+    $this->assertFieldByName('feeds[FeedsExTestUi][sources][new_value][name]', 'new name', 'New expression name');
+    $this->assertFieldByName('feeds[FeedsExTestUi][sources][new_value][value]', 'new value', 'New expression value');
+    $this->assertFieldByName('feeds[FeedsExTestUi][sources][new_value][debug]', 1, 'Debug value set');
+
+    // Remove the row.
+    $edit = array(
+      'feeds[FeedsExTestUi][sources][new_value][remove]' => 1,
+    );
+    $this->drupalPost(NULL, $edit, t('Import'));
+    $this->assertNoFieldByName('feeds[FeedsExTestUi][sources][new_value][name]');
+  }
+
 }
