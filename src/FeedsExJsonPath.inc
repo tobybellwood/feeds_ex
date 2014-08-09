@@ -13,19 +13,6 @@ class FeedsExJsonPath extends FeedsExBase {
   /**
    * {@inheritdoc}
    */
-  protected function __construct($id) {
-    parent::__construct($id);
-    if (!$path = feeds_ex_jsonpath_library_path()) {
-      drupal_set_message(t('The JSONPath library is not installed.'), 'error', FALSE);
-      return;
-    }
-
-    require_once DRUPAL_ROOT . '/' . $path;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   protected function executeContext(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
     $raw = $fetcher_result->getRaw();
 
@@ -80,6 +67,17 @@ class FeedsExJsonPath extends FeedsExBase {
       'severity' => WATCHDOG_ERROR,
     );
     return array($message);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function loadLibrary() {
+    if (!$path = feeds_ex_jsonpath_library_path()) {
+      throw new RuntimeException(t('The JSONPath library is not installed.'));
+    }
+
+    require_once DRUPAL_ROOT . '/' . $path;
   }
 
 }

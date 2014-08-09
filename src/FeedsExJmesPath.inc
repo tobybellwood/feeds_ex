@@ -23,19 +23,6 @@ class FeedsExJmesPath extends FeedsExBase {
   /**
    * {@inheritdoc}
    */
-  protected function __construct($id) {
-    parent::__construct($id);
-    if (!$path = feeds_ex_library_path('jmespath.php', 'vendor/autoload.php')) {
-      drupal_set_message(t('The JMESPath library is not installed.'), 'error', FALSE);
-      return;
-    }
-
-    require_once DRUPAL_ROOT . '/' . $path;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   protected function setUp(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
     $this->jmesPath = new AstRuntime();
   }
@@ -116,6 +103,17 @@ class FeedsExJmesPath extends FeedsExBase {
       'severity' => WATCHDOG_ERROR,
     );
     return array($message);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function loadLibrary() {
+    if (!$path = feeds_ex_library_path('jmespath.php', 'vendor/autoload.php')) {
+      throw new RuntimeException(t('The JMESPath library is not installed.'));
+    }
+
+    require_once DRUPAL_ROOT . '/' . $path;
   }
 
 }

@@ -111,6 +111,18 @@ abstract class FeedsExBase extends FeedsParser {
   }
 
   /**
+   * Loads the necessary library.
+   *
+   * Subclasses can override this to load the necessary library. It will be
+   * called automatically.
+   *
+   * @throws RuntimeException
+   *   Thrown if the library does not exist.
+   */
+  protected function loadLibrary() {
+  }
+
+  /**
    * Returns whether or not this parser uses a context query.
    *
    * Sub-classes can return false here if they don't require a user-configured
@@ -135,6 +147,7 @@ abstract class FeedsExBase extends FeedsParser {
    * {@inheritdoc}
    */
   public function parse(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
+    $this->loadLibrary();
     $this->startErrorHandling();
 
     $config = $this->getConfig();
@@ -160,7 +173,7 @@ abstract class FeedsExBase extends FeedsParser {
     }
     catch (FeedsExEmptyException $e) {
       // The feed is empty.
-      drupal_set_message(t('The feed is empty.'), 'warning', FALSE);
+      $this->getMessenger()->setMessage(t('The feed is empty.'), 'warning', FALSE);
     }
     catch (Expcetion $exception) {
       // Do nothing. Store for later.
@@ -277,7 +290,7 @@ abstract class FeedsExBase extends FeedsParser {
       if ($error['severity'] > $severity) {
         continue;
       }
-      drupal_set_message(t($error['message'], $error['variables']), $error['severity'] <= WATCHDOG_ERROR ? 'error' : 'warning', FALSE);
+      $this->getMessenger()->setMessage(t($error['message'], $error['variables']), $error['severity'] <= WATCHDOG_ERROR ? 'error' : 'warning', FALSE);
     }
   }
 
@@ -369,7 +382,7 @@ abstract class FeedsExBase extends FeedsParser {
       $data[$key] = check_plain($value);
     }
     $output .= theme('item_list', array('items' => $data));
-    drupal_set_message($output);
+    $this->getMessenger()->setMessage($output);
   }
 
   /**
@@ -587,6 +600,15 @@ abstract class FeedsExBase extends FeedsParser {
    * {@inheritdoc}
    */
   public function configFormValidate(&$values) {
+    // Throwing an exception during validation shows a nasty error to users.
+    try {
+      $this->loadLibrary();
+    }
+    catch (RuntimeException $e) {
+      $this->getMessenger()->setMessage($e->getMessage(), 'error', FALSE);
+      return;
+    }
+
     // @todo We should do this in Feeds automatically.
     $values += $this->configDefaults();
 
@@ -745,6 +767,65 @@ abstract class FeedsExBase extends FeedsParser {
    */
   public function setMultibyte($is_multibyte) {
     $this->isMultibyte = $is_multibyte;
+  }
+
+  /**
+   * Sets the messenger to be used to display messages.
+   *
+   * @param FeedsExMessengerInterface $messenger
+   *   The messenger.
+   */
+  public function setMessenger(FeedsExMessengerInterface $messenger) {
+    $this->messenger = $messenger;
+  }
+
+  /**
+   * Returns the messenger.
+   *
+   * @return FeedsExMessengerInterface
+   *   The messenger.
+   */
+  public function getMessenger() {
+    if (!isset($this->messenger)) {
+      $this->messenger = new FeedsExMessenger();
+    }
+
+    return $this->messenger;
+  }
+
+}
+
+/**
+ * Displays messages to the user.
+ */
+interface FeedsExMessengerInterface {
+
+  /**
+   * Sets a message to display to the user.
+   *
+   * @param string $messenge
+   *   The message.
+   * @param string $type
+   *   (optional) The type of message. Defaults to 'status'.
+   * @param bool $repeat
+   *   (optional) Whether to allow the message to repeat. Defaults to true.
+   *
+   * @see drupal_set_message()
+   */
+  public function setMessage($message = NULL, $type = 'status', $repeat = TRUE);
+
+}
+
+/**
+ * Uses drupal_set_message() to show messages.
+ */
+class FeedsExMessenger implements FeedsExMessengerInterface {
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setMessage($message = NULL, $type = 'status', $repeat = TRUE) {
+    drupal_set_message($message, $type, $repeat);
   }
 
 }
