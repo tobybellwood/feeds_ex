@@ -156,13 +156,4 @@ class FeedsExQueryPathXml extends FeedsExXml {
     }
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  protected function loadLibrary() {
-    if (!module_exists('querypath')) {
-      throw new RuntimeException(t('The QueryPath module is not installed.'));
-    }
-  }
-
 }
