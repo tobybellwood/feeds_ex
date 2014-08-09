@@ -82,7 +82,7 @@ abstract class FeedsExBase extends FeedsParser {
   }
 
   /**
-   * Allows subclasses to cleanup.
+   * Allows subclasses to cleanup after parsing.
    *
    * @param FeedsSource $source
    *   The feed source.
@@ -95,7 +95,7 @@ abstract class FeedsExBase extends FeedsParser {
   /**
    * Starts internal error handling.
    *
-   * Subclasses can override this to do error handling.
+   * Subclasses can override this to being error handling.
    */
   protected function startErrorHandling() {
     // No default error handling.
@@ -104,7 +104,7 @@ abstract class FeedsExBase extends FeedsParser {
   /**
    * Stops internal error handling.
    *
-   * Subclasses can override this to do error handling.
+   * Subclasses can override this to end error handling.
    */
   protected function stopErrorHandling() {
     // No default error handling.
@@ -113,7 +113,8 @@ abstract class FeedsExBase extends FeedsParser {
   /**
    * Returns whether or not this parser uses a context query.
    *
-   * Sub-classes can return false here if they don't require a context query.
+   * Sub-classes can return false here if they don't require a user-configured
+   * context query.
    *
    * @return bool
    *   True if the parser uses a context query and false if not.
@@ -167,7 +168,7 @@ abstract class FeedsExBase extends FeedsParser {
       $this->printErrors($errors, WATCHDOG_DEBUG);
     }
     else {
-      // Always print errors.
+      // Always print fatal errors.
       $this->printErrors($errors);
     }
     // Log any fatal errors.
@@ -371,8 +372,7 @@ abstract class FeedsExBase extends FeedsParser {
    * {@inheritdoc}
    */
   public function getMappingSources() {
-    $config = $this->getConfig();
-    return parent::getMappingSources() + $config['sources'];
+    return parent::getMappingSources() + $this->config['sources'];
   }
 
   /**
@@ -567,20 +567,15 @@ abstract class FeedsExBase extends FeedsParser {
       );
     }
 
-    $form['#attached']['drupal_add_tabledrag'][] = array('feeds-ex-source-table', 'order', 'sibling', 'feeds-ex-source-weight');
+    $form['#attached']['drupal_add_tabledrag'][] = array(
+      'feeds-ex-source-table',
+      'order',
+      'sibling',
+      'feeds-ex-source-weight',
+    );
     $form['#attached']['css'][] = drupal_get_path('module', 'feeds_ex') . '/feeds_ex.css';
 
-    $form['#header'] = array(
-      'name' => t('Name'),
-      'machine_name' => t('Machine name'),
-      'value' => t('Value'),
-    );
-    $form['#header'] += $this->configFormTableHeader();
-    $form['#header'] += array(
-      'debug' => t('Debug'),
-      'remove' => t('Remove'),
-      'weight' => t('Weight'),
-    );
+    $form['#header'] = $this->getFormHeader();
 
     return $form;
   }
@@ -591,9 +586,6 @@ abstract class FeedsExBase extends FeedsParser {
   public function configFormValidate(&$values) {
     // @todo We should do this in Feeds automatically.
     $values += $this->configDefaults();
-    $columns = array('name', 'value');
-    $columns = array_merge($columns, array_keys($this->configFormTableHeader()));
-    $columns = array_merge($columns, array('debug', 'weight'));
 
     // Remove sources.
     foreach ($values['sources'] as $machine_name => $source) {
@@ -627,6 +619,10 @@ abstract class FeedsExBase extends FeedsParser {
     }
 
     // Rebuild sources to keep the configuration values clean.
+    $columns = $this->getFormHeader();
+    unset($columns['remove'], $columns['machine_name']);
+    $columns = array_keys($columns);
+
     foreach ($values['sources'] as $machine_name => $source) {
       $new_value = array();
       foreach ($columns as $column) {
@@ -712,6 +708,28 @@ abstract class FeedsExBase extends FeedsParser {
    */
   public function hasSourceConfig() {
     return !empty($this->config['debug_mode']);
+  }
+
+  /**
+   * Returns the configuration form table header.
+   *
+   * @return array
+   *   The header array.
+   */
+  protected function getFormHeader() {
+    $header = array(
+      'name' => t('Name'),
+      'machine_name' => t('Machine name'),
+      'value' => t('Value'),
+    );
+    $header += $this->configFormTableHeader();
+    $header += array(
+      'debug' => t('Debug'),
+      'remove' => t('Remove'),
+      'weight' => t('Weight'),
+    );
+
+    return $header;
   }
 
   /**

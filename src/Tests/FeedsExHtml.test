@@ -177,6 +177,9 @@ class FeedsExHtmlTests extends FeedsWebTestCase {
     $this->setPlugin('syndication', 'FeedsExHtml');
   }
 
+  /**
+   * Tests the full import process.
+   */
   public function test() {
     $this->setContext('syndication', '//div[@class="post"]');
     $this->addMappings('syndication', array(
@@ -202,6 +205,14 @@ class FeedsExHtmlTests extends FeedsWebTestCase {
     $this->assertFieldByName('body[und][0][value]', 'I am a description2');
   }
 
+  /**
+   * Sets the form context value.
+   *
+   * @param string $id
+   *   The importer id.
+   * @param string $value
+   *   The context value.
+   */
   protected function setContext($id, $value) {
     $importer = feeds_importer($id);
     $config = $importer->parser->getConfig();
@@ -210,6 +221,17 @@ class FeedsExHtmlTests extends FeedsWebTestCase {
     $importer->save();
   }
 
+  /**
+   * Adds an expression.
+   *
+   * @param string $id
+   *   The importer id.
+   * @param string $value
+   *   The expression value.
+   * @param array $settings
+   *   (optional) Settings to configure the expression. Defaults to an empty
+   *   array.
+   */
   protected function addExpression($id, $value, array $settings = array()) {
     $importer = feeds_importer($id);
     $config = $importer->parser->getConfig();
