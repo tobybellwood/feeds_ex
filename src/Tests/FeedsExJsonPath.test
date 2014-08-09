@@ -27,9 +27,7 @@ class FeedsExJsonPathUnitTests extends FeedsExUnitTestBase {
 
   public function setUp() {
     parent::setUp();
-
     require_once $this->moduleDir . '/src/FeedsExJsonPath.inc';
-
     $this->source = $this->getMockFeedsSource();
     $this->downloadJsonPath();
   }

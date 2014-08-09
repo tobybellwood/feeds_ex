@@ -831,6 +831,42 @@ class FeedsExMessenger implements FeedsExMessengerInterface {
 }
 
 /**
+ * Stores messages without calling drupal_set_mesage().
+ */
+class FeedsExTestMessenger implements FeedsExMessengerInterface {
+
+  /**
+   * The messages that have been set.
+   *
+   * @var array
+   */
+  protected $messages = array();
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setMessage($message = NULL, $type = 'status', $repeat = TRUE) {
+    $this->messages[] = array(
+      'message' => $message,
+      'type' => $type,
+      'repeat' => $repeat,
+    );
+  }
+
+  /**
+   * Returns the messages.
+   *
+   * This is used to inspect messages that have been set.
+   *
+   * @return array
+   */
+  public function getMessages() {
+    return $this->messages;
+  }
+
+}
+
+/**
  * An exception thrown by parsers when they receive an empty feed.
  */
 class FeedsExEmptyException extends RuntimeException {}
