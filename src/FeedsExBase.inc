@@ -158,6 +158,10 @@ abstract class FeedsExBase extends FeedsParser {
 
       $this->cleanUp($source, $result);
     }
+    catch (FeedsExEmptyException $e) {
+      // The feed is empty.
+      drupal_set_message(t('The feed is empty.'), 'warning', FALSE);
+    }
     catch (Expcetion $exception) {
       // Do nothing. Store for later.
     }
@@ -427,7 +431,6 @@ abstract class FeedsExBase extends FeedsParser {
       '#prefix' => '<div id="feeds-ex-configuration-wrapper">',
       '#suffix' => '</div>',
     );
-    $config = $this->getConfig();
 
     if ($this->hasConfigurableContext()) {
       $form['context']['name'] = array(
@@ -438,7 +441,7 @@ abstract class FeedsExBase extends FeedsParser {
         '#type' => 'textfield',
         '#title' => t('Context value'),
         '#title_display' => 'invisible',
-        '#default_value' => $config['context']['value'],
+        '#default_value' => $this->config['context']['value'],
         '#size' => 50,
         '#required' => TRUE,
         // We're hiding the title, so add a little hint.
@@ -452,7 +455,7 @@ abstract class FeedsExBase extends FeedsParser {
     );
 
     $max_weight = 0;
-    foreach ($config['sources'] as $machine_name => $source) {
+    foreach ($this->config['sources'] as $machine_name => $source) {
       $form['sources'][$machine_name]['name'] = array(
         '#type' => 'textfield',
         '#title' => t('Name'),
@@ -547,13 +550,13 @@ abstract class FeedsExBase extends FeedsParser {
       '#type' => 'checkbox',
       '#title' => t('Display errors'),
       '#description' => t('Display all error messages after parsing. Fatal errors will always be displayed.'),
-      '#default_value' => $config['display_errors'],
+      '#default_value' => $this->config['display_errors'],
     );
     $form['debug_mode'] = array(
       '#type' => 'checkbox',
       '#title' => t('Enable debug mode'),
       '#description' => t('Displays the configuration form on the feed source page to ease figuring out the expressions. Any values entered on that page will be saved here.'),
-      '#default_value' => $config['debug_mode'],
+      '#default_value' => $this->config['debug_mode'],
     );
 
     if ($this->isMultibyte) {
@@ -562,7 +565,7 @@ abstract class FeedsExBase extends FeedsParser {
         '#type' => 'textfield',
         '#title' => t('Source encoding'),
         '#description' => t('The possible encodings of the source files. auto: %encodings', $args),
-        '#default_value' => implode(', ', $config['source_encoding']),
+        '#default_value' => implode(', ', $this->config['source_encoding']),
         '#autocomplete_path' => '_feds_ex/encoding_autocomplete',
       );
     }
@@ -745,3 +748,8 @@ abstract class FeedsExBase extends FeedsParser {
   }
 
 }
+
+/**
+ * An exception thrown by parsers when they receive an empty feed.
+ */
+class FeedsExEmptyException extends RuntimeException {}

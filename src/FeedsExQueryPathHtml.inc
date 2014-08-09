@@ -60,6 +60,15 @@ class FeedsExQueryPathHtml extends FeedsExQueryPathXml {
    * {@inheritdoc}
    */
   protected function prepareDocument(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
+    // Convert encoding.
+    $raw = $fetcher_result->getRaw();
+    if (!strlen(trim($raw))) {
+      throw new FeedsExEmptyException();
+    }
+    $raw = $this->convertEncoding($raw);
+    // Fun hack to force parsing as utf-8.
+    $raw = '<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />' . "\n" . $raw;
+
     $document = new DOMDocument('1.0', 'UTF-8');
     $document->strictErrorChecking = FALSE;
     $document->resolveExternals = FALSE;
@@ -68,10 +77,6 @@ class FeedsExQueryPathHtml extends FeedsExQueryPathXml {
     $document->recover = TRUE;
     $document->encoding = 'UTF-8';
 
-    // Convert encoding.
-    $raw = $this->convertEncoding($fetcher_result->getRaw());
-    // Fun hack to force parsing as utf-8.
-    $raw = '<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />' . "\n" . $raw;
     // Pass in options if available.
     if (version_compare(PHP_VERSION, '5.4.0', '>=')) {
       $options = LIBXML_NOENT | LIBXML_NONET | defined('LIBXML_COMPACT') ? LIBXML_COMPACT : 0;

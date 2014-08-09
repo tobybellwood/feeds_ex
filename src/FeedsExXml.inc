@@ -204,6 +204,16 @@ class FeedsExXml extends FeedsExBase {
    *   The DOM document.
    */
   protected function prepareDocument(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
+    // Convert encoding.
+    $raw = trim($fetcher_result->getRaw());
+    if (!strlen($raw)) {
+      throw new FeedsExEmptyException();
+    }
+    $raw = $this->convertEncoding($raw);
+    // Remove default namespaces. This has to run after the encoding conversion
+    // because a limited set of encodings are supported in regular expressions.
+    $raw = FeedsExXmlUtility::removeDefaultNamespaces($raw);
+
     $document = new DOMDocument('1.0', 'UTF-8');
     $document->strictErrorChecking = FALSE;
     $document->resolveExternals = FALSE;
@@ -211,12 +221,6 @@ class FeedsExXml extends FeedsExBase {
     $document->substituteEntities = FALSE;
     $document->recover = TRUE;
     $document->encoding = 'UTF-8';
-
-    // Convert encoding.
-    $raw = $this->convertEncoding(trim($fetcher_result->getRaw()));
-    // Remove default namespaces. This has to run after the encoding conversion
-    // because a limited set of encodings are supported in regular expressions.
-    $raw = FeedsExXmlUtility::removeDefaultNamespaces($raw);
 
     $options = LIBXML_NOENT | LIBXML_NONET | defined('LIBXML_COMPACT') ? LIBXML_COMPACT : 0;
 

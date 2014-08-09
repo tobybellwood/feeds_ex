@@ -52,6 +52,11 @@ class FeedsExJmesPath extends FeedsExBase {
    */
   protected function executeContext(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
     $raw = $fetcher_result->getRaw();
+
+    if (!strlen($raw)) {
+      throw new FeedsExEmptyException();
+    }
+
     if ($encoding = $this->detectEncoding($raw)) {
       $raw = $this->convertEncoding($raw, $encoding);
     }
