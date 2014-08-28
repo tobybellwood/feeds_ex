@@ -49,7 +49,18 @@ class FeedsExJmesPath extends FeedsExBase {
     }
 
     $parsed = drupal_json_decode($raw);
-    return $this->jmesPath->search($this->config['context']['value'], $parsed);
+    $parsed = $this->jmesPath->search($this->config['context']['value'], $parsed);
+
+    $state = $source->state(FEEDS_PARSE);
+    if (!$state->total) {
+      $state->total = count($parsed);
+    }
+
+    // @todo Consider using array slice syntax when it is supported.
+    $start = $state->pointer ? $state->pointer : 0;
+    $state->pointer = $start + $source->importer->getLimit();
+    $state->progress($state->total, $state->pointer);
+    return array_slice($parsed, $start, $source->importer->getLimit());
   }
 
   /**
