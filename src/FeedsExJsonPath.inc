@@ -34,8 +34,16 @@ class FeedsExJsonPath extends FeedsExBase {
 
     $start = $state->pointer ? $state->pointer : 0;
     $state->pointer = $start + $source->importer->getLimit();
-    $state->progress($state->total, $state->pointer);
     return array_slice($parsed, $start, $source->importer->getLimit());
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function cleanUp(FeedsSource $source, FeedsParserResult $result) {
+    // Calculate progress.
+    $state = $source->state(FEEDS_PARSE);
+    $state->progress($state->total, $state->pointer);
   }
 
   /**

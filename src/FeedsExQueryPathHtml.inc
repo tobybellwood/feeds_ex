@@ -8,8 +8,8 @@
 /**
  * Parses HTML documents with QueryPath.
  *
- * @todo make convertEncoding() and prepareDocument() into helper functions so
- *   that they aren't copied in 2 places.
+ * @todo Make convertEncoding() into a helper function so that they aren't \
+ *   copied in 2 places.
  */
 class FeedsExQueryPathHtml extends FeedsExQueryPathXml {
 
@@ -19,7 +19,6 @@ class FeedsExQueryPathHtml extends FeedsExQueryPathXml {
   protected function setUp(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
     // Change some parser settings.
     $this->queryPathOptions['use_parser'] = 'html';
-    parent::setUp($source, $fetcher_result);
   }
 
   /**

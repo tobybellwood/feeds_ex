@@ -32,34 +32,11 @@ class FeedsExXml extends FeedsExBase {
   protected $entityLoader;
 
   /**
-   * The context query to execute; after preparation.
-   *
-   * @var string
-   */
-  protected $contextQuery;
-
-  /**
    * {@inheritdoc}
    */
   protected function setUp(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
     $document = $this->prepareDocument($source, $fetcher_result);
     $this->xpath = new FeedsExXpathDomXpath($document);
-
-    $state = $source->state(FEEDS_PARSE);
-
-    // Calculate the total once. If the total is zero, this will only execute
-    // once anyway.
-    if (!$state->total) {
-      $state->total = $this->xpath->evaluate('count(' . $this->config['context']['value'] . ')');
-    }
-
-    $start = $state->pointer ? $state->pointer : 0;
-    $limit = $start + $source->importer->getLimit();
-    $end = $limit > $state->total ? $state->total : $limit;
-    $state->pointer = $end;
-
-    // A batched XPath expression.
-    $this->contextQuery = '(' . $this->config['context']['value'] . ")[position() > $start and position() <= $end]";
   }
 
   /**
@@ -79,7 +56,20 @@ class FeedsExXml extends FeedsExBase {
    * {@inheritdoc}
    */
   protected function executeContext(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
-    return $this->xpath->query($this->contextQuery);
+    $state = $source->state(FEEDS_PARSE);
+
+    if (!$state->total) {
+      $state->total = $this->xpath->evaluate('count(' . $this->config['context']['value'] . ')');
+    }
+
+    $start = $state->pointer ? $state->pointer : 0;
+    $limit = $start + $source->importer->getLimit();
+    $end = $limit > $state->total ? $state->total : $limit;
+    $state->pointer = $end;
+
+    // A batched XPath expression.
+    $context_query = '(' . $this->config['context']['value'] . ")[position() > $start and position() <= $end]";
+    return $this->xpath->query($context_query);
   }
 
   /**

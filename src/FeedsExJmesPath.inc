@@ -30,15 +30,8 @@ class FeedsExJmesPath extends FeedsExBase {
   /**
    * {@inheritdoc}
    */
-  protected function cleanUp(FeedsSource $source, FeedsParserResult $result) {
-    unset($this->jmesPath);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   protected function executeContext(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
-    $raw = $fetcher_result->getRaw();
+    $raw = trim($fetcher_result->getRaw());
 
     if (!strlen($raw)) {
       throw new FeedsExEmptyException();
@@ -59,8 +52,17 @@ class FeedsExJmesPath extends FeedsExBase {
     // @todo Consider using array slice syntax when it is supported.
     $start = $state->pointer ? $state->pointer : 0;
     $state->pointer = $start + $source->importer->getLimit();
-    $state->progress($state->total, $state->pointer);
     return array_slice($parsed, $start, $source->importer->getLimit());
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function cleanUp(FeedsSource $source, FeedsParserResult $result) {
+    unset($this->jmesPath);
+    // Calculate progress.
+    $state = $source->state(FEEDS_PARSE);
+    $state->progress($state->total, $state->pointer);
   }
 
   /**
