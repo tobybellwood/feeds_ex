@@ -25,11 +25,13 @@ Installation
 QueryPath
 =========
 To use the QueryPath parsers, download and enable the QueryPath module.
+http://drupal.org/project/querypath
 
 JSONPath
 ========
-To use the JSONPath parser, place this file in sites/all/libraries/jsonpath and
-clear the cache.
+To use the JSONPath parser, download
+https://jsonpath.googlecode.com/svn/trunk/src/php/jsonpath.php
+into sites/all/libraries/jsonpath and clear the cache.
 Note: The JMESPath parser is preferred if you can meet the requirements.
 
 JMESPath
