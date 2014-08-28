@@ -213,29 +213,7 @@ class FeedsExXml extends FeedsExBase {
     // Remove default namespaces. This has to run after the encoding conversion
     // because a limited set of encodings are supported in regular expressions.
     $raw = FeedsExXmlUtility::removeDefaultNamespaces($raw);
-
-    $document = new DOMDocument('1.0', 'UTF-8');
-    $document->strictErrorChecking = FALSE;
-    $document->resolveExternals = FALSE;
-    // Libxml specific.
-    $document->substituteEntities = FALSE;
-    $document->recover = TRUE;
-    $document->encoding = 'UTF-8';
-
-    $options = LIBXML_NOENT | LIBXML_NONET | defined('LIBXML_COMPACT') ? LIBXML_COMPACT : 0;
-
-    if ((version_compare(PHP_VERSION, '5.3.2', '>=') || version_compare(PHP_VERSION, '5.2.12', '>='))
-      && version_compare(LIBXML_DOTTED_VERSION, '2.7.0', '>=')) {
-      $options = $options | LIBXML_PARSEHUGE;
-    }
-
-    $success = $document->loadXML($raw, $options);
-
-    if (!$success) {
-      throw new RuntimeException(t('There was an error parsing the XML document.'));
-    }
-
-    return $document;
+    return FeedsExXmlUtility::createXmlDocument($raw);
   }
 
   /**
