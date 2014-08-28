@@ -14,7 +14,7 @@ class FeedsExJsonPath extends FeedsExBase {
    * {@inheritdoc}
    */
   protected function executeContext(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
-    $raw = $fetcher_result->getRaw();
+    $raw = trim($fetcher_result->getRaw());
 
     if (!strlen($raw)) {
       throw new FeedsExEmptyException();
@@ -25,7 +25,17 @@ class FeedsExJsonPath extends FeedsExBase {
     }
 
     $parsed = drupal_json_decode($raw);
-    return jsonPath($parsed, $this->config['context']['value']);
+    $parsed = jsonPath($parsed, $this->config['context']['value']);
+
+    $state = $source->state(FEEDS_PARSE);
+    if (!$state->total) {
+      $state->total = count($parsed);
+    }
+
+    $start = $state->pointer ? $state->pointer : 0;
+    $state->pointer = $start + $source->importer->getLimit();
+    $state->progress($state->total, $state->pointer);
+    return array_slice($parsed, $start, $source->importer->getLimit());
   }
 
   /**
@@ -39,7 +49,7 @@ class FeedsExJsonPath extends FeedsExBase {
     }
 
     // Return a single value if there's only one value.
-    return count($result) === 1 ? $result[0] : $result;
+    return count($result) === 1 ? reset($result) : $result;
   }
 
   /**

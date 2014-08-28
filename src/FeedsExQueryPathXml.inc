@@ -96,7 +96,7 @@ class FeedsExQueryPathXml extends FeedsExXml {
     }
 
     // Return a single value if there's only one value.
-    return count($return) === 1 ? $return[0] : $return;
+    return count($return) === 1 ? reset($return) : $return;
   }
 
   /**

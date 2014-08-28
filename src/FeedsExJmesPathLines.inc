@@ -76,7 +76,7 @@ class FeedsExJmesPathLines extends FeedsExJmesPath {
     }
 
     // Return a single value if there's only one value.
-    return count($result) === 1 ? $result[0] : $result;
+    return count($result) === 1 ? reset($result) : $result;
   }
 
 }
