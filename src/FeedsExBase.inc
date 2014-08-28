@@ -579,7 +579,7 @@ abstract class FeedsExBase extends FeedsParser {
         '#title' => t('Source encoding'),
         '#description' => t('The possible encodings of the source files. auto: %encodings', $args),
         '#default_value' => implode(', ', $this->config['source_encoding']),
-        '#autocomplete_path' => '_feds_ex/encoding_autocomplete',
+        '#autocomplete_path' => '_feeds_ex/encoding_autocomplete',
       );
     }
 
@@ -702,8 +702,14 @@ abstract class FeedsExBase extends FeedsParser {
       return array();
     }
     $form_state = array();
+
     $form = $this->configForm($form_state);
-    $form['add']['machine_name']['#machine_name']['source'] = array('feeds', get_class($this), 'add', 'name');
+    $form['add']['machine_name']['#machine_name']['source'] = array(
+      'feeds',
+      get_class($this),
+      'add',
+      'name',
+    );
 
     return $form;
   }
@@ -803,7 +809,7 @@ interface FeedsExMessengerInterface {
   /**
    * Sets a message to display to the user.
    *
-   * @param string $messenge
+   * @param string $message
    *   The message.
    * @param string $type
    *   (optional) The type of message. Defaults to 'status'.
@@ -859,6 +865,7 @@ class FeedsExTestMessenger implements FeedsExMessengerInterface {
    * This is used to inspect messages that have been set.
    *
    * @return array
+   *   A list of message arrays.
    */
   public function getMessages() {
     return $this->messages;

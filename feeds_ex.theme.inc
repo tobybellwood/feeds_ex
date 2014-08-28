@@ -35,12 +35,19 @@ function theme_feeds_ex_configuration_table(array $variables) {
   // Render the add row.
   $add_row = array();
   foreach (array_keys($element['#header']) as $column) {
-    $add_row[] = array('data' => drupal_render($element['add'][$column]), 'class' => array('feeds-ex-add-' . $column));
+    $add_row[] = array(
+      'data' => drupal_render($element['add'][$column]),
+      'class' => array('feeds-ex-add-' . $column),
+    );
   }
 
   $rows[] = array('data' => $add_row, 'class' => array('draggable'));
 
-  $output = theme('table', array('header' => $element['#header'], 'rows' => $rows, 'attributes' => array('id' => $element['sources']['#id'])));
+  $output = theme('table', array(
+    'header' => $element['#header'],
+    'rows' => $rows,
+    'attributes' => array('id' => $element['sources']['#id']),
+  ));
   $output .= drupal_render_children($element);
 
   return $output;

@@ -11,7 +11,7 @@
 function feeds_ex_menu() {
   $items = array();
 
-  $items['_feds_ex/encoding_autocomplete'] = array(
+  $items['_feeds_ex/encoding_autocomplete'] = array(
     'title' => 'Encoding autocomplete',
     'page callback' => 'feeds_ex_encoding_autocomplete',
     'access arguments' => array('administer feeds'),
@@ -35,11 +35,18 @@ function feeds_ex_theme() {
 }
 
 /**
+ * Implements hook_modules_enabled().
+ */
+function feeds_ex_modules_enabled(array $modules) {
+  cache_clear_all('plugins:feeds:plugins', 'cache');
+}
+
+/**
  * Implements hook_registry_files_alter().
  *
  * Add JMESPath tests if they are supported.
  */
-function feeds_ex_registry_files_alter(&$files, $indexed_modules) {
+function feeds_ex_registry_files_alter(array &$files, array $modules) {
   if (version_compare(PHP_VERSION, '5.4.0', '<')) {
     return;
   }
@@ -57,13 +64,6 @@ function feeds_ex_registry_files_alter(&$files, $indexed_modules) {
     'module' => 'feeds_ex',
     'weight' => 1,
   );
-}
-
-/**
- * Implements hook_modules_enabled().
- */
-function feeds_ex_modules_enabled(array $modules) {
-  cache_clear_all('plugins:feeds:plugins', 'cache');
 }
 
 /**
