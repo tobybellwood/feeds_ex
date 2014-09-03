@@ -10,7 +10,6 @@
  */
 function feeds_ex_menu() {
   $items = array();
-
   $items['_feeds_ex/encoding_autocomplete'] = array(
     'title' => 'Encoding autocomplete',
     'page callback' => 'feeds_ex_encoding_autocomplete',
@@ -18,7 +17,6 @@ function feeds_ex_menu() {
     'type' => MENU_CALLBACK,
     'file' => 'feeds_ex.pages.inc',
   );
-
   return $items;;
 }
 
@@ -38,7 +36,9 @@ function feeds_ex_theme() {
  * Implements hook_modules_enabled().
  */
 function feeds_ex_modules_enabled(array $modules) {
-  cache_clear_all('plugins:feeds:plugins', 'cache');
+  if (in_array('querypath', $modules) {
+    cache_clear_all('plugins:feeds:plugins', 'cache');
+  }
 }
 
 /**
@@ -55,7 +55,6 @@ function feeds_ex_registry_files_alter(array &$files, array $modules) {
   }
 
   $path = drupal_get_path('module', 'feeds_ex');
-
   $files[$path . '/src/Tests/FeedsExJmesPath.test'] = array(
     'module' => 'feeds_ex',
     'weight' => 1,
