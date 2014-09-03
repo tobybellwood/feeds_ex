@@ -36,7 +36,7 @@ function feeds_ex_theme() {
  * Implements hook_modules_enabled().
  */
 function feeds_ex_modules_enabled(array $modules) {
-  if (in_array('querypath', $modules) {
+  if (in_array('querypath', $modules)) {
     cache_clear_all('plugins:feeds:plugins', 'cache');
   }
 }
