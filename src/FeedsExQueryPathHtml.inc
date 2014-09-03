@@ -59,12 +59,31 @@ class FeedsExQueryPathHtml extends FeedsExQueryPathXml {
    * {@inheritdoc}
    */
   protected function prepareDocument(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
-    // Convert encoding.
     $raw = $fetcher_result->getRaw();
     if (!strlen(trim($raw))) {
       throw new FeedsExEmptyException();
     }
-    return FeedsExXmlUtility::createHtmlDocument($this->convertEncoding($raw));
+    $raw = $this->convertEncoding($raw);
+    if ($this->config['use_tidy'] && extension_loaded('tidy')) {
+      $raw = tidy_repair_string($raw, $this->getTidyConfig(), 'utf8');
+    }
+    return FeedsExXmlUtility::createHtmlDocument($raw);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getTidyConfig() {
+    return array(
+      'merge-divs' => FALSE,
+      'merge-spans' => FALSE,
+      'join-styles' => FALSE,
+      'drop-empty-paras' => FALSE,
+      'wrap' => 0,
+      'tidy-mark' => FALSE,
+      'escape-cdata' => TRUE,
+      'word-2000' => TRUE,
+    );
   }
 
 }

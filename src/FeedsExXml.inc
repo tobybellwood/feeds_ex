@@ -104,6 +104,32 @@ class FeedsExXml extends FeedsExBase {
   /**
    * {@inheritdoc}
    */
+  public function configDefaults() {
+    return array(
+      'use_tidy' => FALSE,
+    ) + parent::configDefaults();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function configForm(&$form_state) {
+    $form = parent::configForm($form_state);
+    if (extension_loaded('tidy')) {
+      $form['use_tidy'] = array(
+        '#type' => 'checkbox',
+        '#title' => t('Use tidy'),
+        '#description' => t('The <a href="http://php.net/manual/en/book.tidy.php">Tidy PHP</a> extension has been detected. Select this to clean the markup before parsing.'),
+        '#default_value' => $this->config['use_tidy'],
+      );
+    }
+
+    return $form;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   protected function configFormTableHeader() {
     return array('raw' => t('Raw'));
   }
@@ -194,7 +220,6 @@ class FeedsExXml extends FeedsExBase {
    *   The DOM document.
    */
   protected function prepareDocument(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
-    // Convert encoding.
     $raw = trim($fetcher_result->getRaw());
     if (!strlen($raw)) {
       throw new FeedsExEmptyException();
@@ -203,6 +228,10 @@ class FeedsExXml extends FeedsExBase {
     // Remove default namespaces. This has to run after the encoding conversion
     // because a limited set of encodings are supported in regular expressions.
     $raw = FeedsExXmlUtility::removeDefaultNamespaces($raw);
+
+    if ($this->config['use_tidy'] && extension_loaded('tidy')) {
+      $raw = tidy_repair_string($raw, $this->getTidyConfig(), 'utf8');
+    }
     return FeedsExXmlUtility::createXmlDocument($raw);
   }
 
@@ -283,6 +312,24 @@ class FeedsExXml extends FeedsExBase {
     }
 
     return $return;
+  }
+
+  /**
+   * Returns the options for phptidy.
+   *
+   * http://php.net/manual/en/book.tidy.php
+   *
+   * @see tidy_repair_string()
+   *
+   * @return array
+   *   The configuration array.
+   */
+  protected function getTidyConfig() {
+    return array(
+      'input-xml' => TRUE,
+      'wrap' => 0,
+      'tidy-mark' => FALSE,
+    );
   }
 
 }
