@@ -18,6 +18,13 @@ abstract class FeedsExBase extends FeedsParser {
   protected $isMultibyte;
 
   /**
+   * The object used to display messages to the user.
+   *
+   * @var FeedsExMessengerInterface
+   */
+  protected $messenger;
+
+  /**
    * Returns rows to be parsed.
    *
    * @param FeedsSource $source
@@ -98,7 +105,6 @@ abstract class FeedsExBase extends FeedsParser {
    * Subclasses can override this to being error handling.
    */
   protected function startErrorHandling() {
-    // No default error handling.
   }
 
   /**
@@ -107,7 +113,6 @@ abstract class FeedsExBase extends FeedsParser {
    * Subclasses can override this to end error handling.
    */
   protected function stopErrorHandling() {
-    // No default error handling.
   }
 
   /**
@@ -136,6 +141,33 @@ abstract class FeedsExBase extends FeedsParser {
   }
 
   /**
+   * Reuturns the list of table headers.
+   *
+   * @return array
+   *   A list of header names keyed by the form keys.
+   */
+  protected function configFormTableHeader() {
+    return array();
+  }
+
+  /**
+   * Returns a form element for a specific column.
+   *
+   * @param array &$form_state
+   *   The current form state.
+   * @param string $column_name
+   *   The name of the column.
+   * @param array $source
+   *   The individual source item.
+   *
+   * @return array
+   *   A single form element.
+   */
+  protected function configFormTableColumn(array &$form_state, $column_name, array $source) {
+    return array();
+  }
+
+  /**
    * {@inheritdoc}
    */
   protected function __construct($id) {
@@ -150,30 +182,13 @@ abstract class FeedsExBase extends FeedsParser {
     $this->loadLibrary();
     $this->startErrorHandling();
 
-    $config = $this->getConfig();
-    $result = new FeedsParserResult();
-
-    // Set link.
-    $fetcher_config = $source->getConfigFor($source->importer->fetcher);
-    $result->link = $fetcher_config['source'];
-
-    $expressions = $this->prepareExpressions();
-    $variable_map = $this->prepareVariables($expressions);
-
     try {
-      $this->setUp($source, $fetcher_result);
-
-      foreach ($this->executeContext($source, $fetcher_result) as $row) {
-        if ($item = $this->executeSources($row, $expressions, $variable_map)) {
-          $result->items[] = $item;
-        }
-      }
-
-      $this->cleanUp($source, $result);
+      $result = $this->delegateParsing($source, $fetcher_result);
     }
     catch (FeedsExEmptyException $e) {
       // The feed is empty.
       $this->getMessenger()->setMessage(t('The feed is empty.'), 'warning', FALSE);
+      $result = new FeedsParserResult();
     }
     catch (Expcetion $exception) {
       // Do nothing. Store for later.
@@ -195,6 +210,44 @@ abstract class FeedsExBase extends FeedsParser {
     if (isset($exception)) {
       throw $exception;
     }
+
+    return $result;
+  }
+
+  /**
+   * Delegates parsing to the subclass.
+   *
+   * @param FeedsSource $source
+   *   The feed source.
+   * @param FeedsFetcherResult $fetcher_result
+   *   The fetcher result.
+   *
+   * @return FeedsParserResult
+   *   The populated parser result.
+   *
+   * @throws FeedsExEmptyException
+   *   Thrown if the feed is empty.
+   * @throws Exception
+   *   Thrown if an error occured during parsing.
+   */
+  protected function delegateParsing(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
+    $result = new FeedsParserResult();
+    // Set link.
+    $fetcher_config = $source->getConfigFor($source->importer->fetcher);
+    $result->link = is_string($fetcher_config['source']) ? $fetcher_config['source'] : '';
+
+    $expressions = $this->prepareExpressions();
+    $variable_map = $this->prepareVariables($expressions);
+
+    $this->setUp($source, $fetcher_result);
+
+    foreach ($this->executeContext($source, $fetcher_result) as $row) {
+      if ($item = $this->executeSources($row, $expressions, $variable_map)) {
+        $result->items[] = $item;
+      }
+    }
+
+    $this->cleanUp($source, $result);
 
     return $result;
   }
@@ -408,33 +461,6 @@ abstract class FeedsExBase extends FeedsParser {
   }
 
   /**
-   * Reuturns the list of table headers.
-   *
-   * @return []string
-   *   A list of header names.
-   */
-  protected function configFormTableHeader() {
-    return array();
-  }
-
-  /**
-   * Returns a form element for a specific column.
-   *
-   * @param array &$form_state
-   *   The current form state.
-   * @param string $column_name
-   *   The name of the column.
-   * @param array $source
-   *   The individual source item.
-   *
-   * @return array
-   *   A single form element.
-   */
-  protected function configFormTableColumn(array &$form_state, $column_name, array $source) {
-    return array();
-  }
-
-  /**
    * {@inheritdoc}
    */
   public function configForm(&$form_state) {
@@ -558,7 +584,6 @@ abstract class FeedsExBase extends FeedsParser {
       '#size' => 3,
       '#attributes' => array('class' => array('feeds-ex-source-weight')),
     );
-
     $form['display_errors'] = array(
       '#type' => 'checkbox',
       '#title' => t('Display errors'),
@@ -590,7 +615,6 @@ abstract class FeedsExBase extends FeedsParser {
       'feeds-ex-source-weight',
     );
     $form['#attached']['css'][] = drupal_get_path('module', 'feeds_ex') . '/feeds_ex.css';
-
     $form['#header'] = $this->getFormHeader();
 
     return $form;
@@ -772,7 +796,7 @@ abstract class FeedsExBase extends FeedsParser {
    * @internal Used only during testing to force handling.
    */
   public function setMultibyte($is_multibyte) {
-    $this->isMultibyte = $is_multibyte;
+    $this->isMultibyte = (bool) $is_multibyte;
   }
 
   /**
