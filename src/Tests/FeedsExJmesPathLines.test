@@ -26,6 +26,12 @@ class FeedsExJmesPathLinesUnitTests extends FeedsExJsonPathLinesUnitTests {
 
     $this->source = $this->getMockFeedsSource();
     $this->parser = FeedsConfigurable::instance('FeedsExJmesPathLines', 'test_parser');
+
+    // Set compile directory manually.
+    $this->variableDel('feeds_ex_jmespath_compile_dir');
+    $path = file_directory_temp() . '/' . drupal_base64_encode(drupal_random_bytes(40)) . '_feeds_ex_jmespath_dir';
+    $this->variableSet('feeds_ex_jmespath_compile_dir', $path);
+
     $this->parser->setConfig(array(
       'sources' => array(
         'title' => array(

@@ -29,13 +29,29 @@ class FeedsExJmesPathUnitTests extends FeedsExUnitTestBase {
     parent::setUp();
     require_once $this->moduleDir . '/src/FeedsExJmesPath.inc';
     $this->source = $this->getMockFeedsSource();
+    $this->variableDel('feeds_ex_jmespath_compile_dir');
+  }
+
+  /**
+   * Returns a new instance of the parser.
+   *
+   * @return FeedsExJmesPath
+   *   A parser instance.
+   */
+  protected function getParserInstance() {
+    $parser = FeedsConfigurable::instance('FeedsExJmesPath', 'test_parser');
+    if (!$this->variableGet('feeds_ex_jmespath_compile_dir')) {
+      $path = file_directory_temp() . '/' . drupal_base64_encode(drupal_random_bytes(40)) . '_feeds_ex_jmespath_dir';
+      $this->variableSet('feeds_ex_jmespath_compile_dir', $path);
+    }
+    return $parser;
   }
 
   /**
    * Tests simple parsing.
    */
   public function testSimpleParsing() {
-    $parser = FeedsConfigurable::instance('FeedsExJmesPath', 'test_parser');
+    $parser = $this->getParserInstance();
     $fetcher_result = new FeedsFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test.json'));
 
     $parser->setConfig(array(
@@ -69,7 +85,7 @@ class FeedsExJmesPathUnitTests extends FeedsExUnitTestBase {
    * This implicitly tests FeedsExBase's encoding conversion.
    */
   public function testEUCJPEncoded() {
-    $parser = FeedsConfigurable::instance('FeedsExJmesPath', 'test_parser');
+    $parser = $this->getParserInstance();
     $fetcher_result = new FeedsFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test_jp.json'));
 
     $parser->setConfig(array(
@@ -105,7 +121,7 @@ class FeedsExJmesPathUnitTests extends FeedsExUnitTestBase {
     // Set batch limit.
     $this->variableSet('feeds_process_limit', 1);
 
-    $parser = FeedsConfigurable::instance('FeedsExJmesPath', 'test_parser');
+    $parser = $this->getParserInstance();
     $fetcher_result = new FeedsFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test.json'));
 
     $parser->setConfig(array(

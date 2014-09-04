@@ -6,6 +6,7 @@
  */
 
 use JmesPath\Runtime\AstRuntime;
+use JmesPath\Runtime\CompilerRuntime;
 use JmesPath\SyntaxErrorException;
 
 /**
@@ -21,10 +22,56 @@ class FeedsExJmesPath extends FeedsExBase {
   protected $jmesPath;
 
   /**
+   * The directory JmesPath uses to store generated code.
+   *
+   * @var string
+   */
+  protected $compileDirectory;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
-    $this->jmesPath = new AstRuntime();
+    // This is probably overly paranoid, but safety first.
+    $path = $this->getCompileDirectory();
+    if (!$path) {
+      $path = file_directory_temp() . '/' . drupal_base64_encode(drupal_random_bytes(40)) . '_feeds_ex_jmespath_dir';
+    }
+    try {
+      $this->jmesPath = new CompilerRuntime(array('dir' => $path));
+    }
+    catch (RuntimeException $e) {
+      $this->jmesPath = new AstRuntime();
+      $path = FALSE;
+    }
+    $this->setCompileDirectory($path);
+  }
+
+  /**
+   * Returns the compilation directory.
+   *
+   * @return string
+   *   The directory JmesPath uses to store generated code.
+   */
+  protected function getCompileDirectory() {
+    if (!isset($this->compileDirectory)) {
+      $this->compileDirectory = variable_get('feeds_ex_jmespath_compile_dir');
+    }
+
+    return $this->compileDirectory;
+  }
+
+  /**
+   * Sets the compilation directory.
+   *
+   * @param string $directory
+   *   The directory JmesPath uses to store generated code.
+   */
+  protected function setCompileDirectory($directory) {
+    if ($this->compileDirectory !== $directory) {
+      $this->compileDirectory = $directory;
+      variable_set('feeds_ex_jmespath_compile_dir', $directory);
+    }
   }
 
   /**

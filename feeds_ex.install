@@ -11,3 +11,10 @@
 function feeds_ex_enable() {
   cache_clear_all('plugins:feeds:plugins', 'cache');
 }
+
+/**
+ * Implements hook_uninstall().
+ */
+function feeds_ex_uninstall() {
+  variable_del('feeds_ex_jmespath_compile_dir');
+}
