@@ -94,7 +94,8 @@ class FeedsExJmesPath extends FeedsExBase {
       $parser->search($expression, array());
     }
     catch (SyntaxErrorException $e) {
-      return check_plain($e->getMessage());
+      // Remove newlines after nl2br() to make testing easier.
+      return str_replace("\n", '', nl2br(check_plain(trim($e->getMessage()))));
     }
   }
 

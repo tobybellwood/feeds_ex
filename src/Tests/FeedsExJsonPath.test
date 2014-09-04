@@ -123,4 +123,19 @@ class FeedsExJsonPathUnitTests extends FeedsExUnitTestBase {
     $this->assertEqual(count($result->items), 0, format_string('@count items parsed.', array('@count' => count($result->items))));
   }
 
+  /**
+   * Tests JSONPath validation.
+   *
+   * @todo Do real validation.
+   */
+  public function testValidateExpression() {
+    // Invalid expression.
+    $parser = FeedsConfigurable::instance('FeedsExJsonPath', 'test_parser');
+    $expression = array('!! ');
+    $this->assertEqual(NULL, $this->invokeMethod($parser, 'validateExpression', $expression));
+
+    // Test that value was trimmed.
+    $this->assertEqual($expression[0], '!!', 'Value was trimmed.');
+  }
+
 }

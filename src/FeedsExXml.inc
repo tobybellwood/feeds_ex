@@ -173,7 +173,7 @@ class FeedsExXml extends FeedsExBase {
       // Error code 1219 is an undefined namespace prefix.
       // Our sample doc doesn't have any namespaces.
       elseif ($error->code != 1219) {
-        $message = t('There was an error with the XPath expression: %error', array('%error' => $error->message));
+        $message = check_plain(trim($error->message));
       }
     }
 

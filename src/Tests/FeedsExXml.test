@@ -185,4 +185,24 @@ class FeedsExXmlUnitTests extends FeedsExUnitTestBase {
     $this->assertEqual($result->link, 'file fetcher source path');
   }
 
+  /**
+   * Tests XPath validation.
+   */
+  public function testValidateExpression() {
+    // Invalid expression.
+    $parser = FeedsConfigurable::instance('FeedsExXml', 'test_parser');
+    $expression = array('!!');
+    $this->assertEqual('Invalid expression', $this->invokeMethod($parser, 'validateExpression', $expression));
+
+    // Test that value was trimmed.
+    $this->assertEqual($expression[0], '!!', 'Value was trimmed.');
+
+    // Unknown namespace.
+    $this->assertEqual(NULL, $this->invokeMethod($parser, 'validateExpression', array('thing:asdf')));
+
+
+    // Empty.
+    $this->assertEqual(NULL, $this->invokeMethod($parser, 'validateExpression', array('')));
+  }
+
 }

@@ -144,5 +144,20 @@ class FeedsExJmesPathUnitTests extends FeedsExUnitTestBase {
     $this->assertEqual(count($result->items), 0, format_string('@count items parsed.', array('@count' => count($result->items))));
   }
 
+  /**
+   * Tests JMESPath validation.
+   */
+  public function testValidateExpression() {
+    // Invalid expression.
+    $parser = FeedsConfigurable::instance('FeedsExJmesPath', 'test_parser');
+    $expression = array('!! ');
+    $this->assertEqual('Syntax error at character 0<br />!!<br />^<br />Invalid expression', $this->invokeMethod($parser, 'validateExpression', $expression));
+
+    // Test that value was trimmed.
+    $this->assertEqual($expression[0], '!!', 'Value was trimmed.');
+
+    // Empty string.
+    $this->assertEqual(NULL, $this->invokeMethod($parser, 'validateExpression', array('')));
+  }
 
 }

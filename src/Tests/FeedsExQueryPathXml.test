@@ -217,4 +217,20 @@ class FeedsExQueryPathXmlUnitTests extends FeedsExUnitTestBase {
     }
   }
 
+  /**
+   * Tests QueryPath validation.
+   */
+  public function testValidateExpression() {
+    // Invalid expression.
+    $parser = FeedsConfigurable::instance('FeedsExQueryPathXml', 'test_parser');
+    $expression = array('!!');
+    $this->assertEqual('CSS selector is not well formed.', $this->invokeMethod($parser, 'validateExpression', $expression));
+
+    // Test that value was trimmed.
+    $this->assertEqual($expression[0], '!!', 'Value was trimmed.');
+
+    // Empty.
+    $this->assertEqual(NULL, $this->invokeMethod($parser, 'validateExpression', array('')));
+  }
+
 }
