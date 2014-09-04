@@ -97,7 +97,7 @@ class FeedsExXmlUtility {
   }
 
   /**
-   * Builds a DOMDocument setting some defautl values.
+   * Builds a DOMDocument setting some default values.
    *
    * @return DOMDocument
    *   A new DOMDocument.

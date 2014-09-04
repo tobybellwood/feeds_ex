@@ -200,7 +200,6 @@ class FeedsExXmlUnitTests extends FeedsExUnitTestBase {
     // Unknown namespace.
     $this->assertEqual(NULL, $this->invokeMethod($parser, 'validateExpression', array('thing:asdf')));
 
-
     // Empty.
     $this->assertEqual(NULL, $this->invokeMethod($parser, 'validateExpression', array('')));
   }
