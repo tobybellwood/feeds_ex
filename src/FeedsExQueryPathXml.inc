@@ -38,12 +38,11 @@ class FeedsExQueryPathXml extends FeedsExXml {
       $state->total = $query_path->size();
     }
 
-    $state->start = $state->pointer ? $state->pointer : 0;
-    $limit = $state->start + $source->importer->getLimit();
-    $state->pointer = $limit > $state->total ? $state->total : $limit;
+    $start = (int) $state->pointer;
+    $state->pointer = $start + $source->importer->getLimit();
     $state->progress($state->total, $state->pointer);
 
-    return $query_path->slice($state->start, $source->importer->getLimit());
+    return $query_path->slice($start, $source->importer->getLimit());
   }
 
   /**

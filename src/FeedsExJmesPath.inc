@@ -33,8 +33,7 @@ class FeedsExJmesPath extends FeedsExBase {
    */
   protected function setUp(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
     // This is probably overly paranoid, but safety first.
-    $path = $this->getCompileDirectory();
-    if (!$path) {
+    if (!$path = $this->getCompileDirectory()) {
       $path = file_directory_temp() . '/' . drupal_base64_encode(drupal_random_bytes(40)) . '_feeds_ex_jmespath_dir';
     }
     try {
@@ -97,7 +96,7 @@ class FeedsExJmesPath extends FeedsExBase {
     }
 
     // @todo Consider using array slice syntax when it is supported.
-    $start = $state->pointer ? $state->pointer : 0;
+    $start = (int) $state->pointer;
     $state->pointer = $start + $source->importer->getLimit();
     return array_slice($parsed, $start, $source->importer->getLimit());
   }
@@ -131,7 +130,7 @@ class FeedsExJmesPath extends FeedsExBase {
    */
   protected function validateExpression(&$expression) {
     $expression = trim($expression);
-    if (!$expression) {
+    if (!strlen($expression)) {
       return;
     }
 

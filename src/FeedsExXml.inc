@@ -62,13 +62,11 @@ class FeedsExXml extends FeedsExBase {
       $state->total = $this->xpath->evaluate('count(' . $this->config['context']['value'] . ')');
     }
 
-    $start = $state->pointer ? $state->pointer : 0;
-    $limit = $start + $source->importer->getLimit();
-    $end = $limit > $state->total ? $state->total : $limit;
-    $state->pointer = $end;
+    $start = (int) $state->pointer;
+    $state->pointer = $start + $source->importer->getLimit();
 
     // A batched XPath expression.
-    $context_query = '(' . $this->config['context']['value'] . ")[position() > $start and position() <= $end]";
+    $context_query = '(' . $this->config['context']['value'] . ")[position() > $start and position() <= {$state->pointer}]";
     return $this->xpath->query($context_query);
   }
 

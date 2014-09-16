@@ -32,7 +32,7 @@ class FeedsExJsonPath extends FeedsExBase {
       $state->total = count($parsed);
     }
 
-    $start = $state->pointer ? $state->pointer : 0;
+    $start = (int) $state->pointer;
     $state->pointer = $start + $source->importer->getLimit();
     return array_slice($parsed, $start, $source->importer->getLimit());
   }

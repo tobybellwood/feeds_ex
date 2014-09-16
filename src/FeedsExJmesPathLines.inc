@@ -44,20 +44,16 @@ class FeedsExJmesPathLines extends FeedsExJmesPath {
       $state->total = $this->iterator->getSize();
     }
 
-    $state->start = $state->pointer ? $state->pointer : 0;
-    $this->iterator->setStartPosition($state->start);
+    $this->iterator->setStartPosition((int) $state->pointer);
   }
 
   /**
    * {@inheritdoc}
    */
   protected function cleanUp(FeedsSource $source, FeedsParserResult $result) {
-    parent::cleanUp($source, $result);
-
-    $state = $source->state(FEEDS_PARSE);
-    $state->pointer = $this->iterator->ftell();
-
+    $source->state(FEEDS_PARSE)->pointer = $this->iterator->ftell();
     unset($this->iterator);
+    parent::cleanUp($source, $result);
   }
 
   /**
