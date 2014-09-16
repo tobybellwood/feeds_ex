@@ -57,8 +57,7 @@ class FeedsExXmlUnitTests extends FeedsExUnitTestBase {
     ));
 
     $result = $parser->parse($this->source, $fetcher_result);
-
-    $this->assertEqual(count($result->items), 3, format_string('@count items parsed.', array('@count' => count($result->items))));
+    $this->assertParserResultItemCount($result, 3);
 
     foreach ($result->items as $delta => $item) {
       $this->assertEqual('I am a title' . $delta, $item['title']);
@@ -90,8 +89,7 @@ class FeedsExXmlUnitTests extends FeedsExUnitTestBase {
     ));
 
     $result = $parser->parse($this->source, $fetcher_result);
-
-    $this->assertEqual(count($result->items), 3, format_string('@count items parsed.', array('@count' => count($result->items))));
+    $this->assertParserResultItemCount($result, 3);
 
     foreach ($result->items as $delta => $item) {
       $this->assertEqual('Я название' . $delta, $item['title']);
@@ -126,8 +124,7 @@ class FeedsExXmlUnitTests extends FeedsExUnitTestBase {
     ));
 
     $result = $parser->parse($this->source, $fetcher_result);
-
-    $this->assertEqual(count($result->items), 3, format_string('@count items parsed.', array('@count' => count($result->items))));
+    $this->assertParserResultItemCount($result, 3);
 
     foreach ($result->items as $delta => $item) {
       $this->assertEqual('私はタイトルです' . $delta, $item['title']);
@@ -162,10 +159,14 @@ class FeedsExXmlUnitTests extends FeedsExUnitTestBase {
 
     foreach (range(0, 2) as $delta) {
       $result = $parser->parse($this->source, $fetcher_result);
-      $this->assertEqual(count($result->items), 1, format_string('@count items parsed.', array('@count' => count($result->items))));
+      $this->assertParserResultItemCount($result, 1);
       $this->assertEqual('I am a title' . $delta, $result->items[0]['title']);
       $this->assertEqual('I am a description' . $delta, $result->items[0]['description']);
     }
+
+    // Should be empty.
+    $result = $parser->parse($this->source, $fetcher_result);
+    $this->assertParserResultItemCount($result, 0);
   }
 
   /**

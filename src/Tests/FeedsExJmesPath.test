@@ -71,8 +71,7 @@ class FeedsExJmesPathUnitTests extends FeedsExUnitTestBase {
     ));
 
     $result = $parser->parse($this->source, $fetcher_result);
-    $this->assertEqual(count($result->items), 3, format_string('@count items parsed.', array('@count' => count($result->items))));
-
+    $this->assertParserResultItemCount($result, 3);
     foreach ($result->items as $delta => $item) {
       $this->assertEqual('I am a title' . $delta, $item['title']);
       $this->assertEqual('I am a description' . $delta, $item['description']);
@@ -106,7 +105,7 @@ class FeedsExJmesPathUnitTests extends FeedsExUnitTestBase {
     ));
 
     $result = $parser->parse($this->source, $fetcher_result);
-    $this->assertEqual(count($result->items), 3, format_string('@count items parsed.', array('@count' => count($result->items))));
+    $this->assertParserResultItemCount($result, 3);
 
     foreach ($result->items as $delta => $item) {
       $this->assertEqual('私はタイトルです' . $delta, $item['title']);
@@ -140,24 +139,16 @@ class FeedsExJmesPathUnitTests extends FeedsExUnitTestBase {
       ),
     ));
 
-    $result = $parser->parse($this->source, $fetcher_result);
-    $this->assertEqual(count($result->items), 1, format_string('@count items parsed.', array('@count' => count($result->items))));
-    $this->assertEqual('I am a title0', $result->items[0]['title']);
-    $this->assertEqual('I am a description0', $result->items[0]['description']);
-
-    $result = $parser->parse($this->source, $fetcher_result);
-    $this->assertEqual(count($result->items), 1, format_string('@count items parsed.', array('@count' => count($result->items))));
-    $this->assertEqual('I am a title1', $result->items[0]['title']);
-    $this->assertEqual('I am a description1', $result->items[0]['description']);
-
-    $result = $parser->parse($this->source, $fetcher_result);
-    $this->assertEqual(count($result->items), 1, format_string('@count items parsed.', array('@count' => count($result->items))));
-    $this->assertEqual('I am a title2', $result->items[0]['title']);
-    $this->assertEqual('I am a description2', $result->items[0]['description']);
+    foreach (range(0, 2) as $delta) {
+      $result = $parser->parse($this->source, $fetcher_result);
+      $this->assertParserResultItemCount($result, 1);
+      $this->assertEqual('I am a title' . $delta, $result->items[0]['title']);
+      $this->assertEqual('I am a description' . $delta, $result->items[0]['description']);
+    }
 
     // We should be out of items.
     $result = $parser->parse($this->source, $fetcher_result);
-    $this->assertEqual(count($result->items), 0, format_string('@count items parsed.', array('@count' => count($result->items))));
+    $this->assertParserResultItemCount($result, 0);
   }
 
   /**

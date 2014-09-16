@@ -65,8 +65,7 @@ class FeedsExQueryPathHtmlUnitTests extends FeedsExUnitTestBase {
     ));
 
     $result = $parser->parse($this->source, $fetcher_result);
-
-    $this->assertEqual(count($result->items), 3, format_string('@count items parsed.', array('@count' => count($result->items))));
+    $this->assertParserResultItemCount($result, 3);
 
     $this->assertEqual('I am a title<thing>Stuff</thing>', $result->items[0]['title']);
     $this->assertEqual('I am a description0', $result->items[0]['description']);
@@ -102,8 +101,7 @@ class FeedsExQueryPathHtmlUnitTests extends FeedsExUnitTestBase {
     ));
 
     $result = $parser->parse($this->source, $fetcher_result);
-
-    $this->assertEqual(count($result->items), 3, format_string('@count items parsed.', array('@count' => count($result->items))));
+    $this->assertParserResultItemCount($result, 3);
 
     foreach ($result->items as $delta => $item) {
       $this->assertEqual('attribute' . $delta, $item['title']);
@@ -137,8 +135,7 @@ class FeedsExQueryPathHtmlUnitTests extends FeedsExUnitTestBase {
     ));
 
     $result = $parser->parse($this->source, $fetcher_result);
-
-    $this->assertEqual(count($result->items), 3, format_string('@count items parsed.', array('@count' => count($result->items))));
+    $this->assertParserResultItemCount($result, 3);
 
     foreach ($result->items as $delta => $item) {
       $this->assertEqual('Я название' . $delta, $item['title']);
@@ -175,8 +172,7 @@ class FeedsExQueryPathHtmlUnitTests extends FeedsExUnitTestBase {
     ));
 
     $result = $parser->parse($this->source, $fetcher_result);
-
-    $this->assertEqual(count($result->items), 3, format_string('@count items parsed.', array('@count' => count($result->items))));
+    $this->assertParserResultItemCount($result, 3);
 
     foreach ($result->items as $delta => $item) {
       $this->assertEqual('私はタイトルです' . $delta, $item['title']);

@@ -65,7 +65,7 @@ class FeedsExJsonPathLinesUnitTests extends FeedsExUnitTestBase {
    */
   public function testSimpleParsing() {
     $result = $this->parser->parse($this->source, $this->fetcherResult);
-    $this->assertEqual(count($result->items), 4, format_string('@count items parsed.', array('@count' => count($result->items))));
+    $this->assertParserResultItemCount($result, 4);
 
     foreach (array('Gilbert', 'Alexa', 'May', 'Deloise') as $delta => $name) {
       $this->assertEqual($name, $result->items[$delta]['title']);
@@ -80,9 +80,13 @@ class FeedsExJsonPathLinesUnitTests extends FeedsExUnitTestBase {
 
     foreach (array('Gilbert', 'Alexa', 'May', 'Deloise') as $name) {
       $result = $this->parser->parse($this->source, $this->fetcherResult);
-      $this->assertEqual(count($result->items), 1, format_string('@count items parsed.', array('@count' => count($result->items))));
+      $this->assertParserResultItemCount($result, 1);
       $this->assertEqual($result->items[0]['title'], $name);
     }
+
+    // We should be out of items.
+    $result = $this->parser->parse($this->source, $this->fetcherResult);
+    $this->assertParserResultItemCount($result, 0);
   }
 
 }

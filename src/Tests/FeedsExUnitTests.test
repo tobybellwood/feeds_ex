@@ -115,6 +115,18 @@ abstract class FeedsExUnitTestBase extends TUnit {
     define('FEEDS_EX_LIBRARY_PATH', $library_dir);
   }
 
+  /**
+   * Asserts that the correct number of items have been parsed.
+   *
+   * @param FeedsParserResult $result
+   *   The parser result.
+   * @param int $count
+   *   The number of items that should exist.
+   */
+  protected function assertParserResultItemCount(FeedsParserResult $result, $count) {
+    $this->assertEqual(count($result->items), $count, format_string('@count items parsed.', array('@count' => count($result->items))));
+  }
+
 }
 
 /**
