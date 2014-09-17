@@ -177,13 +177,6 @@ abstract class FeedsExBase extends FeedsParser {
   /**
    * {@inheritdoc}
    */
-  protected function __construct($id) {
-    parent::__construct($id);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function parse(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
     $this->loadLibrary();
     $this->startErrorHandling();
@@ -583,16 +576,7 @@ abstract class FeedsExBase extends FeedsParser {
       '#default_value' => $this->config['debug_mode'],
     );
 
-    if (function_exists('mb_detect_order')) {
-      $args = array('%encodings' => implode(', ', mb_detect_order()));
-      $form['source_encoding'] = array(
-        '#type' => 'textfield',
-        '#title' => t('Source encoding'),
-        '#description' => t('The possible encodings of the source files. auto: %encodings', $args),
-        '#default_value' => implode(', ', $this->config['source_encoding']),
-        '#autocomplete_path' => '_feeds_ex/encoding_autocomplete',
-      );
-    }
+    $form = $this->getEncoder()->configForm($form, $form_state);
 
     $form['#attached']['drupal_add_tabledrag'][] = array(
       'feeds-ex-source-table',
@@ -669,25 +653,8 @@ abstract class FeedsExBase extends FeedsParser {
     // Sort by weight.
     uasort($values['sources'], 'ctools_plugin_sort');
 
-    if (!function_exists('mb_detect_order')) {
-      return;
-    }
-    // Normalize encodings. Make them exactly as they are defined in
-    // mb_list_encodings(), but maintain user-defined order.
-    $encodings = array_map('drupal_strtolower', array_map('trim', explode(',', $values['source_encoding'])));
-    $values['source_encoding'] = array();
-    foreach (mb_list_encodings() as $encoding) {
-      // Maintain order.
-      $pos = array_search(drupal_strtolower($encoding), $encodings);
-      if ($pos !== FALSE) {
-        $values['source_encoding'][$pos] = $encoding;
-      }
-    }
-    ksort($values['source_encoding']);
-    // Make sure there's some value set.
-    if (!$values['source_encoding']) {
-      $values['source_encoding'][] = 'auto';
-    }
+    // Let the encoder do its thing.
+    $this->getEncoder()->configFormValidate($values);
   }
 
   /**
@@ -778,9 +745,13 @@ abstract class FeedsExBase extends FeedsParser {
    *
    * @param FeedsExMessengerInterface $messenger
    *   The messenger.
+   *
+   * @return $this
+   *   The parser object.
    */
   public function setMessenger(FeedsExMessengerInterface $messenger) {
     $this->messenger = $messenger;
+    return $this;
   }
 
   /**
@@ -793,8 +764,21 @@ abstract class FeedsExBase extends FeedsParser {
     if (!isset($this->messenger)) {
       $this->messenger = new FeedsExMessenger();
     }
-
     return $this->messenger;
+  }
+
+  /**
+   * Sets the encoder.
+   *
+   * @param FeedsExEncoderInterface $encoder
+   *   The encoder.
+   *
+   * @return $this
+   *   The parser object.
+   */
+  public function setEncoder(FeedsExEncoderInterface $encoder) {
+    $this->encoder = $encoder;
+    return $this;
   }
 
   /**
@@ -803,12 +787,11 @@ abstract class FeedsExBase extends FeedsParser {
    * @return FeedsExEncoderInterface
    *   The encoder object.
    */
-  protected function getEncoder() {
+  public function getEncoder() {
     if (!isset($this->encoder)) {
       $class = $this->encoderClass;
       $this->encoder = new $class($this->config['source_encoding']);
     }
-
     return $this->encoder;
   }
 

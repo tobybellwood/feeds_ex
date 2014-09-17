@@ -29,6 +29,27 @@ interface FeedsExEncoderInterface {
    */
   public function convertEncoding($data);
 
+  /**
+   * Returns the configuration form to select encodings.
+   *
+   * @param array $form
+   *   The current form.
+   * @param array &$form_state
+   *   The form state.
+   *
+   * @return array
+   *   The modified form array.
+   */
+  public function configForm(array $form, array &$form_state);
+
+  /**
+   * Validates the encoding configuration form.
+   *
+   * @param array &$values
+   *   The form values.
+   */
+  public function configFormValidate(array &$values);
+
 }
 
 /**
@@ -73,6 +94,51 @@ class FeedsExTextEncoder implements FeedsExEncoderInterface {
       return $data;
     }
     return $this->doConvert($data, $detected);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function configForm(array $form, array &$form_state) {
+    if (!$this->isMultibyte) {
+      return $form;
+    }
+
+    $args = array('%encodings' => implode(', ', mb_detect_order()));
+    $form['source_encoding'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Source encoding'),
+      '#description' => t('The possible encodings of the source files. auto: %encodings', $args),
+      '#default_value' => implode(', ', $this->encodingList),
+      '#autocomplete_path' => '_feeds_ex/encoding_autocomplete',
+    );
+    return $form;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function configFormValidate(array &$values) {
+    if (!$this->isMultibyte) {
+      return;
+    }
+    // Normalize encodings. Make them exactly as they are defined in
+    // mb_list_encodings(), but maintain user-defined order.
+    $encodings = array_map('strtolower', array_map('trim', explode(',', $values['source_encoding'])));
+
+    $values['source_encoding'] = array();
+    foreach (mb_list_encodings() as $encoding) {
+      // Maintain order.
+      $pos = array_search(strtolower($encoding), $encodings);
+      if ($pos !== FALSE) {
+        $values['source_encoding'][$pos] = $encoding;
+      }
+    }
+    ksort($values['source_encoding']);
+    // Make sure there's some value set.
+    if (!$values['source_encoding']) {
+      $values['source_encoding'][] = 'auto';
+    }
   }
 
   /**
