@@ -153,7 +153,7 @@ class FeedsExJsonPathUnitTests extends FeedsExUnitTestBase {
   /**
    * Tests empty feed handling.
    */
-  public function _testEmptyFeed() {
+  public function testEmptyFeed() {
     $parser = $this->getParserInstance();
     $parser->parse($this->source, new FeedsFetcherResult(' '));
     $messages = $parser->getMessenger()->getMessages();
