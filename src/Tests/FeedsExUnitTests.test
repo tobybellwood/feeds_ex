@@ -39,6 +39,7 @@ abstract class FeedsExUnitTestBase extends TUnit {
     drupal_load('module', 'feeds_ex');
     $this->moduleDir = DRUPAL_ROOT . '/' . drupal_get_path('module', 'feeds_ex');
     require_once $this->moduleDir . '/src/Json/Utility.php';
+    require_once $this->moduleDir . '/src/Text/Utility.php';
     require_once $this->moduleDir . '/src/Xml/Utility.php';
     require_once $this->moduleDir . '/src/File/FeedsExLineIterator.php';
     require_once $this->moduleDir . '/src/FeedsExBase.inc';
