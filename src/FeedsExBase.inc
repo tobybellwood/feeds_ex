@@ -190,7 +190,7 @@ abstract class FeedsExBase extends FeedsParser {
       $this->getMessenger()->setMessage(t('The feed is empty.'), 'warning', FALSE);
       $result = new FeedsParserResult();
     }
-    catch (Expcetion $exception) {
+    catch (Exception $exception) {
       // Do nothing. Store for later.
     }
 
