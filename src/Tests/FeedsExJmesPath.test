@@ -167,4 +167,25 @@ class FeedsExJmesPathUnitTests extends FeedsExUnitTestBase {
     $this->assertEqual(NULL, $this->invokeMethod($parser, 'validateExpression', array('')));
   }
 
+  /**
+   * Tests parsing invalid JSON.
+   */
+  public function testInvalidJson() {
+    $parser = $this->getParserInstance();
+
+    $parser->setConfig(array(
+      'context' => array(
+        'value' => 'items',
+      ),
+      'sources' => array(),
+    ));
+
+    $args = array($this->source, new FeedsFetcherResult('{"items": "not an array"}'));
+    $this->assertException(array($parser, 'parse'), $args, 'RuntimeException', t('The context expression must return an object or array.'));
+
+    // Invalid JSON.
+    $args = array($this->source, new FeedsFetcherResult('invalid json'));
+    $this->assertException(array($parser, 'parse'), $args, 'RuntimeException', t('The JSON is invalid.'));
+  }
+
 }

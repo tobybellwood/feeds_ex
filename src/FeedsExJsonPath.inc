@@ -24,8 +24,11 @@ class FeedsExJsonPath extends FeedsExBase {
       $raw = $this->convertEncoding($raw, $encoding);
     }
 
-    $parsed = drupal_json_decode($raw);
+    $parsed = FeedsExJsonUtility::decodeJsonArray($raw);
     $parsed = jsonPath($parsed, $this->config['context']['value']);
+    if (!is_array($parsed)) {
+      throw new RuntimeException(t('The context expression must return an object or array.'));
+    }
 
     $state = $source->state(FEEDS_PARSE);
     if (!$state->total) {

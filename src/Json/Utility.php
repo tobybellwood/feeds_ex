@@ -44,4 +44,26 @@ class FeedsExJsonUtility {
     }
   }
 
+  /**
+   * Decodes a JSON string into an array.
+   *
+   * @param string $json
+   *   A JSON string.
+   *
+   * @return array
+   *   A PHP array.
+   *
+   * @throws RuntimeException
+   *   Thrown if the encoded JSON does not result in an array.
+   */
+  public static function decodeJsonArray($json) {
+    $parsed = drupal_json_decode($json);
+
+    if (!is_array($parsed)) {
+      throw new RuntimeException(t('The JSON is invalid.'));
+    }
+
+    return $parsed;
+  }
+
 }

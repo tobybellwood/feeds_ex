@@ -62,7 +62,7 @@ class FeedsExJsonPathLines extends FeedsExJsonPath {
     if ($encoding = $this->detectEncoding($row)) {
       $row = $this->convertEncoding($row, $encoding);
     }
-    $result = jsonPath(drupal_json_decode($row), $expression);
+    $result = jsonPath(FeedsExJsonUtility::decodeJsonArray($row), $expression);
 
     if (is_scalar($result)) {
       return $result;

@@ -64,8 +64,7 @@ class FeedsExJmesPathLines extends FeedsExJmesPath {
     if ($encoding = $this->detectEncoding($row)) {
       $row = $this->convertEncoding($row, $encoding);
     }
-    $row = drupal_json_decode($row);
-    $result = $this->jmesPath->search($expression, $row);
+    $result = $this->jmesPath->search($expression, FeedsExJsonUtility::decodeJsonArray($row));
 
     if (is_scalar($result)) {
       return $result;
