@@ -18,3 +18,9 @@ function feeds_ex_enable() {
 function feeds_ex_uninstall() {
   variable_del('feeds_ex_jmespath_compile_dir');
 }
+
+/**
+ * Empty update hook to clear the cache.
+ */
+function feeds_ex_update_7101() {
+}
