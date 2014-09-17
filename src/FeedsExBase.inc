@@ -194,17 +194,11 @@ abstract class FeedsExBase extends FeedsParser {
       // Do nothing. Store for later.
     }
 
-    // Show some warnings.
+    // Display and log errors.
     $errors = $this->getErrors();
-    if ($this->config['display_errors']) {
-      $this->printErrors($errors, WATCHDOG_DEBUG);
-    }
-    else {
-      // Always print fatal errors.
-      $this->printErrors($errors);
-    }
-    // Log any fatal errors.
+    $this->printErrors($errors, $this->config['display_errors'] ? WATCHDOG_DEBUG : WATCHDOG_ERROR);
     $this->logErrors($source, $errors);
+
     $this->stopErrorHandling();
 
     if (isset($exception)) {
