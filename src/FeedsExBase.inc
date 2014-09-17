@@ -180,14 +180,19 @@ abstract class FeedsExBase extends FeedsParser {
   public function parse(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
     $this->loadLibrary();
     $this->startErrorHandling();
+    $result = new FeedsParserResult();
+    // Set link.
+    $fetcher_config = $source->getConfigFor($source->importer->fetcher);
+    $result->link = is_string($fetcher_config['source']) ? $fetcher_config['source'] : '';
 
     try {
-      $result = $this->delegateParsing($source, $fetcher_result);
+      $this->setUp($source, $fetcher_result);
+      $this->parseItems($source, $fetcher_result, $result);
+      $this->cleanUp($source, $result);
     }
     catch (FeedsExEmptyException $e) {
       // The feed is empty.
       $this->getMessenger()->setMessage(t('The feed is empty.'), 'warning', FALSE);
-      $result = new FeedsParserResult();
     }
     catch (Exception $exception) {
       // Do nothing. Store for later.
@@ -203,35 +208,6 @@ abstract class FeedsExBase extends FeedsParser {
     if (isset($exception)) {
       throw $exception;
     }
-
-    return $result;
-  }
-
-  /**
-   * Delegates parsing to the subclass.
-   *
-   * @param FeedsSource $source
-   *   The feed source.
-   * @param FeedsFetcherResult $fetcher_result
-   *   The fetcher result.
-   *
-   * @return FeedsParserResult
-   *   The populated parser result.
-   *
-   * @throws FeedsExEmptyException
-   *   Thrown if the feed is empty.
-   * @throws Exception
-   *   Thrown if an error occured during parsing.
-   */
-  protected function delegateParsing(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
-    $result = new FeedsParserResult();
-    // Set link.
-    $fetcher_config = $source->getConfigFor($source->importer->fetcher);
-    $result->link = is_string($fetcher_config['source']) ? $fetcher_config['source'] : '';
-
-    $this->setUp($source, $fetcher_result);
-    $this->parseItems($source, $fetcher_result, $result);
-    $this->cleanUp($source, $result);
 
     return $result;
   }
