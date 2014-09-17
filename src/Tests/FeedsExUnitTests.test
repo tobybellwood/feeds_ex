@@ -160,6 +160,7 @@ class FeedsExRemoveDefaultNamespaces extends DrupalUnitTestCase {
 
   public function setUp() {
     parent::setUp();
+    require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'feeds_ex') . '/src/Text/Utility.php';
     require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'feeds_ex') . '/src/Xml/Utility.php';
   }
 
