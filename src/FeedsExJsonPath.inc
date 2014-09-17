@@ -73,6 +73,14 @@ class FeedsExJsonPath extends FeedsExBase {
   /**
    * {@inheritdoc}
    */
+  protected function startErrorHandling() {
+    // Clear the json errors from previous parsing.
+    json_decode('');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   protected function getErrors() {
     if (!function_exists('json_last_error')) {
       return array();
