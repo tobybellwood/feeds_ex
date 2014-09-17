@@ -158,11 +158,7 @@ class FeedsExHtmlUnitTests extends FeedsExUnitTestBase {
   public function testEmptyFeed() {
     $parser = $this->getParserInstance();
     $parser->parse($this->source, new FeedsFetcherResult(' '));
-    $messages = $parser->getMessenger()->getMessages();
-    $this->assertEqual(1, count($messages), 'The expected number of messages.');
-    $this->assertEqual($messages[0]['message'], 'The feed is empty.', 'Message text is correct.');
-    $this->assertEqual($messages[0]['type'], 'warning', 'Message type is warning.');
-    $this->assertFalse($messages[0]['repeat'], 'Repeat is set to false.');
+    $this->assertEmptyFeedMessage($parser->getMessenger()->getMessages());
   }
 
   /**
