@@ -20,13 +20,6 @@ class FeedsExJsonPathLines extends FeedsExJsonPath {
   /**
    * {@inheritdoc}
    */
-  protected function executeContext(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
-    return $this->iterator;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   protected function hasConfigurableContext() {
     return FALSE;
   }
@@ -48,6 +41,32 @@ class FeedsExJsonPathLines extends FeedsExJsonPath {
   /**
    * {@inheritdoc}
    */
+  protected function parseItems(FeedsSource $source, FeedsFetcherResult $fetcher_result, FeedsParserResult $result) {
+    $expressions = $this->prepareExpressions();
+    $variable_map = $this->prepareVariables($expressions);
+
+    foreach ($this->iterator as $row) {
+      if ($encoding = $this->detectEncoding($row)) {
+        $row = $this->convertEncoding($row, $encoding);
+      }
+
+      try {
+        $row = FeedsExJsonUtility::decodeJsonArray($row);
+      }
+      catch (RuntimeException $e) {
+        // An array wasn't returned. Skip this item.
+        continue;
+      }
+
+      if ($item = $this->executeSources($row, $expressions, $variable_map)) {
+        $result->items[] = $item;
+      }
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   protected function cleanUp(FeedsSource $source, FeedsParserResult $result) {
     $source->state(FEEDS_PARSE)->pointer = $this->iterator->ftell();
     unset($this->iterator);
@@ -58,11 +77,7 @@ class FeedsExJsonPathLines extends FeedsExJsonPath {
    * {@inheritdoc}
    */
   protected function executeSourceExpression($machine_name, $expression, $row) {
-    // Row is a JSON string.
-    if ($encoding = $this->detectEncoding($row)) {
-      $row = $this->convertEncoding($row, $encoding);
-    }
-    $result = jsonPath(FeedsExJsonUtility::decodeJsonArray($row), $expression);
+    $result = jsonPath($row, $expression);
 
     if (is_scalar($result)) {
       return $result;

@@ -236,20 +236,32 @@ abstract class FeedsExBase extends FeedsParser {
     $fetcher_config = $source->getConfigFor($source->importer->fetcher);
     $result->link = is_string($fetcher_config['source']) ? $fetcher_config['source'] : '';
 
+    $this->setUp($source, $fetcher_result);
+    $this->parseItems($source, $fetcher_result, $result);
+    $this->cleanUp($source, $result);
+
+    return $result;
+  }
+
+  /**
+   * Performs the actual parsing.
+   *
+   * @param FeedsSource $source
+   *   The feed source.
+   * @param FeedsFetcherResult $fetcher_result
+   *   The fetcher result.
+   * @param FeedsParserResult $result
+   *   The parser result object to populate.
+   */
+  protected function parseItems(FeedsSource $source, FeedsFetcherResult $fetcher_result, FeedsParserResult $result) {
     $expressions = $this->prepareExpressions();
     $variable_map = $this->prepareVariables($expressions);
-
-    $this->setUp($source, $fetcher_result);
 
     foreach ($this->executeContext($source, $fetcher_result) as $row) {
       if ($item = $this->executeSources($row, $expressions, $variable_map)) {
         $result->items[] = $item;
       }
     }
-
-    $this->cleanUp($source, $result);
-
-    return $result;
   }
 
   /**
