@@ -30,6 +30,11 @@ class FeedsExJmesPathLines extends FeedsExJmesPath {
   protected function setUp(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
     parent::setUp($source, $fetcher_result);
     $this->iterator = new FeedsExLineIterator($fetcher_result->getFilePath());
+
+    if (!$this->iterator->getSize()) {
+      throw new FeedsExEmptyException();
+    }
+
     $this->iterator->setLineLimit($source->importer->getLimit());
 
     $state = $source->state(FEEDS_PARSE);
