@@ -14,16 +14,7 @@ class FeedsExJsonPath extends FeedsExBase {
    * {@inheritdoc}
    */
   protected function executeContext(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
-    $raw = trim($fetcher_result->getRaw());
-
-    if (!strlen($raw)) {
-      throw new FeedsExEmptyException();
-    }
-
-    if ($encoding = $this->detectEncoding($raw)) {
-      $raw = $this->convertEncoding($raw, $encoding);
-    }
-
+    $raw = $this->prepareRaw($fetcher_result);
     $parsed = FeedsExJsonUtility::decodeJsonArray($raw);
     $parsed = jsonPath($parsed, $this->config['context']['value']);
     if (!is_array($parsed)) {

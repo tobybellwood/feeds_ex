@@ -18,6 +18,20 @@ abstract class FeedsExBase extends FeedsParser {
   protected $messenger;
 
   /**
+   * The class used as the text encoder.
+   *
+   * @var string
+   */
+  protected $encoderClass = 'FeedsExTextEncoder';
+
+  /**
+   * The encoder used to convert encodings.
+   *
+   * @var FeedsExEncoderInterface
+   */
+  protected $encoder;
+
+  /**
    * Returns rows to be parsed.
    *
    * @param FeedsSource $source
@@ -165,7 +179,6 @@ abstract class FeedsExBase extends FeedsParser {
    */
   protected function __construct($id) {
     parent::__construct($id);
-    FeedsExTextUtility::setMultibyte($GLOBALS['multibyte'] == UNICODE_MULTIBYTE);
   }
 
   /**
@@ -370,33 +383,22 @@ abstract class FeedsExBase extends FeedsParser {
   }
 
   /**
-   * Detects the encoding of a string.
+   * Prepares the raw string for parsing.
    *
-   * @param string $data
-   *   The string to guess the encoding for.
-   *
-   * @return string|bool
-   *   Returns the encoding, or false if one could not be detected.
-   *
-   * @todo Add other methods of encoding detection.
-   */
-  protected function detectEncoding($data) {
-    return FeedsExTextUtility::detectEncoding($data, $this->config['source_encoding']);
-  }
-
-  /**
-   * Converts a string to UTF-8.
-   *
-   * @param string $data
-   *   The string to convert.
-   * @param string $from_encoding
-   *   The encoding to convert from.
+   * @param FeedsFetcherResult $fetcher_result
+   *   The fetcher result.
    *
    * @return string
-   *   The encoded string, or the original string if encoding failed.
+   *   The prepared raw string.
    */
-  protected function convertEncoding($data, $from_encoding) {
-    return FeedsExTextUtility::convertEncoding($data, $from_encoding);
+  protected function prepareRaw(FeedsFetcherResult $fetcher_result) {
+    $raw = trim($this->getEncoder()->convertEncoding($fetcher_result->getRaw()));
+
+    if (!strlen($raw)) {
+      throw new FeedsExEmptyException();
+    }
+
+    return $raw;
   }
 
   /**
@@ -795,6 +797,21 @@ abstract class FeedsExBase extends FeedsParser {
     return $this->messenger;
   }
 
+  /**
+   * Returns the encoder.
+   *
+   * @return FeedsExEncoderInterface
+   *   The encoder object.
+   */
+  protected function getEncoder() {
+    if (!isset($this->encoder)) {
+      $class = $this->encoderClass;
+      $this->encoder = new $class($this->config['source_encoding']);
+    }
+
+    return $this->encoder;
+  }
+
 }
 
 /**
@@ -866,6 +883,42 @@ class FeedsExTestMessenger implements FeedsExMessengerInterface {
   public function getMessages() {
     return $this->messages;
   }
+
+}
+
+/**
+ * Coverts text encodings.
+ */
+interface FeedsExEncoderInterface {
+
+  /**
+   * Constructs a FeedsExEncoderInterface object.
+   *
+   * @param array $encoding_list
+   *   The list of encodings to search through.
+   */
+  public function __construct(array $encoding_list);
+
+  /**
+   * Sets the multibyte handling.
+   *
+   * @param bool $is_multibyte
+   *   Whether this parser should assume multibyte handling exists.
+   */
+  public function setMultibyte($is_multibyte);
+
+  /**
+   * Converts a string to UTF-8.
+   *
+   * @param string $data
+   *   The string to convert.
+   *
+   * @return string
+   *   The encoded string, or the original string if encoding failed.
+   *
+   * @see drupal_convert_to_utf8()
+   */
+  public function convertEncoding($data);
 
 }
 

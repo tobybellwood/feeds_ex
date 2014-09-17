@@ -51,10 +51,7 @@ class FeedsExJsonPathLines extends FeedsExJsonPath {
     $variable_map = $this->prepareVariables($expressions);
 
     foreach ($this->iterator as $row) {
-      if ($encoding = $this->detectEncoding($row)) {
-        $row = $this->convertEncoding($row, $encoding);
-      }
-
+      $row = $this->getEncoder()->convertEncoding($row);
       try {
         $row = FeedsExJsonUtility::decodeJsonArray($row);
       }

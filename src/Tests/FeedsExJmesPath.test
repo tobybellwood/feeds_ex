@@ -39,7 +39,7 @@ class FeedsExJmesPathUnitTests extends FeedsExUnitTestBase {
    *   A parser instance.
    */
   protected function getParserInstance() {
-    $parser = FeedsConfigurable::instance('FeedsExJmesPath', 'test_parser');
+    $parser = FeedsConfigurable::instance('FeedsExJmesPath', strtolower($this->randomName()));
     $parser->setMessenger(new FeedsExTestMessenger());
     if (!$this->variableGet('feeds_ex_jmespath_compile_dir')) {
       $path = file_directory_temp() . '/' . drupal_base64_encode(drupal_random_bytes(40)) . '_feeds_ex_jmespath_dir';
@@ -157,7 +157,7 @@ class FeedsExJmesPathUnitTests extends FeedsExUnitTestBase {
    */
   public function testValidateExpression() {
     // Invalid expression.
-    $parser = FeedsConfigurable::instance('FeedsExJmesPath', 'test_parser');
+    $parser = $this->getParserInstance();
     $expression = array('!! ');
     $this->assertEqual('Syntax error at character 0<br />!!<br />^<br />Invalid expression', $this->invokeMethod($parser, 'validateExpression', $expression));
 

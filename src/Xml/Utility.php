@@ -113,72 +113,80 @@ class FeedsExXmlUtility {
     return $document;
   }
 
+}
+
+/**
+ * Converts the encoding of an XML document to UTF-8.
+ */
+class FeedsExXmlEncoder extends FeedsExTextEncoder {
+
   /**
-   * Converts the encoding of an XML document to UTF-8.
+   * The regex used to find the encoding.
    *
-   * @param string $data
-   *   The XML data to convert.
-   * @param array $encoding_list
-   *   The list of encodings to search for.
-   *
-   * @return string
-   *   The converted XML string.
+   * @var string
    */
-  public static function convertXmlEncoding($data, array $encoding_list) {
+  protected $findRegex = '/^<\?xml[^>]+encoding\s*=\s*("|\')([\w-]+)(\1)/';
+
+  /**
+   * The regex used to replace the encoding.
+   *
+   * @var string
+   */
+  protected $replaceRegex = '/^(<\?xml[^>]+encoding\s*=\s*("|\'))([\w-]+)(\2)/';
+
+  /**
+   * The replacement pattern.
+   *
+   * @var string
+   */
+  protected $replacePattern = '$1UTF-8$4';
+
+  /**
+   * {@inheritdoc}
+   */
+  public function convertEncoding($data) {
     // Check for an encoding declaration in the XML prolog.
     $matches = FALSE;
-    if (preg_match('/^<\?xml[^>]+encoding\s*=\s*("|\')([\w-]+)(\1)/', $data, $matches)) {
+    $encoding = 'ascii';
+    if (preg_match($this->findRegex, $data, $matches)) {
       $encoding = $matches[2];
     }
-    elseif ($detected = FeedsExTextUtility::detectEncoding($data, $encoding_list)) {
+    elseif ($detected = $this->detectEncoding($data)) {
       $encoding = $detected;
     }
 
     // Unsupported encodings are converted here into UTF-8.
-    if (in_array(strtolower($encoding), FeedsExTextUtility::$utf8Compatible)) {
+    if (in_array(strtolower($encoding), self::$utf8Compatible)) {
       return $data;
     }
 
-    $data = FeedsExTextUtility::convertEncoding($data, $encoding);
+    $data = $this->doConvert($data, $encoding);
     if ($matches) {
-      $data = preg_replace('/^(<\?xml[^>]+encoding\s*=\s*("|\'))([\w-]+)(\2)/', '$1UTF-8$4', $data);
+      $data = preg_replace($this->replaceRegex, $this->replacePattern, $data);
     }
 
     return $data;
   }
+}
+
+/**
+ * Converts the encoding of an HTML document to UTF-8.
+ */
+class FeedsExHtmlEncoder extends FeedsExXmlEncoder {
 
   /**
-   * Converts the encoding of an HTML document to UTF-8.
-   *
-   * @param string $data
-   *   The HTML data to convert.
-   * @param array $encoding_list
-   *   The list of encodings to search for.
-   *
-   * @return string
-   *   The converted HTML string.
+   * {@inheritdoc}
    */
-  public static function convertHtmlEncoding($data, array $encoding_list) {
-    // Check for an encoding declaration.
-    $matches = FALSE;
-    if (preg_match('/<meta[^>]+charset\s*=\s*["\']?([\w-]+)\b/i', $data, $matches)) {
-      $encoding = $matches[1];
-    }
-    elseif ($detected = FeedsExTextUtility::detectEncoding($data, $encoding_list)) {
-      $encoding = $detected;
-    }
+  protected $findRegex = '/(<meta[^>]+charset\s*=\s*["\']?)([\w-]+)\b/i';
 
-    // Unsupported encodings are converted here into UTF-8.
-    if (in_array(strtolower($encoding), FeedsExTextUtility::$utf8Compatible)) {
-      return $data;
-    }
+  /**
+   * {@inheritdoc}
+   */
+  protected $replaceRegex = '/(<meta[^>]+charset\s*=\s*["\']?)([\w-]+)\b/i';
 
-    $data = FeedsExTextUtility::convertEncoding($data, $encoding);
-    if ($matches) {
-      $data = preg_replace('/(<meta[^>]+charset\s*=\s*["\']?)([\w-]+)\b/i', '$1UTF-8', $data, 1);
-    }
-
-    return $data;
-  }
+  /**
+   * {@inheritdoc}
+   */
+  protected $replacePattern = '$1UTF-8';
 
 }

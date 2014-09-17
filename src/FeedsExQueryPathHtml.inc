@@ -16,6 +16,11 @@ class FeedsExQueryPathHtml extends FeedsExQueryPathXml {
   /**
    * {@inheritdoc}
    */
+  protected $encoderClass = 'FeedsExHtmlEncoder';
+
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
     // Change some parser settings.
     $this->queryPathOptions['use_parser'] = 'html';
@@ -39,11 +44,7 @@ class FeedsExQueryPathHtml extends FeedsExQueryPathXml {
    * {@inheritdoc}
    */
   protected function prepareDocument(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
-    $raw = $fetcher_result->getRaw();
-    if (!strlen(trim($raw))) {
-      throw new FeedsExEmptyException();
-    }
-    $raw = $this->convertEncoding($raw);
+    $raw = $this->prepareRaw($fetcher_result);
     if ($this->config['use_tidy'] && extension_loaded('tidy')) {
       $raw = tidy_repair_string($raw, $this->getTidyConfig(), 'utf8');
     }

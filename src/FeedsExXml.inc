@@ -34,6 +34,11 @@ class FeedsExXml extends FeedsExBase {
   /**
    * {@inheritdoc}
    */
+  protected $encoderClass = 'FeedsExXmlEncoder';
+
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
     $document = $this->prepareDocument($source, $fetcher_result);
     $this->xpath = new FeedsExXpathDomXpath($document);
@@ -198,11 +203,7 @@ class FeedsExXml extends FeedsExBase {
    *   The DOM document.
    */
   protected function prepareDocument(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
-    $raw = trim($fetcher_result->getRaw());
-    if (!strlen($raw)) {
-      throw new FeedsExEmptyException();
-    }
-    $raw = $this->convertEncoding($raw);
+    $raw = $this->prepareRaw($fetcher_result);
     // Remove default namespaces. This has to run after the encoding conversion
     // because a limited set of encodings are supported in regular expressions.
     $raw = FeedsExXmlUtility::removeDefaultNamespaces($raw);
