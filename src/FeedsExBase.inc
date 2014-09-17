@@ -887,42 +887,6 @@ class FeedsExTestMessenger implements FeedsExMessengerInterface {
 }
 
 /**
- * Coverts text encodings.
- */
-interface FeedsExEncoderInterface {
-
-  /**
-   * Constructs a FeedsExEncoderInterface object.
-   *
-   * @param array $encoding_list
-   *   The list of encodings to search through.
-   */
-  public function __construct(array $encoding_list);
-
-  /**
-   * Sets the multibyte handling.
-   *
-   * @param bool $is_multibyte
-   *   Whether this parser should assume multibyte handling exists.
-   */
-  public function setMultibyte($is_multibyte);
-
-  /**
-   * Converts a string to UTF-8.
-   *
-   * @param string $data
-   *   The string to convert.
-   *
-   * @return string
-   *   The encoded string, or the original string if encoding failed.
-   *
-   * @see drupal_convert_to_utf8()
-   */
-  public function convertEncoding($data);
-
-}
-
-/**
  * An exception thrown by parsers when they receive an empty feed.
  */
 class FeedsExEmptyException extends RuntimeException {}

@@ -2,8 +2,44 @@
 
 /**
  * @file
- * Contains FeedsExTextEncoder.
+ * Contains FeedsExEncoderInterface and FeedsExTextEncoder.
  */
+
+/**
+ * Coverts text encodings.
+ */
+interface FeedsExEncoderInterface {
+
+  /**
+   * Constructs a FeedsExEncoderInterface object.
+   *
+   * @param array $encoding_list
+   *   The list of encodings to search through.
+   */
+  public function __construct(array $encoding_list);
+
+  /**
+   * Sets the multibyte handling.
+   *
+   * @param bool $is_multibyte
+   *   Whether this parser should assume multibyte handling exists.
+   */
+  public function setMultibyte($is_multibyte);
+
+  /**
+   * Converts a string to UTF-8.
+   *
+   * @param string $data
+   *   The string to convert.
+   *
+   * @return string
+   *   The encoded string, or the original string if encoding failed.
+   *
+   * @see drupal_convert_to_utf8()
+   */
+  public function convertEncoding($data);
+
+}
 
 /**
  * Generic text encoder.
@@ -47,6 +83,16 @@ class FeedsExTextEncoder implements FeedsExEncoderInterface {
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public function convertEncoding($data) {
+    if (!$detected = $this->detectEncoding($data)) {
+      return $data;
+    }
+    return $this->doConvert($data, $detected);
+  }
+
+  /**
    * Detects the encoding of a string.
    *
    * @param string $data
@@ -62,16 +108,6 @@ class FeedsExTextEncoder implements FeedsExEncoderInterface {
       return mb_detect_encoding($data, $this->encodingList, TRUE);
     }
     return FALSE;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function convertEncoding($data) {
-    if (!$detected = $this->detectEncoding($data)) {
-      return $data;
-    }
-    return $this->doConvert($data, $detected);
   }
 
   /**
