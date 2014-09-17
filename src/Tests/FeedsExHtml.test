@@ -38,7 +38,7 @@ class FeedsExHtmlUnitTests extends FeedsExUnitTestBase {
    * Tests simple parsing.
    */
   public function testSimpleParsing() {
-    $parser = FeedsConfigurable::instance('FeedsExHtml', 'test_parser');
+    $parser = $this->getParserInstance();
     $fetcher_result = new FeedsFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test.html'));
 
     $parser->setConfig(array(
@@ -72,7 +72,7 @@ class FeedsExHtmlUnitTests extends FeedsExUnitTestBase {
    * Tests parsing a CP866 (Russian) encoded file.
    */
   public function testCP866Encoded() {
-    $parser = FeedsConfigurable::instance('FeedsExHtml', 'test_parser');
+    $parser = $this->getParserInstance();
     $fetcher_result = new FeedsFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test_ru.html'));
 
     $parser->setConfig(array(
@@ -106,7 +106,7 @@ class FeedsExHtmlUnitTests extends FeedsExUnitTestBase {
    * This implicitly tests FeedsExBase's encoding conversion.
    */
   public function testEUCJPEncodedNoDeclaration() {
-    $parser = FeedsConfigurable::instance('FeedsExHtml', 'test_parser');
+    $parser = $this->getParserInstance();
     $fetcher_result = new FeedsFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test_jp.html'));
 
     $parser->setConfig(array(
@@ -145,11 +145,36 @@ class FeedsExHtmlUnitTests extends FeedsExUnitTestBase {
       ),
     ));
 
-    $parser = FeedsConfigurable::instance('FeedsExHtml', 'test_parser');
+    $parser = $this->getParserInstance();
     $parser->setConfig(array('context' => array('value' => '/beep')));
 
     $result = $parser->parse($this->source, new FeedsFetcherResult('<?xml version="1.0" encoding="UTF-8"?><item></item>'));
     $this->assertEqual($result->link, 'file fetcher source path');
+  }
+
+  /**
+   * Tests empty feed handling.
+   */
+  public function testEmptyFeed() {
+    $parser = $this->getParserInstance();
+    $parser->parse($this->source, new FeedsFetcherResult(' '));
+    $messages = $parser->getMessenger()->getMessages();
+    $this->assertEqual(1, count($messages), 'The expected number of messages.');
+    $this->assertEqual($messages[0]['message'], 'The feed is empty.', 'Message text is correct.');
+    $this->assertEqual($messages[0]['type'], 'warning', 'Message type is warning.');
+    $this->assertFalse($messages[0]['repeat'], 'Repeat is set to false.');
+  }
+
+  /**
+   * Returns a new instance of the parser.
+   *
+   * @return FeedsExHtml
+   *   A parser instance.
+   */
+  protected function getParserInstance() {
+    $parser = FeedsConfigurable::instance('FeedsExHtml', 'test_parser');
+    $parser->setMessenger(new FeedsExTestMessenger());
+    return $parser;
   }
 
 }

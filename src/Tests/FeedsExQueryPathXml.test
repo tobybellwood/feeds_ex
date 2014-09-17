@@ -42,7 +42,7 @@ class FeedsExQueryPathXmlUnitTests extends FeedsExUnitTestBase {
    * Tests simple parsing.
    */
   public function testSimpleParsing() {
-    $parser = FeedsConfigurable::instance('FeedsExQueryPathXml', 'test_parser');
+    $parser = $this->getParserInstance();
     $fetcher_result = new FeedsFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test.xml'));
 
     $parser->setConfig(array(
@@ -76,7 +76,7 @@ class FeedsExQueryPathXmlUnitTests extends FeedsExUnitTestBase {
    * Tests grabbing an attribute.
    */
   public function testAttributeParsing() {
-    $parser = FeedsConfigurable::instance('FeedsExQueryPathXml', 'test_parser');
+    $parser = $this->getParserInstance();
     $fetcher_result = new FeedsFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test.xml'));
 
     $parser->setConfig(array(
@@ -110,7 +110,7 @@ class FeedsExQueryPathXmlUnitTests extends FeedsExUnitTestBase {
    * Tests parsing a CP866 (Russian) encoded file.
    */
   public function testCP866Encoded() {
-    $parser = FeedsConfigurable::instance('FeedsExQueryPathXml', 'test_parser');
+    $parser = $this->getParserInstance();
     $fetcher_result = new FeedsFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test_ru.xml'));
 
     $parser->setConfig(array(
@@ -146,7 +146,7 @@ class FeedsExQueryPathXmlUnitTests extends FeedsExUnitTestBase {
    * This implicitly tests FeedsExBase's encoding conversion.
    */
   public function testEUCJPEncodedNoDeclaration() {
-    $parser = FeedsConfigurable::instance('FeedsExQueryPathXml', 'test_parser');
+    $parser = $this->getParserInstance();
     $fetcher_result = new FeedsFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test_jp.xml'));
 
     $parser->setConfig(array(
@@ -181,7 +181,7 @@ class FeedsExQueryPathXmlUnitTests extends FeedsExUnitTestBase {
    * Tests that batch parsing works.
    */
   public function testBatchParsing() {
-    $parser = FeedsConfigurable::instance('FeedsExQueryPathXml', 'test_parser');
+    $parser = $this->getParserInstance();
     $fetcher_result = new FeedsFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test.xml'));
 
     $parser->setConfig(array(
@@ -220,7 +220,7 @@ class FeedsExQueryPathXmlUnitTests extends FeedsExUnitTestBase {
    */
   public function testValidateExpression() {
     // Invalid expression.
-    $parser = FeedsConfigurable::instance('FeedsExQueryPathXml', 'test_parser');
+    $parser = $this->getParserInstance();
     $expression = array('!!');
     $this->assertEqual('CSS selector is not well formed.', $this->invokeMethod($parser, 'validateExpression', $expression));
 
@@ -229,6 +229,31 @@ class FeedsExQueryPathXmlUnitTests extends FeedsExUnitTestBase {
 
     // Empty.
     $this->assertEqual(NULL, $this->invokeMethod($parser, 'validateExpression', array('')));
+  }
+
+  /**
+   * Tests empty feed handling.
+   */
+  public function testEmptyFeed() {
+    $parser = $this->getParserInstance();
+    $parser->parse($this->source, new FeedsFetcherResult(' '));
+    $messages = $parser->getMessenger()->getMessages();
+    $this->assertEqual(1, count($messages), 'The expected number of messages.');
+    $this->assertEqual($messages[0]['message'], 'The feed is empty.', 'Message text is correct.');
+    $this->assertEqual($messages[0]['type'], 'warning', 'Message type is warning.');
+    $this->assertFalse($messages[0]['repeat'], 'Repeat is set to false.');
+  }
+
+  /**
+   * Returns a new instance of the parser.
+   *
+   * @return FeedsExQueryPathXml
+   *   A parser instance.
+   */
+  protected function getParserInstance() {
+    $parser = FeedsConfigurable::instance('FeedsExQueryPathXml', 'test_parser');
+    $parser->setMessenger(new FeedsExTestMessenger());
+    return $parser;
   }
 
 }

@@ -40,6 +40,7 @@ class FeedsExJmesPathUnitTests extends FeedsExUnitTestBase {
    */
   protected function getParserInstance() {
     $parser = FeedsConfigurable::instance('FeedsExJmesPath', 'test_parser');
+    $parser->setMessenger(new FeedsExTestMessenger());
     if (!$this->variableGet('feeds_ex_jmespath_compile_dir')) {
       $path = file_directory_temp() . '/' . drupal_base64_encode(drupal_random_bytes(40)) . '_feeds_ex_jmespath_dir';
       $this->variableSet('feeds_ex_jmespath_compile_dir', $path);
@@ -186,6 +187,19 @@ class FeedsExJmesPathUnitTests extends FeedsExUnitTestBase {
     // Invalid JSON.
     $args = array($this->source, new FeedsFetcherResult('invalid json'));
     $this->assertException(array($parser, 'parse'), $args, 'RuntimeException', t('The JSON is invalid.'));
+  }
+
+  /**
+   * Tests empty feed handling.
+   */
+  public function testEmptyFeed() {
+    $parser = $this->getParserInstance();
+    $parser->parse($this->source, new FeedsFetcherResult(' '));
+    $messages = $parser->getMessenger()->getMessages();
+    $this->assertEqual(1, count($messages), 'The expected number of messages.');
+    $this->assertEqual($messages[0]['message'], 'The feed is empty.', 'Message text is correct.');
+    $this->assertEqual($messages[0]['type'], 'warning', 'Message type is warning.');
+    $this->assertFalse($messages[0]['repeat'], 'Repeat is set to false.');
   }
 
 }

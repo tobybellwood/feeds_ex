@@ -36,7 +36,7 @@ class FeedsExJsonPathUnitTests extends FeedsExUnitTestBase {
    * Tests simple parsing.
    */
   public function testSimpleParsing() {
-    $parser = FeedsConfigurable::instance('FeedsExJsonPath', 'test_parser');
+    $parser = $this->getParserInstance();
     $fetcher_result = new FeedsFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test.json'));
 
     $parser->setConfig(array(
@@ -71,7 +71,7 @@ class FeedsExJsonPathUnitTests extends FeedsExUnitTestBase {
     // Parse some invalid JSON.
     json_decode('\\"asdfasfd');
 
-    $parser = FeedsConfigurable::instance('FeedsExJsonPath', 'test_parser');
+    $parser = $this->getParserInstance();
     $errors = $this->invokeMethod($parser, 'getErrors');
     $this->assertEqual(3, $errors[0]['severity']);
   }
@@ -83,7 +83,7 @@ class FeedsExJsonPathUnitTests extends FeedsExUnitTestBase {
     // Set batch limit.
     $this->variableSet('feeds_process_limit', 1);
 
-    $parser = FeedsConfigurable::instance('FeedsExJsonPath', 'test_parser');
+    $parser = $this->getParserInstance();
     $fetcher_result = new FeedsFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test.json'));
 
     $parser->setConfig(array(
@@ -121,7 +121,7 @@ class FeedsExJsonPathUnitTests extends FeedsExUnitTestBase {
    */
   public function testValidateExpression() {
     // Invalid expression.
-    $parser = FeedsConfigurable::instance('FeedsExJsonPath', 'test_parser');
+    $parser = $this->getParserInstance();
     $expression = array('!! ');
     $this->assertEqual(NULL, $this->invokeMethod($parser, 'validateExpression', $expression));
 
@@ -133,7 +133,7 @@ class FeedsExJsonPathUnitTests extends FeedsExUnitTestBase {
    * Tests parsing invalid JSON.
    */
   public function testInvalidJson() {
-    $parser = FeedsConfigurable::instance('FeedsExJsonPath', 'test_parser');
+    $parser = $this->getParserInstance();
 
     $parser->setConfig(array(
       'context' => array(
@@ -148,6 +148,31 @@ class FeedsExJsonPathUnitTests extends FeedsExUnitTestBase {
     // Invalid JSON.
     $args = array($this->source, new FeedsFetcherResult('invalid json'));
     $this->assertException(array($parser, 'parse'), $args, 'RuntimeException', t('The JSON is invalid.'));
+  }
+
+  /**
+   * Tests empty feed handling.
+   */
+  public function _testEmptyFeed() {
+    $parser = $this->getParserInstance();
+    $parser->parse($this->source, new FeedsFetcherResult(' '));
+    $messages = $parser->getMessenger()->getMessages();
+    $this->assertEqual(1, count($messages), 'The expected number of messages.');
+    $this->assertEqual($messages[0]['message'], 'The feed is empty.', 'Message text is correct.');
+    $this->assertEqual($messages[0]['type'], 'warning', 'Message type is warning.');
+    $this->assertFalse($messages[0]['repeat'], 'Repeat is set to false.');
+  }
+
+  /**
+   * Returns a new instance of the parser.
+   *
+   * @return FeedsExJsonPath
+   *   A parser instance.
+   */
+  protected function getParserInstance() {
+    $parser = FeedsConfigurable::instance('FeedsExJsonPath', 'test_parser');
+    $parser->setMessenger(new FeedsExTestMessenger());
+    return $parser;
   }
 
 }
