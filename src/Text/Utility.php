@@ -19,14 +19,6 @@ interface FeedsExEncoderInterface {
   public function __construct(array $encoding_list);
 
   /**
-   * Sets the multibyte handling.
-   *
-   * @param bool $is_multibyte
-   *   Whether this parser should assume multibyte handling exists.
-   */
-  public function setMultibyte($is_multibyte);
-
-  /**
    * Converts a string to UTF-8.
    *
    * @param string $data
@@ -34,8 +26,6 @@ interface FeedsExEncoderInterface {
    *
    * @return string
    *   The encoded string, or the original string if encoding failed.
-   *
-   * @see drupal_convert_to_utf8()
    */
   public function convertEncoding($data);
 
@@ -58,7 +48,7 @@ class FeedsExTextEncoder implements FeedsExEncoderInterface {
    *
    * @param array
    */
-  protected static $utf8Compatible = array('utf-8', 'us-ascii', 'ascii');
+  protected static $utf8Compatible = array('utf-8', 'utf8', 'us-ascii', 'ascii');
 
   /**
    * The list of encodings to search for.
@@ -73,13 +63,6 @@ class FeedsExTextEncoder implements FeedsExEncoderInterface {
   public function __construct(array $encoding_list) {
     $this->encodingList = $encoding_list;
     $this->isMultibyte = $GLOBALS['multibyte'] == UNICODE_MULTIBYTE;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setMultibyte($is_multibyte) {
-    $this->isMultibyte = (bool) $is_multibyte;
   }
 
   /**
@@ -100,14 +83,15 @@ class FeedsExTextEncoder implements FeedsExEncoderInterface {
    *
    * @return string|bool
    *   Returns the encoding, or false if one could not be detected.
-   *
-   * @todo Add other methods of encoding detection.
    */
   protected function detectEncoding($data) {
-    if ($this->isMultibyte) {
-      return mb_detect_encoding($data, $this->encodingList, TRUE);
+    if (!$this->isMultibyte) {
+      return FALSE;
     }
-    return FALSE;
+    if ($detected = mb_detect_encoding($data, $this->encodingList, TRUE)) {
+      return $detected;
+    }
+    return mb_detect_encoding($data, $this->encodingList);
   }
 
   /**

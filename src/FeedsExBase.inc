@@ -583,7 +583,7 @@ abstract class FeedsExBase extends FeedsParser {
       '#default_value' => $this->config['debug_mode'],
     );
 
-    if ($this->isMultibyte) {
+    if (function_exists('mb_detect_order')) {
       $args = array('%encodings' => implode(', ', mb_detect_order()));
       $form['source_encoding'] = array(
         '#type' => 'textfield',
@@ -669,7 +669,7 @@ abstract class FeedsExBase extends FeedsParser {
     // Sort by weight.
     uasort($values['sources'], 'ctools_plugin_sort');
 
-    if (!$this->isMultibyte) {
+    if (!function_exists('mb_detect_order')) {
       return;
     }
     // Normalize encodings. Make them exactly as they are defined in
