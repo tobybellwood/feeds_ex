@@ -8,6 +8,7 @@ test_dependencies[] = querypath
 
 files[] = src/File/FeedsExLineIterator.php
 files[] = src/Json/Utility.php
+files[] = src/Text/Utility.php
 files[] = src/Xml/Utility.php
 
 files[] = src/Tests/FeedsExUnitTests.test

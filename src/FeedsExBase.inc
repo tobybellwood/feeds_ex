@@ -11,13 +11,6 @@
 abstract class FeedsExBase extends FeedsParser {
 
   /**
-   * Whether the current system handles mb_* functions.
-   *
-   * @var bool
-   */
-  protected $isMultibyte;
-
-  /**
    * The object used to display messages to the user.
    *
    * @var FeedsExMessengerInterface
@@ -172,7 +165,7 @@ abstract class FeedsExBase extends FeedsParser {
    */
   protected function __construct($id) {
     parent::__construct($id);
-    $this->isMultibyte = $GLOBALS['multibyte'] == UNICODE_MULTIBYTE;
+    FeedsExTextUtility::setMultibyte($GLOBALS['multibyte'] == UNICODE_MULTIBYTE);
   }
 
   /**
@@ -388,37 +381,22 @@ abstract class FeedsExBase extends FeedsParser {
    * @todo Add other methods of encoding detection.
    */
   protected function detectEncoding($data) {
-    if ($this->isMultibyte) {
-      return mb_detect_encoding($data, $this->config['source_encoding'], TRUE);
-    }
-    return FALSE;
+    return FeedsExTextUtility::detectEncoding($data, $this->config['source_encoding']);
   }
 
   /**
    * Converts a string to UTF-8.
    *
-   * Requires the iconv, GNU recode or mbstring PHP extension.
-   *
    * @param string $data
    *   The string to convert.
-   * @param string $encoding
-   *   The encoding to convert to.
+   * @param string $from_encoding
+   *   The encoding to convert from.
    *
    * @return string
    *   The encoded string, or the original string if encoding failed.
-   *
-   * @see drupal_convert_to_utf8()
    */
-  protected function convertEncoding($data, $encoding) {
-    $php_supported = array('utf-8', 'us-ascii', 'ascii');
-    if (in_array(strtolower($encoding), $php_supported)) {
-      return $data;
-    }
-    $converted = drupal_convert_to_utf8($data, $encoding);
-    if ($converted === FALSE) {
-      return $data;
-    }
-    return $converted;
+  protected function convertEncoding($data, $from_encoding) {
+    return FeedsExTextUtility::convertEncoding($data, $from_encoding);
   }
 
   /**
@@ -791,18 +769,6 @@ abstract class FeedsExBase extends FeedsParser {
     );
 
     return $header;
-  }
-
-  /**
-   * Sets the multibyte handling.
-   *
-   * @param bool $is_multibyte
-   *   Whether this parser should assume multibyte handling exists.
-   *
-   * @internal Used only during testing to force handling.
-   */
-  public function setMultibyte($is_multibyte) {
-    $this->isMultibyte = (bool) $is_multibyte;
   }
 
   /**

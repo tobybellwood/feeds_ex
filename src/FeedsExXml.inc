@@ -183,27 +183,7 @@ class FeedsExXml extends FeedsExBase {
    * {@inheritdoc}
    */
   protected function convertEncoding($data, $encoding = 'UTF-8') {
-    // Check for an encoding declaration in the XML prolog.
-    $matches = FALSE;
-    if (preg_match('/^<\?xml[^>]+encoding\s*=\s*("|\')(.+?)(\1)/', $data, $matches)) {
-      $encoding = $matches[2];
-    }
-    elseif ($detected = parent::detectEncoding($data)) {
-      $encoding = $detected;
-    }
-
-    // Unsupported encodings are converted here into UTF-8.
-    $php_supported = array('utf-8', 'us-ascii', 'ascii');
-    if (in_array(strtolower($encoding), $php_supported)) {
-      return $data;
-    }
-
-    $data = parent::convertEncoding($data, $encoding);
-    if ($matches) {
-      $data = preg_replace('/^(<\?xml[^>]+encoding\s*=\s*("|\'))(.+?)(\2)/', '$1UTF-8$4', $data);
-    }
-
-    return $data;
+    return FeedsExXmlUtility::convertXmlEncoding($data, $this->config['source_encoding']);
   }
 
   /**
