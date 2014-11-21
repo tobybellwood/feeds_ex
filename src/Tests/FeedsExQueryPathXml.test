@@ -73,6 +73,77 @@ class FeedsExQueryPathXmlUnitTests extends FeedsExUnitTestBase {
   }
 
   /**
+   * Tests raw parsing.
+   */
+  public function testRaw() {
+    $parser = $this->getParserInstance();
+    $fetcher_result = new FeedsFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test.xml'));
+
+    $parser->setConfig(array(
+      'context' => array(
+        'value' => 'items item',
+      ),
+      'sources' => array(
+        'title' => array(
+          'name' => 'Title',
+          'value' => 'title',
+          'attribute' => '',
+        ),
+        'description' => array(
+          'name' => 'Title',
+          'value' => 'description',
+          'attribute' => '',
+          'raw' => TRUE,
+        ),
+      ),
+    ));
+
+    $result = $parser->parse($this->source, $fetcher_result);
+    $this->assertParserResultItemCount($result, 3);
+
+    foreach ($result->items as $delta => $item) {
+      $this->assertEqual('I am a title' . $delta, $item['title']);
+      $this->assertEqual('<description><text>I am a description' . $delta . '</text></description>', $item['description']);
+    }
+  }
+
+  /**
+   * Tests inner xml.
+   */
+  public function testInner() {
+    $parser = $this->getParserInstance();
+    $fetcher_result = new FeedsFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test.xml'));
+
+    $parser->setConfig(array(
+      'context' => array(
+        'value' => 'items item',
+      ),
+      'sources' => array(
+        'title' => array(
+          'name' => 'Title',
+          'value' => 'title',
+          'attribute' => '',
+        ),
+        'description' => array(
+          'name' => 'Title',
+          'value' => 'description',
+          'attribute' => '',
+          'raw' => TRUE,
+          'inner' => TRUE,
+        ),
+      ),
+    ));
+
+    $result = $parser->parse($this->source, $fetcher_result);
+    $this->assertParserResultItemCount($result, 3);
+
+    foreach ($result->items as $delta => $item) {
+      $this->assertEqual('I am a title' . $delta, $item['title']);
+      $this->assertEqual('<text>I am a description' . $delta . '</text>', $item['description']);
+    }
+  }
+
+  /**
    * Tests grabbing an attribute.
    */
   public function testAttributeParsing() {

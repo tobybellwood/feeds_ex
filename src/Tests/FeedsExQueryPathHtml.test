@@ -76,6 +76,81 @@ class FeedsExQueryPathHtmlUnitTests extends FeedsExUnitTestBase {
   }
 
   /**
+   * Tests raw.
+   */
+  public function testRaw() {
+    $parser = $this->getParserInstance();
+    $fetcher_result = new FeedsFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test.html'));
+
+    $parser->setConfig(array(
+      'context' => array(
+        'value' => '.post',
+      ),
+      'sources' => array(
+        'title' => array(
+          'name' => 'Title',
+          'value' => 'h3',
+          'attribute' => '',
+        ),
+        'description' => array(
+          'name' => 'Title',
+          'value' => 'p',
+          'attribute' => '',
+          'raw' => TRUE,
+        ),
+      ),
+    ));
+
+    $result = $parser->parse($this->source, $fetcher_result);
+    $this->assertParserResultItemCount($result, 3);
+
+    $this->assertEqual('I am a title<thing>Stuff</thing>', $result->items[0]['title']);
+    $this->assertEqual('<p>I am a description0</p>', $result->items[0]['description']);
+    $this->assertEqual('I am a title1', $result->items[1]['title']);
+    $this->assertEqual('<p>I am a description1</p>', $result->items[1]['description']);
+    $this->assertEqual('I am a title2', $result->items[2]['title']);
+    $this->assertEqual('<p>I am a description2</p>', $result->items[2]['description']);
+  }
+
+  /**
+   * Tests inner xml.
+   */
+  public function testInner() {
+    $parser = $this->getParserInstance();
+    $fetcher_result = new FeedsFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test.html'));
+
+    $parser->setConfig(array(
+      'context' => array(
+        'value' => '.post',
+      ),
+      'sources' => array(
+        'title' => array(
+          'name' => 'Title',
+          'value' => 'h3',
+          'attribute' => '',
+        ),
+        'description' => array(
+          'name' => 'Title',
+          'value' => 'p',
+          'attribute' => '',
+          'raw' => TRUE,
+          'inner' => TRUE,
+        ),
+      ),
+    ));
+
+    $result = $parser->parse($this->source, $fetcher_result);
+    $this->assertParserResultItemCount($result, 3);
+
+    $this->assertEqual('I am a title<thing>Stuff</thing>', $result->items[0]['title']);
+    $this->assertEqual('I am a description0', $result->items[0]['description']);
+    $this->assertEqual('I am a title1', $result->items[1]['title']);
+    $this->assertEqual('I am a description1', $result->items[1]['description']);
+    $this->assertEqual('I am a title2', $result->items[2]['title']);
+    $this->assertEqual('I am a description2', $result->items[2]['description']);
+  }
+
+  /**
    * Tests grabbing an attribute.
    */
   public function testAttributeParsing() {

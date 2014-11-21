@@ -60,7 +60,12 @@ class FeedsExQueryPathXml extends FeedsExXml {
     }
 
     $return = array();
-    if (!empty($this->config['sources'][$machine_name]['raw'])) {
+    if (!empty($this->config['sources'][$machine_name]['inner'])) {
+      foreach ($result as $node) {
+        $return[] = $node->innerXML();
+      }
+    }
+    elseif (!empty($this->config['sources'][$machine_name]['raw'])) {
       foreach ($result as $node) {
         $return[] = $this->getRawValue($node);
       }
@@ -116,8 +121,8 @@ class FeedsExQueryPathXml extends FeedsExXml {
   /**
    * {@inheritdoc}
    */
-  protected function configFormTableColumn(array &$form_state, $column_name, array $source) {
-    switch ($column_name) {
+  protected function configFormTableColumn(array &$form_state, array $values, $column, $machine_name) {
+    switch ($column) {
       case 'attribute':
         return array(
           '#type' => 'textfield',
@@ -129,7 +134,7 @@ class FeedsExQueryPathXml extends FeedsExXml {
         );
 
       default:
-        return parent::configFormTableColumn($form_state, $column_name, $source);
+        return parent::configFormTableColumn($form_state, $column, $source);
     }
   }
 

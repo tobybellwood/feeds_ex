@@ -89,7 +89,12 @@ class FeedsExXml extends FeedsExBase {
     }
 
     $return = array();
-    if (!empty($this->config['sources'][$machine_name]['raw'])) {
+    if (!empty($this->config['sources'][$machine_name]['inner'])) {
+      foreach ($result as $node) {
+        $return[] = $this->getInnerXml($node);
+      }
+    }
+    elseif (!empty($this->config['sources'][$machine_name]['raw'])) {
       foreach ($result as $node) {
         $return[] = $this->getRaw($node);
       }
@@ -134,20 +139,34 @@ class FeedsExXml extends FeedsExBase {
    * {@inheritdoc}
    */
   protected function configFormTableHeader() {
-    return array('raw' => t('Raw'));
+    return array('raw' => t('Raw'), 'inner' => t('Inner XML'));
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function configFormTableColumn(array &$form_state, $column_name, array $source) {
-    switch ($column_name) {
+  protected function configFormTableColumn(array &$form_state, array $values, $column, $machine_name) {
+    $id = 'feeds-ex-xml-raw-' . check_plain($machine_name);
+
+    switch ($column) {
       case 'raw':
         return array(
           '#type' => 'checkbox',
           '#title' => t('Raw value'),
           '#title_display' => 'invisible',
-          '#default_value' => !empty($source['raw']) ? $source['raw'] : 0,
+          '#default_value' => (int) !empty($values['raw']),
+          '#id' => $id,
+        );
+
+      case 'inner':
+        return array(
+          '#type' => 'checkbox',
+          '#title' => t('Inner XML'),
+          '#title_display' => 'invisible',
+          '#default_value' => (int) !empty($values['inner']),
+          '#states' => array(
+            'visible' => array('#' . $id => array('checked' => TRUE)),
+          ),
         );
     }
   }
@@ -182,6 +201,20 @@ class FeedsExXml extends FeedsExBase {
 
     $this->stopErrorHandling();
     return $message;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function configFormValidate(&$values) {
+    parent::configFormValidate($values);
+
+    // Remove values that are inner but not raw.
+    foreach ($values['sources'] as $machine_name => $source) {
+      if (!empty($source['inner']) && empty($source['raw'])) {
+        unset($values['sources'][$machine_name]['inner']);
+      }
+    }
   }
 
   /**
@@ -225,6 +258,23 @@ class FeedsExXml extends FeedsExBase {
    */
   protected function getRaw(DOMNode $node) {
     return $node->ownerDocument->saveXML($node);
+  }
+
+  /**
+   * Returns the inner XML of a DOM node.
+   *
+   * @param DOMNode $node
+   *   The node to convert to raw XML.
+   *
+   * @return string
+   *   The inner XML.
+   */
+  protected function getInnerXml(DOMNode $node) {
+    $buffer = '';
+    foreach ($node->childNodes as $child) {
+      $buffer .= $this->getRaw($child);
+    }
+    return $buffer;
   }
 
   /**

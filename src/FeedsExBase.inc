@@ -162,15 +162,17 @@ abstract class FeedsExBase extends FeedsParser {
    *
    * @param array &$form_state
    *   The current form state.
-   * @param string $column_name
+   * @param array $values
+   *   The individual source item values.
+   * @param string $column
    *   The name of the column.
-   * @param array $source
-   *   The individual source item.
+   * @param string $machine_name
+   *   The machine name of the source.
    *
    * @return array
    *   A single form element.
    */
-  protected function configFormTableColumn(array &$form_state, $column_name, array $source) {
+  protected function configFormTableColumn(array &$form_state, array $values, $column, $machine_name) {
     return array();
   }
 
@@ -473,7 +475,7 @@ abstract class FeedsExBase extends FeedsParser {
       );
 
       foreach ($this->configFormTableHeader() as $column => $name) {
-        $form['sources'][$machine_name][$column] = $this->configFormTableColumn($form_state, $column, $source);
+        $form['sources'][$machine_name][$column] = $this->configFormTableColumn($form_state, $source, $column, $machine_name);
       }
 
       $form['sources'][$machine_name]['debug'] = array(
@@ -529,7 +531,7 @@ abstract class FeedsExBase extends FeedsParser {
       '#maxlength' => 1024,
     );
     foreach ($this->configFormTableHeader() as $column => $name) {
-      $form['add'][$column] = $this->configFormTableColumn($form_state, $column, array());
+      $form['add'][$column] = $this->configFormTableColumn($form_state, array(), $column, '');
     }
     $form['add']['debug'] = array(
       '#type' => 'checkbox',

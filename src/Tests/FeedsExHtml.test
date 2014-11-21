@@ -51,8 +51,79 @@ class FeedsExHtmlUnitTests extends FeedsExUnitTestBase {
           'value' => 'h3',
         ),
         'description' => array(
-          'name' => 'Title',
+          'name' => 'Description',
           'value' => 'p',
+        ),
+      ),
+    ));
+
+    $result = $parser->parse($this->source, $fetcher_result);
+    $this->assertParserResultItemCount($result, 3);
+
+    $this->assertEqual('I am a title<thing>Stuff</thing>', $result->items[0]['title']);
+    $this->assertEqual('I am a description0', $result->items[0]['description']);
+    $this->assertEqual('I am a title1', $result->items[1]['title']);
+    $this->assertEqual('I am a description1', $result->items[1]['description']);
+    $this->assertEqual('I am a title2', $result->items[2]['title']);
+    $this->assertEqual('I am a description2', $result->items[2]['description']);
+  }
+
+  /**
+   * Tests getting the raw value.
+   */
+  public function testRaw() {
+    $parser = $this->getParserInstance();
+    $fetcher_result = new FeedsFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test.html'));
+
+    $parser->setConfig(array(
+      'context' => array(
+        'value' => '//div[@class="post"]',
+      ),
+      'sources' => array(
+        'title' => array(
+          'name' => 'Title',
+          'value' => 'h3',
+        ),
+        'description' => array(
+          'name' => 'Description',
+          'value' => 'p',
+          'raw' => TRUE,
+        ),
+      ),
+    ));
+
+    $result = $parser->parse($this->source, $fetcher_result);
+    $this->assertParserResultItemCount($result, 3);
+
+    $this->assertEqual('I am a title<thing>Stuff</thing>', $result->items[0]['title']);
+    $this->assertEqual('<p>I am a description0</p>', $result->items[0]['description']);
+    $this->assertEqual('I am a title1', $result->items[1]['title']);
+    $this->assertEqual('<p>I am a description1</p>', $result->items[1]['description']);
+    $this->assertEqual('I am a title2', $result->items[2]['title']);
+    $this->assertEqual('<p>I am a description2</p>', $result->items[2]['description']);
+  }
+
+  /**
+   * Tests innerxml.
+   */
+  public function testInner() {
+    $parser = $this->getParserInstance();
+    $fetcher_result = new FeedsFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test.html'));
+
+    $parser->setConfig(array(
+      'context' => array(
+        'value' => '//div[@class="post"]',
+      ),
+      'sources' => array(
+        'title' => array(
+          'name' => 'Title',
+          'value' => 'h3',
+        ),
+        'description' => array(
+          'name' => 'Description',
+          'value' => 'p',
+          'raw' => TRUE,
+          'inner' => TRUE,
         ),
       ),
     ));
