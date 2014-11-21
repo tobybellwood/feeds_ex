@@ -125,6 +125,7 @@ class FeedsExQueryPathXml extends FeedsExXml {
           '#title_display' => 'invisible',
           '#default_value' => !empty($source['attribute']) ? $source['attribute'] : '',
           '#size' => 10,
+          '#maxlength' => 1024,
         );
 
       default:

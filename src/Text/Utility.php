@@ -111,6 +111,7 @@ class FeedsExTextEncoder implements FeedsExEncoderInterface {
       '#description' => t('The possible encodings of the source files. auto: %encodings', $args),
       '#default_value' => implode(', ', $this->encodingList),
       '#autocomplete_path' => '_feeds_ex/encoding_autocomplete',
+      '#maxlength' => 1024,
     );
     return $form;
   }

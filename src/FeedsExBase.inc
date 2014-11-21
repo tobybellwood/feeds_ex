@@ -441,6 +441,7 @@ abstract class FeedsExBase extends FeedsParser {
         // We're hiding the title, so add a little hint.
         '#description' => '<span class="form-required">*</span>',
         '#attributes' => array('class' => array('feeds-ex-context-value')),
+        '#maxlength' => 1024,
       );
     }
 
@@ -468,6 +469,7 @@ abstract class FeedsExBase extends FeedsParser {
         '#title_display' => 'invisible',
         '#default_value' => $source['value'],
         '#size' => 50,
+        '#maxlength' => 1024,
       );
 
       foreach ($this->configFormTableHeader() as $column => $name) {
@@ -524,6 +526,7 @@ abstract class FeedsExBase extends FeedsParser {
       '#description' => t('Value'),
       '#title' => '&nbsp;',
       '#size' => 50,
+      '#maxlength' => 1024,
     );
     foreach ($this->configFormTableHeader() as $column => $name) {
       $form['add'][$column] = $this->configFormTableColumn($form_state, $column, array());
