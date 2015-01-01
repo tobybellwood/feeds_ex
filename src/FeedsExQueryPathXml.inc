@@ -128,13 +128,13 @@ class FeedsExQueryPathXml extends FeedsExXml {
           '#type' => 'textfield',
           '#title' => t('Attribute name'),
           '#title_display' => 'invisible',
-          '#default_value' => !empty($source['attribute']) ? $source['attribute'] : '',
+          '#default_value' => !empty($values['attribute']) ? $values['attribute'] : '',
           '#size' => 10,
           '#maxlength' => 1024,
         );
 
       default:
-        return parent::configFormTableColumn($form_state, $column, $source);
+        return parent::configFormTableColumn($form_state, $values, $column, $machine_name);
     }
   }
 
