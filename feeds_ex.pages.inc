@@ -11,7 +11,7 @@
 function feeds_ex_encoding_autocomplete($string = '') {
   $matches = array();
 
-  if (!strlen($string) || $GLOBALS['multibyte'] != UNICODE_MULTIBYTE) {
+  if (!strlen($string) || $GLOBALS['multibyte'] != \Drupal\Component\Utility\Unicode::STATUS_MULTIBYTE) {
     drupal_json_output($matches);
     return;
   }
@@ -25,7 +25,7 @@ function feeds_ex_encoding_autocomplete($string = '') {
   $prefix = '';
   $encodings = array();
   foreach (mb_list_encodings() as $suggestion) {
-    if (in_array(drupal_strtolower($suggestion), $lower_added)) {
+    if (in_array(\Drupal\Component\Utility\Unicode::strtolower($suggestion), $lower_added)) {
       $prefix .= $suggestion . ', ';
       continue;
     }

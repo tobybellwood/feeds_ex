@@ -23,7 +23,7 @@ function theme_feeds_ex_configuration_table(array $variables) {
   }
 
   // Render the sources.
-  foreach (element_children($element['sources']) as $source_key) {
+  foreach (\Drupal\Core\Render\Element::children($element['sources']) as $source_key) {
     $source = $element['sources'][$source_key];
     $row = array();
     foreach (array_keys($element['#header']) as $column) {
@@ -43,7 +43,7 @@ function theme_feeds_ex_configuration_table(array $variables) {
 
   $rows[] = array('data' => $add_row, 'class' => array('draggable'));
 
-  $output = theme('table', array(
+  $output = _theme('table', array(
     'header' => $element['#header'],
     'rows' => $rows,
     'attributes' => array('id' => $element['sources']['#id']),

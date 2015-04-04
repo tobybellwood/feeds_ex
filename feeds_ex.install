@@ -16,7 +16,7 @@ function feeds_ex_enable() {
  * Implements hook_uninstall().
  */
 function feeds_ex_uninstall() {
-  variable_del('feeds_ex_jmespath_compile_dir');
+  \Drupal::config('feeds_ex.settings')->clear('feeds_ex_jmespath_compile_dir')->save();
 }
 
 /**

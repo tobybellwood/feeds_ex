@@ -70,7 +70,7 @@ function feeds_ex_feeds_plugins() {
     );
   }
 
-  if (module_exists('querypath')) {
+  if (\Drupal::moduleHandler()->moduleExists('querypath')) {
     $plugins['FeedsExQueryPathXml'] = array(
       'name' => 'QueryPath XML parser',
       'description' => 'Parse XML with QueryPath.',
