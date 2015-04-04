@@ -2,15 +2,15 @@
 
 /**
  * @file
- * Contains \Drupal\feeds_ex\Xml.
+ * Contains \Drupal\feeds_ex\Feeds\Parser\XmlParser.
  */
 
-namespace Drupal\feeds_ex;
+namespace Drupal\feeds_ex\Feeds\Parser;
 
 /**
  * Parses XML documents with XPath.
  */
-class Xml extends Base {
+class XmlParser extends ParserBase {
 
   /**
    * The XpathDomXpath object used for parsing.

@@ -2,18 +2,22 @@
 
 /**
  * @file
- * Contains \Drupal\feeds_ex\QueryPathHtml.
+ * Contains \Drupal\feeds_ex\Feeds\Parser\HtmlParser.
  */
 
-namespace Drupal\feeds_ex;
+namespace Drupal\feeds_ex\Feeds\Parser;
 
 /**
- * Parses HTML documents with QueryPath.
- *
- * @todo Make convertEncoding() into a helper function so that they aren't \
- *   copied in 2 places.
+ * Parses HTML documents with XPath.
  */
-class QueryPathHtml extends QueryPathXml {
+class HtmlParser extends XmlParser {
+
+  /**
+   * Whether this version of PHP has the correct saveHTML() method.
+   *
+   * @var bool
+   */
+  protected $useSaveHTML;
 
   /**
    * {@inheritdoc}
@@ -23,16 +27,10 @@ class QueryPathHtml extends QueryPathXml {
   /**
    * {@inheritdoc}
    */
-  protected function setUp(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
-    // Change some parser settings.
-    $this->queryPathOptions['use_parser'] = 'html';
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function getRawValue(QueryPath $node) {
-    return $node->html();
+  public function __construct($id) {
+    parent::__construct($id);
+    // DOMDocument::saveHTML() cannot take $node as an argument prior to 5.3.6.
+    $this->useSaveHTML = version_compare(PHP_VERSION, '5.3.6', '>=');
   }
 
   /**
@@ -51,6 +49,16 @@ class QueryPathHtml extends QueryPathXml {
       $raw = tidy_repair_string($raw, $this->getTidyConfig(), 'utf8');
     }
     return XmlUtility::createHtmlDocument($raw);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getRaw(DOMNode $node) {
+    if ($this->useSaveHTML) {
+      return $node->ownerDocument->saveHTML($node);
+    }
+    return $node->ownerDocument->saveXML($node, LIBXML_NOEMPTYTAG);
   }
 
   /**

@@ -2,15 +2,15 @@
 
 /**
  * @file
- * Contains \Drupal\feeds_ex\JsonPathLines.
+ * Contains \Drupal\feeds_ex\Feeds\Parser\JsonPathLinesParser.
  */
 
-namespace Drupal\feeds_ex;
+namespace Drupal\feeds_ex\Feeds\Parser;
 
 /**
  * Parses the JSON Lines format via JSONPath.
  */
-class JsonPathLines extends JsonPath {
+class JsonPathLinesParser extends JsonPathParser {
 
   /**
    * The file iterator.

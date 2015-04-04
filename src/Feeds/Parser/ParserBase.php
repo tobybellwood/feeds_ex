@@ -2,15 +2,19 @@
 
 /**
  * @file
- * Contains \Drupal\feeds_ex\Base.
+ * Contains \Drupal\feeds_ex\Feeds\Parser\ParserBase.
  */
 
-namespace Drupal\feeds_ex;
+namespace Drupal\feeds_ex\Feeds\Parser;
+
+use Drupal\feeds\Plugin\Type\ConfigurablePluginBase;
+use Drupal\feeds\Plugin\Type\FeedPluginFormInterface;
+use Drupal\feeds\Plugin\Type\Parser\ParserInterface;
 
 /**
  * The Feeds extensible parser.
  */
-abstract class Base extends FeedsParser {
+abstract class ParserBase extends ConfigurablePluginBase implements FeedPluginFormInterface, ParserInterface {
 
   /**
    * The object used to display messages to the user.

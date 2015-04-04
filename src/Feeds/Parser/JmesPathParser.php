@@ -2,15 +2,15 @@
 
 /**
  * @file
- * Contains \Drupal\feeds_ex\JmesPath.
+ * Contains \Drupal\feeds_ex\Feeds\Parser\JmesPathParser.
  */
 
-namespace Drupal\feeds_ex;
+namespace Drupal\feeds_ex\Feeds\Parser;
 
 /**
  * Parses JSON documents with JMESPath.
  */
-class JmesPath extends Base {
+class JmesPathParser extends ParserBase {
 
   /**
    * The JMESPath parser.

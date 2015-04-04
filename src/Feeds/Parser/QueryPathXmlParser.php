@@ -2,15 +2,15 @@
 
 /**
  * @file
- * Contains \Drupal\feeds_ex\QueryPathXml.
+ * Contains \Drupal\feeds_ex\Feeds\Parser\QueryPathXmlParser.
  */
 
-namespace Drupal\feeds_ex;
+namespace Drupal\feeds_ex\Feeds\Parser;
 
 /**
  * Parses XML documents with QueryPath.
  */
-class QueryPathXml extends Xml {
+class QueryPathXmlParser extends XmlParser {
 
   /**
    * Options passed to QueryPath.

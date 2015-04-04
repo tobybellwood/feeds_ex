@@ -2,15 +2,15 @@
 
 /**
  * @file
- * Contains \Drupal\feeds_ex\JmesPathLines.
+ * Contains \Drupal\feeds_ex\Feeds\Parser\JmesPathLinesParser.
  */
 
-namespace Drupal\feeds_ex;
+namespace Drupal\feeds_ex\Feeds\Parser;
 
 /**
  * Parses JSON Lines documents with JMESPath.
  */
-class JmesPathLines extends JmesPath {
+class JmesPathLinesParser extends JmesPathParser {
 
   /**
    * The file iterator.

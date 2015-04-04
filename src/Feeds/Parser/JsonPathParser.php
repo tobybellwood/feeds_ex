@@ -2,15 +2,15 @@
 
 /**
  * @file
- * Contains \Drupal\feeds_ex\JsonPath.
+ * Contains \Drupal\feeds_ex\Feeds\Parser\JsonPathParser.
  */
 
-namespace Drupal\feeds_ex;
+namespace Drupal\feeds_ex\Feeds\Parser;
 
 /**
  * Parses JSON via JSONPath.
  */
-class JsonPath extends Base {
+class JsonPathParser extends ParserBase {
 
   /**
    * {@inheritdoc}
