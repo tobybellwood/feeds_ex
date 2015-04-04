@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\feeds_ex\FeedsExMessenger.
+ * Contains \Drupal\feeds_ex\Messenger.
  */
 
 namespace Drupal\feeds_ex;
@@ -10,7 +10,7 @@ namespace Drupal\feeds_ex;
 /**
  * Uses drupal_set_message() to show messages.
  */
-class FeedsExMessenger implements FeedsExMessengerInterface {
+class Messenger implements MessengerInterface {
 
   /**
    * {@inheritdoc}

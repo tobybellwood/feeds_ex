@@ -8,7 +8,7 @@
 namespace Drupal\feeds_ex\Tests;
 
 /**
- * Unit tests for FeedsExJmesPath.
+ * Unit tests for JmesPath.
  *
  * @group feeds_ex
  */
@@ -23,7 +23,7 @@ class JmesPathUnitTest extends UnitTestBase {
 
   public function setUp() {
     parent::setUp();
-    require_once $this->moduleDir . '/src/FeedsExJmesPath.inc';
+    require_once $this->moduleDir . '/src/JmesPath.inc';
     $this->source = $this->getMockFeedsSource();
     $this->variableDel('feeds_ex_jmespath_compile_dir');
   }
@@ -31,12 +31,12 @@ class JmesPathUnitTest extends UnitTestBase {
   /**
    * Returns a new instance of the parser.
    *
-   * @return FeedsExJmesPath
+   * @return JmesPath
    *   A parser instance.
    */
   protected function getParserInstance() {
-    $parser = FeedsConfigurable::instance('FeedsExJmesPath', strtolower($this->randomName()));
-    $parser->setMessenger(new FeedsExTestMessenger());
+    $parser = FeedsConfigurable::instance('JmesPath', strtolower($this->randomName()));
+    $parser->setMessenger(new TestMessenger());
     if (!$this->variableGet('feeds_ex_jmespath_compile_dir')) {
       $path = file_directory_temp() . '/' . drupal_base64_encode(drupal_random_bytes(40)) . '_feeds_ex_jmespath_dir';
       $this->variableSet('feeds_ex_jmespath_compile_dir', $path);
@@ -78,7 +78,7 @@ class JmesPathUnitTest extends UnitTestBase {
   /**
    * Tests a EUC-JP (Japanese) encoded file.
    *
-   * This implicitly tests FeedsExBase's encoding conversion.
+   * This implicitly tests Base's encoding conversion.
    */
   public function testEUCJPEncoded() {
     $parser = $this->getParserInstance();

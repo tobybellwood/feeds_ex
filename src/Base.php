@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\feeds_ex\FeedsExBase.
+ * Contains \Drupal\feeds_ex\Base.
  */
 
 namespace Drupal\feeds_ex;
@@ -10,12 +10,12 @@ namespace Drupal\feeds_ex;
 /**
  * The Feeds extensible parser.
  */
-abstract class FeedsExBase extends FeedsParser {
+abstract class Base extends FeedsParser {
 
   /**
    * The object used to display messages to the user.
    *
-   * @var FeedsExMessengerInterface
+   * @var MessengerInterface
    */
   protected $messenger;
 
@@ -24,12 +24,12 @@ abstract class FeedsExBase extends FeedsParser {
    *
    * @var string
    */
-  protected $encoderClass = 'FeedsExTextEncoder';
+  protected $encoderClass = 'TextEncoder';
 
   /**
    * The encoder used to convert encodings.
    *
-   * @var FeedsExEncoderInterface
+   * @var EncoderInterface
    */
   protected $encoder;
 
@@ -194,7 +194,7 @@ abstract class FeedsExBase extends FeedsParser {
       $this->parseItems($source, $fetcher_result, $result);
       $this->cleanUp($source, $result);
     }
-    catch (FeedsExEmptyException $e) {
+    catch (EmptyException $e) {
       // The feed is empty.
       $this->getMessenger()->setMessage(t('The feed is empty.'), 'warning', FALSE);
     }
@@ -368,7 +368,7 @@ abstract class FeedsExBase extends FeedsParser {
     $raw = trim($this->getEncoder()->convertEncoding($fetcher_result->getRaw()));
 
     if (!strlen($raw)) {
-      throw new FeedsExEmptyException();
+      throw new EmptyException();
     }
 
     return $raw;
@@ -726,13 +726,13 @@ abstract class FeedsExBase extends FeedsParser {
   /**
    * Sets the messenger to be used to display messages.
    *
-   * @param FeedsExMessengerInterface $messenger
+   * @param MessengerInterface $messenger
    *   The messenger.
    *
    * @return $this
    *   The parser object.
    */
-  public function setMessenger(FeedsExMessengerInterface $messenger) {
+  public function setMessenger(MessengerInterface $messenger) {
     $this->messenger = $messenger;
     return $this;
   }
@@ -740,12 +740,12 @@ abstract class FeedsExBase extends FeedsParser {
   /**
    * Returns the messenger.
    *
-   * @return FeedsExMessengerInterface
+   * @return MessengerInterface
    *   The messenger.
    */
   public function getMessenger() {
     if (!isset($this->messenger)) {
-      $this->messenger = new FeedsExMessenger();
+      $this->messenger = new Messenger();
     }
     return $this->messenger;
   }
@@ -753,13 +753,13 @@ abstract class FeedsExBase extends FeedsParser {
   /**
    * Sets the encoder.
    *
-   * @param FeedsExEncoderInterface $encoder
+   * @param EncoderInterface $encoder
    *   The encoder.
    *
    * @return $this
    *   The parser object.
    */
-  public function setEncoder(FeedsExEncoderInterface $encoder) {
+  public function setEncoder(EncoderInterface $encoder) {
     $this->encoder = $encoder;
     return $this;
   }
@@ -767,7 +767,7 @@ abstract class FeedsExBase extends FeedsParser {
   /**
    * Returns the encoder.
    *
-   * @return FeedsExEncoderInterface
+   * @return EncoderInterface
    *   The encoder object.
    */
   public function getEncoder() {

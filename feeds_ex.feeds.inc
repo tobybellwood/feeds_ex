@@ -16,101 +16,101 @@ function feeds_ex_feeds_plugins() {
   drupal_load('module', 'feeds_ex');
 
   $plugins = array(
-    'FeedsExBase' => array(
+    'Base' => array(
       'hidden' => TRUE,
       'handler' => array(
         'parent' => 'FeedsParser',
-        'class' => 'FeedsExBase',
-        'file' => 'FeedsExBase.inc',
+        'class' => 'Base',
+        'file' => 'Base.inc',
         'path' => $path,
       ),
     ),
-    'FeedsExXml' => array(
+    'Xml' => array(
       'name' => 'XML Xpath parser',
       'description' => 'Parse XML with XPath.',
       'handler' => array(
-        'parent' => 'FeedsExBase',
-        'class' => 'FeedsExXml',
-        'file' => 'FeedsExXml.inc',
+        'parent' => 'Base',
+        'class' => 'Xml',
+        'file' => 'Xml.inc',
         'path' => $path,
       ),
     ),
-    'FeedsExHtml' => array(
+    'Html' => array(
       'name' => 'HTML Xpath parser',
       'description' => 'Parse HTML with XPath.',
       'handler' => array(
-        'parent' => 'FeedsExXml',
-        'class' => 'FeedsExHtml',
-        'file' => 'FeedsExHtml.inc',
+        'parent' => 'Xml',
+        'class' => 'Html',
+        'file' => 'Html.inc',
         'path' => $path,
       ),
     ),
   );
 
   if (feeds_ex_library_path('jmespath.php', 'vendor/autoload.php')) {
-    $plugins['FeedsExJmesPath'] = array(
+    $plugins['JmesPath'] = array(
       'name' => 'JSON JMESPath parser',
       'description' => 'Parse JSON with JMESPath.',
       'handler' => array(
-        'parent' => 'FeedsExBase',
-        'class' => 'FeedsExJmesPath',
-        'file' => 'FeedsExJmesPath.inc',
+        'parent' => 'Base',
+        'class' => 'JmesPath',
+        'file' => 'JmesPath.inc',
         'path' => $path,
       ),
     );
-    $plugins['FeedsExJmesPathLines'] = array(
+    $plugins['JmesPathLines'] = array(
       'name' => 'JSON Lines JMESPath parser',
       'description' => 'Parse JSON Lines with JMESPath.',
       'handler' => array(
-        'parent' => 'FeedsExJmesPath',
-        'class' => 'FeedsExJmesPathLines',
-        'file' => 'FeedsExJmesPathLines.inc',
+        'parent' => 'JmesPath',
+        'class' => 'JmesPathLines',
+        'file' => 'JmesPathLines.inc',
         'path' => $path,
       ),
     );
   }
 
   if (\Drupal::moduleHandler()->moduleExists('querypath')) {
-    $plugins['FeedsExQueryPathXml'] = array(
+    $plugins['QueryPathXml'] = array(
       'name' => 'QueryPath XML parser',
       'description' => 'Parse XML with QueryPath.',
       'handler' => array(
-        'parent' => 'FeedsExXml',
-        'class' => 'FeedsExQueryPathXml',
-        'file' => 'FeedsExQueryPathXml.inc',
+        'parent' => 'Xml',
+        'class' => 'QueryPathXml',
+        'file' => 'QueryPathXml.inc',
         'path' => $path,
       ),
     );
-    $plugins['FeedsExQueryPathHtml'] = array(
+    $plugins['QueryPathHtml'] = array(
       'name' => 'QueryPath HTML parser',
       'description' => 'Parse HTML with QueryPath.',
       'handler' => array(
-        'parent' => 'FeedsExQueryPathXml',
-        'class' => 'FeedsExQueryPathHtml',
-        'file' => 'FeedsExQueryPathHtml.inc',
+        'parent' => 'QueryPathXml',
+        'class' => 'QueryPathHtml',
+        'file' => 'QueryPathHtml.inc',
         'path' => $path,
       ),
     );
   }
 
   if (feeds_ex_jsonpath_library_path()) {
-    $plugins['FeedsExJsonPath'] = array(
+    $plugins['JsonPath'] = array(
       'name' => 'JSON JSONPath parser',
       'description' => 'Parse JSON with JSONPath.',
       'handler' => array(
-        'parent' => 'FeedsExBase',
-        'class' => 'FeedsExJsonPath',
-        'file' => 'FeedsExJsonPath.inc',
+        'parent' => 'Base',
+        'class' => 'JsonPath',
+        'file' => 'JsonPath.inc',
         'path' => $path,
       ),
     );
-    $plugins['FeedsExJsonPathLines'] = array(
+    $plugins['JsonPathLines'] = array(
       'name' => 'JSON Lines JSONPath parser',
       'description' => 'Parse JSON Lines with JSONPath.',
       'handler' => array(
-        'parent' => 'FeedsExJsonPath',
-        'class' => 'FeedsExJsonPathLines',
-        'file' => 'FeedsExJsonPathLines.inc',
+        'parent' => 'JsonPath',
+        'class' => 'JsonPathLines',
+        'file' => 'JsonPathLines.inc',
         'path' => $path,
       ),
     );

@@ -2,13 +2,13 @@
 
 /**
  * @file
- * Contains FeedsExTestUi.
+ * Contains TestUi.
  */
 
 /**
  * A minimal implementation of a parser for UI testing.
  */
-class FeedsExTestUi extends FeedsExBase {
+class TestUi extends Base {
 
   /**
    * {@inheritdoc}

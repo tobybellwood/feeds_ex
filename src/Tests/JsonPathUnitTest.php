@@ -8,7 +8,7 @@
 namespace Drupal\feeds_ex\Tests;
 
 /**
- * Unit tests for FeedsExJsonPath.
+ * Unit tests for JsonPath.
  *
  * @group feeds_ex
  */
@@ -23,7 +23,7 @@ class JsonPathUnitTest extends UnitTestBase {
 
   public function setUp() {
     parent::setUp();
-    require_once $this->moduleDir . '/src/FeedsExJsonPath.inc';
+    require_once $this->moduleDir . '/src/JsonPath.inc';
     $this->source = $this->getMockFeedsSource();
     $this->downloadJsonPath();
   }
@@ -164,12 +164,12 @@ class JsonPathUnitTest extends UnitTestBase {
   /**
    * Returns a new instance of the parser.
    *
-   * @return FeedsExJsonPath
+   * @return JsonPath
    *   A parser instance.
    */
   protected function getParserInstance() {
-    $parser = FeedsConfigurable::instance('FeedsExJsonPath', strtolower($this->randomName()));
-    $parser->setMessenger(new FeedsExTestMessenger());
+    $parser = FeedsConfigurable::instance('JsonPath', strtolower($this->randomName()));
+    $parser->setMessenger(new TestMessenger());
     return $parser;
   }
 

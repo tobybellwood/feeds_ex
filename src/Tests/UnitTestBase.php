@@ -38,15 +38,15 @@ abstract class UnitTestBase extends TUnit {
     require_once $feeds . '/plugins/FeedsNodeProcessor.inc';
 
     // This is out test feed source.
-    require_once dirname(__FILE__) . '/FeedsExTestFeedsSource.inc';
+    require_once dirname(__FILE__) . '/TestFeedsSource.php';
 
     drupal_load('module', 'feeds_ex');
     $this->moduleDir = DRUPAL_ROOT . '/' . drupal_get_path('module', 'feeds_ex');
     require_once $this->moduleDir . '/src/Json/Utility.php';
     require_once $this->moduleDir . '/src/Text/Utility.php';
     require_once $this->moduleDir . '/src/Xml/Utility.php';
-    require_once $this->moduleDir . '/src/File/FeedsExLineIterator.php';
-    require_once $this->moduleDir . '/src/FeedsExBase.inc';
+    require_once $this->moduleDir . '/src/File/LineIterator.php';
+    require_once $this->moduleDir . '/src/Base.inc';
   }
 
   /**
@@ -69,7 +69,7 @@ abstract class UnitTestBase extends TUnit {
     $processor = $this->newInstanceWithoutConstructor($processor);
     $this->setProperty($importer, 'processor', $processor);
 
-    $source = $this->newInstanceWithoutConstructor('FeedsExTestFeedsSource');
+    $source = $this->newInstanceWithoutConstructor('TestFeedsSource');
     $this->setProperty($source, 'importer', $importer);
 
     return $source;
@@ -153,7 +153,7 @@ abstract class UnitTestBase extends TUnit {
 /**
  * Tests stripping default namespaces.
  */
-class FeedsExRemoveDefaultNamespaces extends DrupalUnitTestCase {
+class RemoveDefaultNamespaces extends DrupalUnitTestCase {
   public static function getInfo() {
     return array(
       'name' => 'Strip default namespaces',
@@ -199,7 +199,7 @@ class FeedsExRemoveDefaultNamespaces extends DrupalUnitTestCase {
    * Checks that the input and output are equal.
    */
   protected function check($in, $out) {
-    $this->assertEqual(FeedsExXmlUtility::removeDefaultNamespaces($in), $out);
+    $this->assertEqual(XmlUtility::removeDefaultNamespaces($in), $out);
   }
 
 }
@@ -207,7 +207,7 @@ class FeedsExRemoveDefaultNamespaces extends DrupalUnitTestCase {
 /**
  * Reading a line from a file.
  */
-class FeedsExLineIteratorUnitTests extends DrupalUnitTestCase {
+class LineIteratorUnitTests extends DrupalUnitTestCase {
 
   /**
    * The module directory path.
@@ -219,7 +219,7 @@ class FeedsExLineIteratorUnitTests extends DrupalUnitTestCase {
   public static function getInfo() {
     return array(
       'name' => 'Unit tests for the line reading iterator',
-      'description' => 'Unit tests for FeedsExLineIterator.',
+      'description' => 'Unit tests for LineIterator.',
       'group' => 'Feeds EX',
     );
   }
@@ -227,14 +227,14 @@ class FeedsExLineIteratorUnitTests extends DrupalUnitTestCase {
   public function setUp() {
     parent::setUp();
     $this->moduleDir = drupal_get_path('module', 'feeds_ex');
-    require_once DRUPAL_ROOT . '/' . $this->moduleDir . '/src/File/FeedsExLineIterator.php';
+    require_once DRUPAL_ROOT . '/' . $this->moduleDir . '/src/File/LineIterator.php';
   }
 
   /**
    * Tests basic iteration.
    */
   public function test() {
-    $iterator = new FeedsExLineIterator($this->moduleDir . '/tests/resources/test.jsonl');
+    $iterator = new LineIterator($this->moduleDir . '/tests/resources/test.jsonl');
     $this->assertEqual(count(iterator_to_array($iterator)), 4);
   }
 
@@ -243,7 +243,7 @@ class FeedsExLineIteratorUnitTests extends DrupalUnitTestCase {
    */
   public function testLineLimit() {
     foreach (range(1, 4) as $limit) {
-      $iterator = new FeedsExLineIterator($this->moduleDir . '/tests/resources/test.jsonl');
+      $iterator = new LineIterator($this->moduleDir . '/tests/resources/test.jsonl');
       $iterator->setLineLimit($limit);
       $array = iterator_to_array($iterator);
       $this->assertEqual(count($array), $limit, format_string('@count lines read.', array('@count' => count($array))));
@@ -254,7 +254,7 @@ class FeedsExLineIteratorUnitTests extends DrupalUnitTestCase {
    * Tests resuming file position.
    */
   public function testFileResume() {
-    $iterator = new FeedsExLineIterator($this->moduleDir . '/tests/resources/test.jsonl');
+    $iterator = new LineIterator($this->moduleDir . '/tests/resources/test.jsonl');
     $iterator->setLineLimit(1);
     foreach (array('Gilbert', 'Alexa', 'May', 'Deloise') as $name) {
       foreach ($iterator as $line) {

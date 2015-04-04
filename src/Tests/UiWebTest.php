@@ -23,14 +23,14 @@ class UiWebTest extends FeedsWebTestCase {
     parent::setUp('feeds_ex', 'feeds_ex_test');
     $this->createImporterConfiguration();
     $this->setSettings('syndication', '', array('content_type' => ''));
-    $this->setPlugin('syndication', 'FeedsExTestUi');
+    $this->setPlugin('syndication', 'TestUi');
   }
 
   /**
    * Tests basic UI functionality.
    */
   public function test() {
-    $path = 'admin/structure/feeds/syndication/settings/FeedsExTestUi';
+    $path = 'admin/structure/feeds/syndication/settings/TestUi';
 
     // Set context.
     $edit = array(
@@ -63,7 +63,7 @@ class UiWebTest extends FeedsWebTestCase {
    * Tests debug mode.
    */
   public function testDebugMode() {
-    $path = 'admin/structure/feeds/syndication/settings/FeedsExTestUi';
+    $path = 'admin/structure/feeds/syndication/settings/TestUi';
 
     // Set context.
     $edit = array(
@@ -79,29 +79,29 @@ class UiWebTest extends FeedsWebTestCase {
     // Set context.
     $edit = array(
       'feeds[FeedsHTTPFetcher][source]' => 'http://example.com',
-      'feeds[FeedsExTestUi][context][value]' => 'new context value',
+      'feeds[TestUi][context][value]' => 'new context value',
     );
     $this->drupalPost($path, $edit, t('Import'));
     $this->assertFieldByName(key($edit), reset($edit), 'Context value set.');
 
     // Add a value.
     $edit = array(
-      'feeds[FeedsExTestUi][add][name]' => 'new name',
-      'feeds[FeedsExTestUi][add][machine_name]' => 'new_value',
-      'feeds[FeedsExTestUi][add][value]' => 'new value',
-      'feeds[FeedsExTestUi][add][debug]' => 1,
+      'feeds[TestUi][add][name]' => 'new name',
+      'feeds[TestUi][add][machine_name]' => 'new_value',
+      'feeds[TestUi][add][value]' => 'new value',
+      'feeds[TestUi][add][debug]' => 1,
     );
     $this->drupalPost(NULL, $edit, t('Import'));
-    $this->assertFieldByName('feeds[FeedsExTestUi][sources][new_value][name]', 'new name', 'New expression name');
-    $this->assertFieldByName('feeds[FeedsExTestUi][sources][new_value][value]', 'new value', 'New expression value');
-    $this->assertFieldByName('feeds[FeedsExTestUi][sources][new_value][debug]', 1, 'Debug value set');
+    $this->assertFieldByName('feeds[TestUi][sources][new_value][name]', 'new name', 'New expression name');
+    $this->assertFieldByName('feeds[TestUi][sources][new_value][value]', 'new value', 'New expression value');
+    $this->assertFieldByName('feeds[TestUi][sources][new_value][debug]', 1, 'Debug value set');
 
     // Remove the row.
     $edit = array(
-      'feeds[FeedsExTestUi][sources][new_value][remove]' => 1,
+      'feeds[TestUi][sources][new_value][remove]' => 1,
     );
     $this->drupalPost(NULL, $edit, t('Import'));
-    $this->assertNoFieldByName('feeds[FeedsExTestUi][sources][new_value][name]');
+    $this->assertNoFieldByName('feeds[TestUi][sources][new_value][name]');
   }
 
 }

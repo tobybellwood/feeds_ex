@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\feeds_ex\FeedsExJsonPath.
+ * Contains \Drupal\feeds_ex\JsonPath.
  */
 
 namespace Drupal\feeds_ex;
@@ -10,14 +10,14 @@ namespace Drupal\feeds_ex;
 /**
  * Parses JSON via JSONPath.
  */
-class FeedsExJsonPath extends FeedsExBase {
+class JsonPath extends Base {
 
   /**
    * {@inheritdoc}
    */
   protected function executeContext(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
     $raw = $this->prepareRaw($fetcher_result);
-    $parsed = FeedsExJsonUtility::decodeJsonArray($raw);
+    $parsed = JsonUtility::decodeJsonArray($raw);
     $parsed = jsonPath($parsed, $this->config['context']['value']);
     if (!is_array($parsed)) {
       throw new RuntimeException(t('The context expression must return an object or array.'));
@@ -84,7 +84,7 @@ class FeedsExJsonPath extends FeedsExBase {
     }
 
     $message = array(
-      'message' => FeedsExJsonUtility::translateError($error),
+      'message' => JsonUtility::translateError($error),
       'variables' => array(),
       'severity' => WATCHDOG_ERROR,
     );

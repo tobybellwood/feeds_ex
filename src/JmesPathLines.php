@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\feeds_ex\FeedsExJmesPathLines.
+ * Contains \Drupal\feeds_ex\JmesPathLines.
  */
 
 namespace Drupal\feeds_ex;
@@ -10,12 +10,12 @@ namespace Drupal\feeds_ex;
 /**
  * Parses JSON Lines documents with JMESPath.
  */
-class FeedsExJmesPathLines extends FeedsExJmesPath {
+class JmesPathLines extends JmesPath {
 
   /**
    * The file iterator.
    *
-   * @var FeedsExLineIterator
+   * @var LineIterator
    */
   protected $iterator;
 
@@ -31,10 +31,10 @@ class FeedsExJmesPathLines extends FeedsExJmesPath {
    */
   protected function setUp(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
     parent::setUp($source, $fetcher_result);
-    $this->iterator = new FeedsExLineIterator($fetcher_result->getFilePath());
+    $this->iterator = new LineIterator($fetcher_result->getFilePath());
 
     if (!$this->iterator->getSize()) {
-      throw new FeedsExEmptyException();
+      throw new EmptyException();
     }
 
     $this->iterator->setLineLimit($source->importer->getLimit());
@@ -57,7 +57,7 @@ class FeedsExJmesPathLines extends FeedsExJmesPath {
     foreach ($this->iterator as $row) {
       $row = $this->getEncoder()->convertEncoding($row);
       try {
-        $row = FeedsExJsonUtility::decodeJsonArray($row);
+        $row = JsonUtility::decodeJsonArray($row);
       }
       catch (RuntimeException $e) {
         // An array wasn't returned. Skip this item.

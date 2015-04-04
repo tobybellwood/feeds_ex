@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\feeds_ex\FeedsExXml.
+ * Contains \Drupal\feeds_ex\Xml.
  */
 
 namespace Drupal\feeds_ex;
@@ -10,12 +10,12 @@ namespace Drupal\feeds_ex;
 /**
  * Parses XML documents with XPath.
  */
-class FeedsExXml extends FeedsExBase {
+class Xml extends Base {
 
   /**
-   * The FeedsExXpathDomXpath object used for parsing.
+   * The XpathDomXpath object used for parsing.
    *
-   * @var FeedsExXpathDomXpath
+   * @var XpathDomXpath
    */
   protected $xpath;
 
@@ -36,14 +36,14 @@ class FeedsExXml extends FeedsExBase {
   /**
    * {@inheritdoc}
    */
-  protected $encoderClass = 'FeedsExXmlEncoder';
+  protected $encoderClass = 'XmlEncoder';
 
   /**
    * {@inheritdoc}
    */
   protected function setUp(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
     $document = $this->prepareDocument($source, $fetcher_result);
-    $this->xpath = new FeedsExXpathDomXpath($document);
+    $this->xpath = new XpathDomXpath($document);
   }
 
   /**
@@ -223,7 +223,7 @@ class FeedsExXml extends FeedsExBase {
    * {@inheritdoc}
    */
   protected function convertEncoding($data, $encoding = 'UTF-8') {
-    return FeedsExXmlUtility::convertXmlEncoding($data, $this->config['source_encoding']);
+    return XmlUtility::convertXmlEncoding($data, $this->config['source_encoding']);
   }
 
   /**
@@ -241,12 +241,12 @@ class FeedsExXml extends FeedsExBase {
     $raw = $this->prepareRaw($fetcher_result);
     // Remove default namespaces. This has to run after the encoding conversion
     // because a limited set of encodings are supported in regular expressions.
-    $raw = FeedsExXmlUtility::removeDefaultNamespaces($raw);
+    $raw = XmlUtility::removeDefaultNamespaces($raw);
 
     if ($this->config['use_tidy'] && extension_loaded('tidy')) {
       $raw = tidy_repair_string($raw, $this->getTidyConfig(), 'utf8');
     }
-    return FeedsExXmlUtility::createXmlDocument($raw);
+    return XmlUtility::createXmlDocument($raw);
   }
 
   /**

@@ -8,7 +8,7 @@
 namespace Drupal\feeds_ex\Tests;
 
 /**
- * Unit tests for FeedsExHtml.
+ * Unit tests for Html.
  *
  * @group feeds_ex
  */
@@ -24,8 +24,8 @@ class HtmlUnitTest extends UnitTestBase {
   public function setUp() {
     parent::setUp();
 
-    require_once $this->moduleDir . '/src/FeedsExXml.inc';
-    require_once $this->moduleDir . '/src/FeedsExHtml.inc';
+    require_once $this->moduleDir . '/src/Xml.inc';
+    require_once $this->moduleDir . '/src/Html.inc';
 
     $this->source = $this->getMockFeedsSource();
   }
@@ -170,7 +170,7 @@ class HtmlUnitTest extends UnitTestBase {
   /**
    * Tests a EUC-JP (Japanese) encoded file without the encoding declaration.
    *
-   * This implicitly tests FeedsExBase's encoding conversion.
+   * This implicitly tests Base's encoding conversion.
    */
   public function testEUCJPEncodedNoDeclaration() {
     $parser = $this->getParserInstance();
@@ -231,26 +231,26 @@ class HtmlUnitTest extends UnitTestBase {
   /**
    * Returns a new instance of the parser.
    *
-   * @return FeedsExHtml
+   * @return Html
    *   A parser instance.
    */
   protected function getParserInstance() {
-    $parser = FeedsConfigurable::instance('FeedsExHtml', strtolower($this->randomName()));
-    $parser->setMessenger(new FeedsExTestMessenger());
+    $parser = FeedsConfigurable::instance('Html', strtolower($this->randomName()));
+    $parser->setMessenger(new TestMessenger());
     return $parser;
   }
 
 }
 
 /**
- * Integration tests for FeedsExHtml.
+ * Integration tests for Html.
  */
-class FeedsExHtmlTests extends FeedsWebTestCase {
+class HtmlTests extends FeedsWebTestCase {
 
   public static function getInfo() {
     return array(
       'name' => 'HTML parser integration tests',
-      'description' => 'Integration tests for FeedsExHtml.',
+      'description' => 'Integration tests for Html.',
       'group' => 'Feeds EX',
     );
   }
@@ -259,7 +259,7 @@ class FeedsExHtmlTests extends FeedsWebTestCase {
     parent::setUp('feeds_ex');
     $this->createImporterConfiguration();
     $this->setSettings('syndication', '', array('content_type' => ''));
-    $this->setPlugin('syndication', 'FeedsExHtml');
+    $this->setPlugin('syndication', 'Html');
   }
 
   /**

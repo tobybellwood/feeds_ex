@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\feeds_ex\FeedsExTestMessenger.
+ * Contains \Drupal\feeds_ex\TestMessenger.
  */
 
 namespace Drupal\feeds_ex;
@@ -10,7 +10,7 @@ namespace Drupal\feeds_ex;
 /**
  * Stores messages without calling drupal_set_mesage().
  */
-class FeedsExTestMessenger implements FeedsExMessengerInterface {
+class TestMessenger implements MessengerInterface {
 
   /**
    * The messages that have been set.

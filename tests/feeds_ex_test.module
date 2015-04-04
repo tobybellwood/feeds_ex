@@ -10,13 +10,13 @@
  */
 function feeds_ex_test_feeds_plugins() {
   return array(
-    'FeedsExTestUi' => array(
+    'TestUi' => array(
       'name' => 'Test UI parser',
       'description' => 'Do not use this.',
       'handler' => array(
-        'parent' => 'FeedsExBase',
-        'class' => 'FeedsExTestUi',
-        'file' => 'FeedsExTestUi.inc',
+        'parent' => 'Base',
+        'class' => 'TestUi',
+        'file' => 'TestUi.inc',
       ),
     ),
   );

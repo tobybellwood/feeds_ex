@@ -55,11 +55,11 @@ function feeds_ex_registry_files_alter(array &$files, array $modules) {
   }
 
   $path = drupal_get_path('module', 'feeds_ex');
-  $files[$path . '/src/Tests/FeedsExJmesPath.test'] = array(
+  $files[$path . '/src/Tests/JmesPathTest.php'] = array(
     'module' => 'feeds_ex',
     'weight' => 1,
   );
-  $files[$path . '/src/Tests/FeedsExJmesPathLines.test'] = array(
+  $files[$path . '/src/Tests/JmesPathLinesTest.php'] = array(
     'module' => 'feeds_ex',
     'weight' => 1,
   );

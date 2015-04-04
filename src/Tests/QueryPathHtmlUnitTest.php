@@ -8,7 +8,7 @@
 namespace Drupal\feeds_ex\Tests;
 
 /**
- * Unit tests for FeedsExQueryPathHtml.
+ * Unit tests for QueryPathHtml.
  *
  * @group feeds_ex
  */
@@ -27,9 +27,9 @@ class QueryPathHtmlUnitTest extends UnitTestBase {
     $query_path = drupal_get_path('module', 'querypath');
     require_once DRUPAL_ROOT . '/' . $query_path .  '/QueryPath/QueryPath.php';
 
-    require_once $this->moduleDir . '/src/FeedsExXml.inc';
-    require_once $this->moduleDir . '/src/FeedsExQueryPathXml.inc';
-    require_once $this->moduleDir . '/src/FeedsExQueryPathHtml.inc';
+    require_once $this->moduleDir . '/src/Xml.inc';
+    require_once $this->moduleDir . '/src/QueryPathXml.inc';
+    require_once $this->moduleDir . '/src/QueryPathHtml.inc';
 
     $this->source = $this->getMockFeedsSource();
   }
@@ -216,7 +216,7 @@ class QueryPathHtmlUnitTest extends UnitTestBase {
   /**
    * Tests a EUC-JP (Japanese) encoded file without the encoding declaration.
    *
-   * This implicitly tests FeedsExBase's encoding conversion.
+   * This implicitly tests Base's encoding conversion.
    */
   public function testEUCJPEncodedNoDeclaration() {
     $parser = $this->getParserInstance();
@@ -262,12 +262,12 @@ class QueryPathHtmlUnitTest extends UnitTestBase {
   /**
    * Returns a new instance of the parser.
    *
-   * @return FeedsExQueryPathHtml
+   * @return QueryPathHtml
    *   A parser instance.
    */
   protected function getParserInstance() {
-    $parser = FeedsConfigurable::instance('FeedsExQueryPathHtml', strtolower($this->randomName()));
-    $parser->setMessenger(new FeedsExTestMessenger());
+    $parser = FeedsConfigurable::instance('QueryPathHtml', strtolower($this->randomName()));
+    $parser->setMessenger(new TestMessenger());
     return $parser;
   }
 

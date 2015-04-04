@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\feeds_ex\FeedsExEmptyException.
+ * Contains \Drupal\feeds_ex\EmptyException.
  */
 
 namespace Drupal\feeds_ex;
@@ -10,4 +10,4 @@ namespace Drupal\feeds_ex;
 /**
  * An exception thrown by parsers when they receive an empty feed.
  */
-class FeedsExEmptyException extends RuntimeException {}
+class EmptyException extends RuntimeException {}

@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\feeds_ex\FeedsExXpathDomXpath.
+ * Contains \Drupal\feeds_ex\XpathDomXpath.
  */
 
 namespace Drupal\feeds_ex;
@@ -10,7 +10,7 @@ namespace Drupal\feeds_ex;
 /**
  * Wraps DOMXPath simplifying usage.
  */
-class FeedsExXpathDomXpath {
+class XpathDomXpath {
 
   /**
    * The XPath query object.
@@ -20,7 +20,7 @@ class FeedsExXpathDomXpath {
   protected $xpath;
 
   /**
-   * Constructs a FeedsExXpathDomXpath object.
+   * Constructs a XpathDomXpath object.
    *
    * @param DOMDocument $document
    *   The DOM document to parse.

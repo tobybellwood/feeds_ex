@@ -7,7 +7,7 @@ namespace Drupal\Tests\feeds_ex\Unit;
  * Unit tests are now written for the PHPUnit framework. You will need to refactor
  * this test in order for it to work properly.
  */
-class FeedsExRemoveDefaultNamespaces extends \Drupal\Tests\UnitTestCase {
+class RemoveDefaultNamespaces extends \Drupal\Tests\UnitTestCase {
   public static function getInfo() {
     return array(
       'name' => 'Strip default namespaces',
@@ -53,7 +53,7 @@ class FeedsExRemoveDefaultNamespaces extends \Drupal\Tests\UnitTestCase {
    * Checks that the input and output are equal.
    */
   protected function check($in, $out) {
-    $this->assertEqual(FeedsExXmlUtility::removeDefaultNamespaces($in), $out);
+    $this->assertEqual(XmlUtility::removeDefaultNamespaces($in), $out);
   }
 
 }

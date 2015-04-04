@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\feeds_ex\FeedsExQueryPathHtml.
+ * Contains \Drupal\feeds_ex\QueryPathHtml.
  */
 
 namespace Drupal\feeds_ex;
@@ -13,12 +13,12 @@ namespace Drupal\feeds_ex;
  * @todo Make convertEncoding() into a helper function so that they aren't \
  *   copied in 2 places.
  */
-class FeedsExQueryPathHtml extends FeedsExQueryPathXml {
+class QueryPathHtml extends QueryPathXml {
 
   /**
    * {@inheritdoc}
    */
-  protected $encoderClass = 'FeedsExHtmlEncoder';
+  protected $encoderClass = 'HtmlEncoder';
 
   /**
    * {@inheritdoc}
@@ -39,7 +39,7 @@ class FeedsExQueryPathHtml extends FeedsExQueryPathXml {
    * {@inheritdoc}
    */
   protected function convertEncoding($data, $encoding = 'UTF-8') {
-    return FeedsExXmlUtility::convertHtmlEncoding($data, $this->config['source_encoding']);
+    return XmlUtility::convertHtmlEncoding($data, $this->config['source_encoding']);
   }
 
   /**
@@ -50,7 +50,7 @@ class FeedsExQueryPathHtml extends FeedsExQueryPathXml {
     if ($this->config['use_tidy'] && extension_loaded('tidy')) {
       $raw = tidy_repair_string($raw, $this->getTidyConfig(), 'utf8');
     }
-    return FeedsExXmlUtility::createHtmlDocument($raw);
+    return XmlUtility::createHtmlDocument($raw);
   }
 
   /**

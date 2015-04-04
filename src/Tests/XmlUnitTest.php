@@ -8,7 +8,7 @@
 namespace Drupal\feeds_ex\Tests;
 
 /**
- * Unit tests for FeedsExXml.
+ * Unit tests for Xml.
  *
  * @group feeds_ex
  */
@@ -24,7 +24,7 @@ class XmlUnitTest extends UnitTestBase {
   public function setUp() {
     parent::setUp();
 
-    require_once $this->moduleDir . '/src/FeedsExXml.inc';
+    require_once $this->moduleDir . '/src/Xml.inc';
 
     $this->source = $this->getMockFeedsSource();
   }
@@ -163,7 +163,7 @@ class XmlUnitTest extends UnitTestBase {
   /**
    * Tests a EUC-JP (Japanese) encoded file without the encoding declaration.
    *
-   * This implicitly tests FeedsExBase's encoding conversion.
+   * This implicitly tests Base's encoding conversion.
    */
   public function testEUCJPEncodedNoDeclaration() {
     $parser = $this->getParserInstance();
@@ -284,12 +284,12 @@ class XmlUnitTest extends UnitTestBase {
   /**
    * Returns a new instance of the parser.
    *
-   * @return FeedsExXml
+   * @return Xml
    *   A parser instance.
    */
   protected function getParserInstance() {
-    $parser = FeedsConfigurable::instance('FeedsExXml', strtolower($this->randomName()));
-    $parser->setMessenger(new FeedsExTestMessenger());
+    $parser = FeedsConfigurable::instance('Xml', strtolower($this->randomName()));
+    $parser->setMessenger(new TestMessenger());
     return $parser;
   }
 

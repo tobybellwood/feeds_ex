@@ -8,7 +8,7 @@
 namespace Drupal\feeds_ex\Tests;
 
 /**
- * Unit tests for FeedsExJmesPathLines.
+ * Unit tests for JmesPathLines.
  *
  * @group feeds_ex
  */
@@ -17,12 +17,12 @@ class JmesPathLinesUnitTest extends JsonPathLinesUnitTest {
   public function setUp() {
     parent::setUp();
 
-    require_once $this->moduleDir . '/src/FeedsExJmesPath.inc';
-    require_once $this->moduleDir . '/src/FeedsExJmesPathLines.inc';
+    require_once $this->moduleDir . '/src/JmesPath.inc';
+    require_once $this->moduleDir . '/src/JmesPathLines.inc';
 
     $this->source = $this->getMockFeedsSource();
-    $this->parser = FeedsConfigurable::instance('FeedsExJmesPathLines', strtolower($this->randomName()));
-    $this->parser->setMessenger(new FeedsExTestMessenger());
+    $this->parser = FeedsConfigurable::instance('JmesPathLines', strtolower($this->randomName()));
+    $this->parser->setMessenger(new TestMessenger());
 
     // Set compile directory manually.
     $this->variableDel('feeds_ex_jmespath_compile_dir');
@@ -38,7 +38,7 @@ class JmesPathLinesUnitTest extends JsonPathLinesUnitTest {
       ),
     ));
     $this->fetcherResult = new FeedsFileFetcherResult($this->moduleDir . '/tests/resources/test.jsonl');
-    // Tests are in FeedsExJsonPathLinesUnitTests.
+    // Tests are in JsonPathLinesUnitTests.
   }
 
 }

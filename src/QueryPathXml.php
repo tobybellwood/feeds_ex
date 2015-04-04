@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\feeds_ex\FeedsExQueryPathXml.
+ * Contains \Drupal\feeds_ex\QueryPathXml.
  */
 
 namespace Drupal\feeds_ex;
@@ -10,7 +10,7 @@ namespace Drupal\feeds_ex;
 /**
  * Parses XML documents with QueryPath.
  */
-class FeedsExQueryPathXml extends FeedsExXml {
+class QueryPathXml extends Xml {
 
   /**
    * Options passed to QueryPath.

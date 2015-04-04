@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\feeds_ex\FeedsExHtml.
+ * Contains \Drupal\feeds_ex\Html.
  */
 
 namespace Drupal\feeds_ex;
@@ -10,7 +10,7 @@ namespace Drupal\feeds_ex;
 /**
  * Parses HTML documents with XPath.
  */
-class FeedsExHtml extends FeedsExXml {
+class Html extends Xml {
 
   /**
    * Whether this version of PHP has the correct saveHTML() method.
@@ -22,7 +22,7 @@ class FeedsExHtml extends FeedsExXml {
   /**
    * {@inheritdoc}
    */
-  protected $encoderClass = 'FeedsExHtmlEncoder';
+  protected $encoderClass = 'HtmlEncoder';
 
   /**
    * {@inheritdoc}
@@ -37,7 +37,7 @@ class FeedsExHtml extends FeedsExXml {
    * {@inheritdoc}
    */
   protected function convertEncoding($data, $encoding = 'UTF-8') {
-    return FeedsExXmlUtility::convertHtmlEncoding($data, $this->config['source_encoding']);
+    return XmlUtility::convertHtmlEncoding($data, $this->config['source_encoding']);
   }
 
   /**
@@ -48,7 +48,7 @@ class FeedsExHtml extends FeedsExXml {
     if ($this->config['use_tidy'] && extension_loaded('tidy')) {
       $raw = tidy_repair_string($raw, $this->getTidyConfig(), 'utf8');
     }
-    return FeedsExXmlUtility::createHtmlDocument($raw);
+    return XmlUtility::createHtmlDocument($raw);
   }
 
   /**

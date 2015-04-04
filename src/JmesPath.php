@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\feeds_ex\FeedsExJmesPath.
+ * Contains \Drupal\feeds_ex\JmesPath.
  */
 
 namespace Drupal\feeds_ex;
@@ -10,7 +10,7 @@ namespace Drupal\feeds_ex;
 /**
  * Parses JSON documents with JMESPath.
  */
-class FeedsExJmesPath extends FeedsExBase {
+class JmesPath extends Base {
 
   /**
    * The JMESPath parser.
@@ -80,7 +80,7 @@ $this->compileDirectory = \Drupal::config('feeds_ex.settings')->get('feeds_ex_jm
    */
   protected function executeContext(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
     $raw = $this->prepareRaw($fetcher_result);
-    $parsed = FeedsExJsonUtility::decodeJsonArray($raw);
+    $parsed = JsonUtility::decodeJsonArray($raw);
     $parsed = $this->jmesPath->search($this->config['context']['value'], $parsed);
     if (!is_array($parsed)) {
       throw new RuntimeException(t('The context expression must return an object or array.'));
@@ -162,7 +162,7 @@ $this->compileDirectory = \Drupal::config('feeds_ex.settings')->get('feeds_ex_jm
     }
 
     $message = array(
-      'message' => FeedsExJsonUtility::translateError($error),
+      'message' => JsonUtility::translateError($error),
       'variables' => array(),
       'severity' => WATCHDOG_ERROR,
     );

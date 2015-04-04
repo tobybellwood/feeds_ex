@@ -8,7 +8,7 @@
 namespace Drupal\feeds_ex\Tests;
 
 /**
- * Unit tests for FeedsExJsonPathLines.
+ * Unit tests for JsonPathLines.
  *
  * @group feeds_ex
  */
@@ -38,14 +38,14 @@ class JsonPathLinesUnitTest extends UnitTestBase {
   public function setUp() {
     parent::setUp();
 
-    require_once $this->moduleDir . '/src/FeedsExJsonPath.inc';
-    require_once $this->moduleDir . '/src/FeedsExJsonPathLines.inc';
+    require_once $this->moduleDir . '/src/JsonPath.inc';
+    require_once $this->moduleDir . '/src/JsonPathLines.inc';
 
     $this->downloadJsonPath();
 
     $this->source = $this->getMockFeedsSource();
-    $this->parser = FeedsConfigurable::instance('FeedsExJsonPathLines', strtolower($this->randomName()));
-    $this->parser->setMessenger(new FeedsExTestMessenger());
+    $this->parser = FeedsConfigurable::instance('JsonPathLines', strtolower($this->randomName()));
+    $this->parser->setMessenger(new TestMessenger());
     $this->parser->addConfig(array(
       'sources' => array(
         'title' => array(

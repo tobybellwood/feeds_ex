@@ -13,7 +13,7 @@ namespace Drupal\feeds_ex\Text;
 interface EncoderInterface {
 
   /**
-   * Constructs a FeedsExEncoderInterface object.
+   * Constructs a EncoderInterface object.
    *
    * @param array $encoding_list
    *   The list of encodings to search through.
