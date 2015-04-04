@@ -2,15 +2,15 @@
 
 /**
  * @file
- * Contains \Drupal\feeds_ex\Xml\Utility.
+ * Contains \Drupal\feeds_ex\Utility\XmlUtility.
  */
 
-namespace Drupal\feeds_ex\Xml;
+namespace Drupal\feeds_ex\Utility;
 
 /**
  * Simple XML helpers.
  */
-class Utility {
+class XmlUtility {
 
   /**
    * Matches the characters of an XML element.

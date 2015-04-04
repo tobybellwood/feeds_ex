@@ -2,15 +2,15 @@
 
 /**
  * @file
- * Contains \Drupal\feeds_ex\Json\Utility.
+ * Contains \Drupal\feeds_ex\Utility\JsonUtility.
  */
 
-namespace Drupal\feeds_ex\Json;
+namespace Drupal\feeds_ex\Utility;
 
 /**
  * Various helpers for handling JSON.
  */
-class Utility {
+class JsonUtility {
 
   /**
    * Translates an error message.
