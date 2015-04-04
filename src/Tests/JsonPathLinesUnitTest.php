@@ -2,13 +2,17 @@
 
 /**
  * @file
- * Contains FeedsExJsonPathLinesUnitTests.
+ * Contains \Drupal\feeds_ex\Tests\JsonPathLinesUnitTest.
  */
+
+namespace Drupal\feeds_ex\Tests;
 
 /**
  * Unit tests for FeedsExJsonPathLines.
+ *
+ * @group feeds_ex
  */
-class FeedsExJsonPathLinesUnitTests extends FeedsExUnitTestBase {
+class JsonPathLinesUnitTest extends UnitTestBase {
 
   /**
    * The mocked FeedsSource.
@@ -30,14 +34,6 @@ class FeedsExJsonPathLinesUnitTests extends FeedsExUnitTestBase {
    * @var FeedsFetcherResult
    */
   protected $fetcherResult;
-
-  public static function getInfo() {
-    return array(
-      'name' => 'JSONPath JSON lines parser unit tests',
-      'description' => 'Unit tests for FeedsExJsonPathLines.',
-      'group' => 'Feeds EX',
-    );
-  }
 
   public function setUp() {
     parent::setUp();

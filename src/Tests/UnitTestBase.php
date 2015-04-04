@@ -2,13 +2,17 @@
 
 /**
  * @file
- * Contains unit tests for feeds_ex.
+ * Contains \Drupal\feeds_ex\Tests\UnitTestBase.
  */
+
+namespace Drupal\feeds_ex\Tests;
+
+use \TUnit;
 
 /**
  * Base class for units tests.
  */
-abstract class FeedsExUnitTestBase extends TUnit {
+abstract class UnitTestBase extends TUnit {
 
   /**
    * The module directory.

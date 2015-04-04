@@ -2,13 +2,17 @@
 
 /**
  * @file
- * Contains tests for FeedsExJsonPath.
+ * Contains \Drupal\feeds_ex\Tests\JsonPathUnitTest.
  */
+
+namespace Drupal\feeds_ex\Tests;
 
 /**
  * Unit tests for FeedsExJsonPath.
+ *
+ * @group feeds_ex
  */
-class FeedsExJsonPathUnitTests extends FeedsExUnitTestBase {
+class JsonPathUnitTest extends UnitTestBase {
 
   /**
    * The mocked FeedsSource.
@@ -16,14 +20,6 @@ class FeedsExJsonPathUnitTests extends FeedsExUnitTestBase {
    * @var FeedsSource
    */
   protected $source;
-
-  public static function getInfo() {
-    return array(
-      'name' => 'JSONPath parser unit tests',
-      'description' => 'Unit tests for FeedsExJsonPath.',
-      'group' => 'Feeds EX',
-    );
-  }
 
   public function setUp() {
     parent::setUp();

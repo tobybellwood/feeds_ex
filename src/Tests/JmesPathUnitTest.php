@@ -2,13 +2,17 @@
 
 /**
  * @file
- * Contains tests for FeedsExJmesPath.
+ * Contains \Drupal\feeds_ex\Tests\JmesPathUnitTest.
  */
+
+namespace Drupal\feeds_ex\Tests;
 
 /**
  * Unit tests for FeedsExJmesPath.
+ *
+ * @group feeds_ex
  */
-class FeedsExJmesPathUnitTests extends FeedsExUnitTestBase {
+class JmesPathUnitTest extends UnitTestBase {
 
   /**
    * The mocked FeedsSource.
@@ -16,14 +20,6 @@ class FeedsExJmesPathUnitTests extends FeedsExUnitTestBase {
    * @var FeedsSource
    */
   protected $source;
-
-  public static function getInfo() {
-    return array(
-      'name' => 'JMESPath parser unit tests',
-      'description' => 'Unit tests for FeedsExJmesPath.',
-      'group' => 'Feeds EX',
-    );
-  }
 
   public function setUp() {
     parent::setUp();

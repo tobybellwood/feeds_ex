@@ -2,13 +2,17 @@
 
 /**
  * @file
- * Contains tests for FeedsExHtml.
+ * Contains \Drupal\feeds_ex\Tests\HtmlUnitTest.
  */
+
+namespace Drupal\feeds_ex\Tests;
 
 /**
  * Unit tests for FeedsExHtml.
+ *
+ * @group feeds_ex
  */
-class FeedsExHtmlUnitTests extends FeedsExUnitTestBase {
+class HtmlUnitTest extends UnitTestBase {
 
   /**
    * The mocked FeedsSource.
@@ -16,14 +20,6 @@ class FeedsExHtmlUnitTests extends FeedsExUnitTestBase {
    * @var FeedsSource
    */
   protected $source;
-
-  public static function getInfo() {
-    return array(
-      'name' => 'HTML parser unit tests',
-      'description' => 'Unit tests for FeedsExHtml.',
-      'group' => 'Feeds EX',
-    );
-  }
 
   public function setUp() {
     parent::setUp();

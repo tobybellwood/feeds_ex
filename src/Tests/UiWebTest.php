@@ -2,21 +2,22 @@
 
 /**
  * @file
- * Contains FeedsExUi.
+ * Contains \Drupal\feeds_ex\Tests\UiWebTest.
  */
+
+namespace Drupal\feeds_ex\Tests;
 
 /**
  * User interface tests.
+ *
+ * @group feeds_ex
  */
-class FeedsExUi extends FeedsWebTestCase {
+class UiWebTest extends FeedsWebTestCase {
 
-  public static function getInfo() {
-    return array(
-      'name' => 'UI tests',
-      'description' => 'Integration tests for the user interface.',
-      'group' => 'Feeds EX',
-    );
-  }
+  public static $modules = [
+    'feeds_ex',
+    'feeds_ex_test',
+  ];
 
   public function setUp() {
     parent::setUp('feeds_ex', 'feeds_ex_test');

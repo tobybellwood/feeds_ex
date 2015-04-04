@@ -2,13 +2,17 @@
 
 /**
  * @file
- * Contains tests for FeedsExQueryPathHtml.
+ * Contains \Drupal\feeds_ex\Tests\QueryPathHtmlUnitTest.
  */
+
+namespace Drupal\feeds_ex\Tests;
 
 /**
  * Unit tests for FeedsExQueryPathHtml.
+ *
+ * @group feeds_ex
  */
-class FeedsExQueryPathHtmlUnitTests extends FeedsExUnitTestBase {
+class QueryPathHtmlUnitTest extends UnitTestBase {
 
   /**
    * The mocked FeedsSource.
@@ -16,15 +20,6 @@ class FeedsExQueryPathHtmlUnitTests extends FeedsExUnitTestBase {
    * @var FeedsSource
    */
   protected $source;
-
-  public static function getInfo() {
-    return array(
-      'name' => 'QueryPath HTML parser unit tests',
-      'description' => 'Unit tests for FeedsExQueryPathHtml.',
-      'group' => 'Feeds EX',
-      'dependencies' => array('querypath'),
-    );
-  }
 
   public function setUp() {
     parent::setUp();

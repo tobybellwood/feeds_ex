@@ -2,21 +2,17 @@
 
 /**
  * @file
- * Contains FeedsExJmesPathLinesUnitTests.
+ * Contains \Drupal\feeds_ex\Tests\JmesPathLinesUnitTest.
  */
+
+namespace Drupal\feeds_ex\Tests;
 
 /**
  * Unit tests for FeedsExJmesPathLines.
+ *
+ * @group feeds_ex
  */
-class FeedsExJmesPathLinesUnitTests extends FeedsExJsonPathLinesUnitTests {
-
-  public static function getInfo() {
-    return array(
-      'name' => 'JMESPath JSON lines parser unit tests',
-      'description' => 'Unit tests for FeedsExJmesPathLines.',
-      'group' => 'Feeds EX',
-    );
-  }
+class JmesPathLinesUnitTest extends JsonPathLinesUnitTest {
 
   public function setUp() {
     parent::setUp();

@@ -2,13 +2,15 @@
 
 /**
  * @file
- * Contains FeedsExTestFeedsSource.
+ * Contains \Drupal\feeds_ex\Tests\TestFeedsSource.
  */
+
+namespace Drupal\feeds_ex\Tests;
 
 /**
  * A FeedsSource class used during testing.
  */
-class FeedsExTestFeedsSource extends FeedsSource {
+class TestFeedsSource extends FeedsSource {
 
   /**
    * Log messages stored for later use.
