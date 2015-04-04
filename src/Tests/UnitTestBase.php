@@ -7,12 +7,12 @@
 
 namespace Drupal\feeds_ex\Tests;
 
-use \TUnit;
+use Drupal\feeds\Tests\FeedsUnitTestCase;
 
 /**
  * Base class for units tests.
  */
-abstract class UnitTestBase extends TUnit {
+abstract class UnitTestBase extends FeedsUnitTestCase {
 
   /**
    * The module directory.
@@ -146,123 +146,6 @@ abstract class UnitTestBase extends TUnit {
     $this->assertEqual($messages[0]['message'], 'The feed is empty.', 'Message text is correct.');
     $this->assertEqual($messages[0]['type'], 'warning', 'Message type is warning.');
     $this->assertFalse($messages[0]['repeat'], 'Repeat is set to false.');
-  }
-
-}
-
-/**
- * Tests stripping default namespaces.
- */
-class RemoveDefaultNamespaces extends DrupalUnitTestCase {
-  public static function getInfo() {
-    return array(
-      'name' => 'Strip default namespaces',
-      'description' => 'Tests stripping default namespaces from XML.',
-      'group' => 'Feeds EX',
-    );
-  }
-
-  public function setUp() {
-    parent::setUp();
-    require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'feeds_ex') . '/src/Text/Utility.php';
-    require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'feeds_ex') . '/src/Xml/Utility.php';
-  }
-
-  /**
-   * Strip some namespaces out of XML.
-   */
-  public function test() {
-    $this->check('<feed xmlns="http://www.w3.org/2005/Atom">bleep blorp</feed>', '<feed>bleep blorp</feed>');
-    $this->check('<подача xmlns="http://www.w3.org/2005/Atom">bleep blorp</подача>', '<подача>bleep blorp</подача>');
-    $this->check('<по.дача xmlns="http://www.w3.org/2005/Atom">bleep blorp</по.дача>', '<по.дача>bleep blorp</по.дача>');
-    $this->check('<element other attrs xmlns="http://www.w3.org/2005/Atom">bleep blorp</element>', '<element other attrs>bleep blorp</element>');
-    $this->check('<cat xmlns="http://www.w3.org/2005/Atom" other attrs>bleep blorp</cat>', '<cat other attrs>bleep blorp</cat>');
-    $this->check('<飼料 thing="stuff" xmlns="http://www.w3.org/2005/Atom">bleep blorp</飼料>', '<飼料 thing="stuff">bleep blorp</飼料>');
-    $this->check('<飼-料 thing="stuff" xmlns="http://www.w3.org/2005/Atom">bleep blorp</飼-料>', '<飼-料 thing="stuff">bleep blorp</飼-料>');
-    $this->check('<self xmlns="http://www.w3.org/2005/Atom" />', '<self />');
-    $this->check('<self attr xmlns="http://www.w3.org/2005/Atom"/>', '<self attr/>');
-    $this->check('<a xmlns="http://www.w3.org/2005/Atom"/>', '<a/>');
-    $this->check('<a xmlns="http://www.w3.org/2005/Atom"></a>', '<a></a>');
-    $this->check('<a href="http://google.com" xmlns="http://www.w3.org/2005/Atom"></a>', '<a href="http://google.com"></a>');
-
-    // Test invalid XML element names.
-    $this->check('<1name href="http://google.com" xmlns="http://www.w3.org/2005/Atom"></1name>', '<1name href="http://google.com" xmlns="http://www.w3.org/2005/Atom"></1name>');
-
-    // Test other namespaces.
-    $this->check('<name href="http://google.com" xmlns:h="http://www.w3.org/2005/Atom"></name>', '<name href="http://google.com" xmlns:h="http://www.w3.org/2005/Atom"></name>');
-
-    // Test multiple default namespaces.
-    $this->check('<name xmlns="http://www.w3.org/2005/Atom"></name><name xmlns="http://www.w3.org/2005/Atom"></name>', '<name></name><name></name>');
-  }
-
-  /**
-   * Checks that the input and output are equal.
-   */
-  protected function check($in, $out) {
-    $this->assertEqual(XmlUtility::removeDefaultNamespaces($in), $out);
-  }
-
-}
-
-/**
- * Reading a line from a file.
- */
-class LineIteratorUnitTests extends DrupalUnitTestCase {
-
-  /**
-   * The module directory path.
-   *
-   * @var string
-   */
-  protected $moduleDir;
-
-  public static function getInfo() {
-    return array(
-      'name' => 'Unit tests for the line reading iterator',
-      'description' => 'Unit tests for LineIterator.',
-      'group' => 'Feeds EX',
-    );
-  }
-
-  public function setUp() {
-    parent::setUp();
-    $this->moduleDir = drupal_get_path('module', 'feeds_ex');
-    require_once DRUPAL_ROOT . '/' . $this->moduleDir . '/src/File/LineIterator.php';
-  }
-
-  /**
-   * Tests basic iteration.
-   */
-  public function test() {
-    $iterator = new LineIterator($this->moduleDir . '/tests/resources/test.jsonl');
-    $this->assertEqual(count(iterator_to_array($iterator)), 4);
-  }
-
-  /**
-   * Tests settings line limits.
-   */
-  public function testLineLimit() {
-    foreach (range(1, 4) as $limit) {
-      $iterator = new LineIterator($this->moduleDir . '/tests/resources/test.jsonl');
-      $iterator->setLineLimit($limit);
-      $array = iterator_to_array($iterator);
-      $this->assertEqual(count($array), $limit, format_string('@count lines read.', array('@count' => count($array))));
-    }
-  }
-
-  /**
-   * Tests resuming file position.
-   */
-  public function testFileResume() {
-    $iterator = new LineIterator($this->moduleDir . '/tests/resources/test.jsonl');
-    $iterator->setLineLimit(1);
-    foreach (array('Gilbert', 'Alexa', 'May', 'Deloise') as $name) {
-      foreach ($iterator as $line) {
-        $line = drupal_json_decode($line);
-        $this->assertEqual($line['name'], $name);
-      }
-      $iterator->setStartPosition($iterator->ftell());
-    }
   }
 
 }
