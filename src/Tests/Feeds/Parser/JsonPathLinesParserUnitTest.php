@@ -2,17 +2,19 @@
 
 /**
  * @file
- * Contains \Drupal\feeds_ex\Tests\JsonPathLinesUnitTest.
+ * Contains \Drupal\feeds_ex\Tests\Feeds\Parser\JsonPathLinesParserUnitTest.
  */
 
-namespace Drupal\feeds_ex\Tests;
+namespace Drupal\feeds_ex\Tests\Feeds\Parser;
+
+use Drupal\feeds_ex\UnitTestBase;
 
 /**
  * Unit tests for JsonPathLines.
  *
  * @group feeds_ex
  */
-class JsonPathLinesUnitTest extends UnitTestBase {
+class JsonPathLinesParserUnitTest extends UnitTestBase {
 
   /**
    * The mocked FeedsSource.

@@ -2,17 +2,19 @@
 
 /**
  * @file
- * Contains \Drupal\feeds_ex\Tests\QueryPathHtmlUnitTest.
+ * Contains \Drupal\feeds_ex\Tests\Feeds\Parser\HtmlParserUnitTest.
  */
 
-namespace Drupal\feeds_ex\Tests;
+namespace Drupal\feeds_ex\Tests\Feeds\Parser;
+
+use Drupal\feeds_ex\UnitTestBase;
 
 /**
- * Unit tests for QueryPathHtml.
+ * Unit tests for Html.
  *
  * @group feeds_ex
  */
-class QueryPathHtmlUnitTest extends UnitTestBase {
+class HtmlParserUnitTest extends UnitTestBase {
 
   /**
    * The mocked FeedsSource.
@@ -24,12 +26,8 @@ class QueryPathHtmlUnitTest extends UnitTestBase {
   public function setUp() {
     parent::setUp();
 
-    $query_path = drupal_get_path('module', 'querypath');
-    require_once DRUPAL_ROOT . '/' . $query_path .  '/QueryPath/QueryPath.php';
-
     require_once $this->moduleDir . '/src/Xml.inc';
-    require_once $this->moduleDir . '/src/QueryPathXml.inc';
-    require_once $this->moduleDir . '/src/QueryPathHtml.inc';
+    require_once $this->moduleDir . '/src/Html.inc';
 
     $this->source = $this->getMockFeedsSource();
   }
@@ -43,18 +41,16 @@ class QueryPathHtmlUnitTest extends UnitTestBase {
 
     $parser->setConfig(array(
       'context' => array(
-        'value' => '.post',
+        'value' => '//div[@class="post"]',
       ),
       'sources' => array(
         'title' => array(
           'name' => 'Title',
           'value' => 'h3',
-          'attribute' => '',
         ),
         'description' => array(
-          'name' => 'Title',
+          'name' => 'Description',
           'value' => 'p',
-          'attribute' => '',
         ),
       ),
     ));
@@ -71,7 +67,7 @@ class QueryPathHtmlUnitTest extends UnitTestBase {
   }
 
   /**
-   * Tests raw.
+   * Tests getting the raw value.
    */
   public function testRaw() {
     $parser = $this->getParserInstance();
@@ -79,18 +75,16 @@ class QueryPathHtmlUnitTest extends UnitTestBase {
 
     $parser->setConfig(array(
       'context' => array(
-        'value' => '.post',
+        'value' => '//div[@class="post"]',
       ),
       'sources' => array(
         'title' => array(
           'name' => 'Title',
           'value' => 'h3',
-          'attribute' => '',
         ),
         'description' => array(
-          'name' => 'Title',
+          'name' => 'Description',
           'value' => 'p',
-          'attribute' => '',
           'raw' => TRUE,
         ),
       ),
@@ -108,7 +102,7 @@ class QueryPathHtmlUnitTest extends UnitTestBase {
   }
 
   /**
-   * Tests inner xml.
+   * Tests innerxml.
    */
   public function testInner() {
     $parser = $this->getParserInstance();
@@ -116,18 +110,16 @@ class QueryPathHtmlUnitTest extends UnitTestBase {
 
     $parser->setConfig(array(
       'context' => array(
-        'value' => '.post',
+        'value' => '//div[@class="post"]',
       ),
       'sources' => array(
         'title' => array(
           'name' => 'Title',
           'value' => 'h3',
-          'attribute' => '',
         ),
         'description' => array(
-          'name' => 'Title',
+          'name' => 'Description',
           'value' => 'p',
-          'attribute' => '',
           'raw' => TRUE,
           'inner' => TRUE,
         ),
@@ -146,40 +138,6 @@ class QueryPathHtmlUnitTest extends UnitTestBase {
   }
 
   /**
-   * Tests grabbing an attribute.
-   */
-  public function testAttributeParsing() {
-    $parser = $this->getParserInstance();
-    $fetcher_result = new FeedsFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test.html'));
-
-    $parser->setConfig(array(
-      'context' => array(
-        'value' => '.post',
-      ),
-      'sources' => array(
-        'title' => array(
-          'name' => 'Title',
-          'value' => 'h3',
-          'attribute' => 'attr',
-        ),
-        'description' => array(
-          'name' => 'Title',
-          'value' => 'p',
-          'attribute' => '',
-        ),
-      ),
-    ));
-
-    $result = $parser->parse($this->source, $fetcher_result);
-    $this->assertParserResultItemCount($result, 3);
-
-    foreach ($result->items as $delta => $item) {
-      $this->assertEqual('attribute' . $delta, $item['title']);
-      $this->assertEqual('I am a description' . $delta, $item['description']);
-    }
-  }
-
-  /**
    * Tests parsing a CP866 (Russian) encoded file.
    */
   public function testCP866Encoded() {
@@ -188,18 +146,16 @@ class QueryPathHtmlUnitTest extends UnitTestBase {
 
     $parser->setConfig(array(
       'context' => array(
-        'value' => '.post',
+        'value' => '//div[@class="post"]',
       ),
       'sources' => array(
         'title' => array(
           'name' => 'Title',
           'value' => 'h3',
-          'attribute' => '',
         ),
         'description' => array(
           'name' => 'Title',
           'value' => 'p',
-          'attribute' => '',
         ),
       ),
     ));
@@ -224,18 +180,16 @@ class QueryPathHtmlUnitTest extends UnitTestBase {
 
     $parser->setConfig(array(
       'context' => array(
-        'value' => '.post',
+        'value' => '//div[@class="post"]',
       ),
       'sources' => array(
         'title' => array(
           'name' => 'Title',
           'value' => 'h3',
-          'attribute' => '',
         ),
         'description' => array(
           'name' => 'Title',
           'value' => 'p',
-          'attribute' => '',
         ),
       ),
       'source_encoding' => array('EUC-JP'),
@@ -251,6 +205,23 @@ class QueryPathHtmlUnitTest extends UnitTestBase {
   }
 
   /**
+   * Tests that the link propery is set.
+   */
+  public function testLinkIsSet() {
+    $this->setProperty($this->source, 'config', array(
+      'FeedsFileFetcher' => array(
+        'source' => 'file fetcher source path',
+      ),
+    ));
+
+    $parser = $this->getParserInstance();
+    $parser->setConfig(array('context' => array('value' => '/beep')));
+
+    $result = $parser->parse($this->source, new FeedsFetcherResult('<?xml version="1.0" encoding="UTF-8"?><item></item>'));
+    $this->assertEqual($result->link, 'file fetcher source path');
+  }
+
+  /**
    * Tests empty feed handling.
    */
   public function testEmptyFeed() {
@@ -262,11 +233,11 @@ class QueryPathHtmlUnitTest extends UnitTestBase {
   /**
    * Returns a new instance of the parser.
    *
-   * @return QueryPathHtml
+   * @return Html
    *   A parser instance.
    */
   protected function getParserInstance() {
-    $parser = FeedsConfigurable::instance('QueryPathHtml', strtolower($this->randomName()));
+    $parser = FeedsConfigurable::instance('Html', strtolower($this->randomName()));
     $parser->setMessenger(new TestMessenger());
     return $parser;
   }

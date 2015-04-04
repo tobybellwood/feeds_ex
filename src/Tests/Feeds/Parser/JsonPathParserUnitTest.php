@@ -2,17 +2,19 @@
 
 /**
  * @file
- * Contains \Drupal\feeds_ex\Tests\JsonPathUnitTest.
+ * Contains \Drupal\feeds_ex\Tests\Feeds\Parser\JsonPathParserUnitTest.
  */
 
-namespace Drupal\feeds_ex\Tests;
+namespace Drupal\feeds_ex\Tests\Feeds\Parser;
+
+use Drupal\feeds_ex\UnitTestBase;
 
 /**
  * Unit tests for JsonPath.
  *
  * @group feeds_ex
  */
-class JsonPathUnitTest extends UnitTestBase {
+class JsonPathParserUnitTest extends UnitTestBase {
 
   /**
    * The mocked FeedsSource.

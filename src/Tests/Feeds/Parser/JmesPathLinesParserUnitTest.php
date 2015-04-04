@@ -2,17 +2,19 @@
 
 /**
  * @file
- * Contains \Drupal\feeds_ex\Tests\JmesPathLinesUnitTest.
+ * Contains \Drupal\feeds_ex\Tests\Feeds\Parser\JmesPathLinesParserUnitTest.
  */
 
-namespace Drupal\feeds_ex\Tests;
+namespace Drupal\feeds_ex\Tests\Feeds\Parser;
+
+use Drupal\feeds_ex\UnitTestBase;
 
 /**
  * Unit tests for JmesPathLines.
  *
  * @group feeds_ex
  */
-class JmesPathLinesUnitTest extends JsonPathLinesUnitTest {
+class JmesPathLinesParserUnitTest extends JsonPathLinesParserUnitTest {
 
   public function setUp() {
     parent::setUp();
@@ -38,7 +40,7 @@ class JmesPathLinesUnitTest extends JsonPathLinesUnitTest {
       ),
     ));
     $this->fetcherResult = new FeedsFileFetcherResult($this->moduleDir . '/tests/resources/test.jsonl');
-    // Tests are in JsonPathLinesUnitTests.
+    // Tests are in JsonPathLinesParserUnitTests.
   }
 
 }

@@ -2,17 +2,19 @@
 
 /**
  * @file
- * Contains \Drupal\feeds_ex\Tests\HtmlWebTest.
+ * Contains \Drupal\feeds_ex\Tests\Feeds\Parser\HtmlWebTest.
  */
 
-namespace Drupal\feeds_ex\Tests;
+namespace Drupal\feeds_ex\Tests\Feeds\Parser;
+
+use Drupal\feeds_ex\UnitTestBase;
 
 /**
  * Integration tests for Html.
  *
  * @group feeds_ex
  */
-class HtmlWebTest extends FeedsWebTestCase {
+class HtmlParserWebTest extends FeedsWebTestCase {
 
   public function setUp() {
     parent::setUp('feeds_ex');
