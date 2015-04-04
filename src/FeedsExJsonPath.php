@@ -2,8 +2,10 @@
 
 /**
  * @file
- * Contains FeedsExJsonPath.
+ * Contains \Drupal\feeds_ex\FeedsExJsonPath.
  */
+
+namespace Drupal\feeds_ex;
 
 /**
  * Parses JSON via JSONPath.
@@ -97,7 +99,7 @@ class FeedsExJsonPath extends FeedsExBase {
       throw new RuntimeException(t('The JSONPath library is not installed.'));
     }
 
-    require_once DRUPAL_ROOT . '/' . $path;
+    require_once \Drupal::root() . '/' . $path;
   }
 
 }

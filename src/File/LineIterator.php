@@ -2,13 +2,15 @@
 
 /**
  * @file
- * Contains FeedsExLineIterator.
+ * Contains \Drupal\feeds_ex\File\LineIterator.
  */
+
+namespace Drupal\feeds_ex\File;
 
 /**
  * Text lines from file iterator.
  */
-class FeedsExLineIterator extends SplFileObject {
+class LineIterator extends SplFileObject {
 
   /**
    * The position to start in the file.

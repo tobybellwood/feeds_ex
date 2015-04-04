@@ -2,13 +2,15 @@
 
 /**
  * @file
- * Contains FeedsExJsonUtility.
+ * Contains \Drupal\feeds_ex\Json\Utility.
  */
+
+namespace Drupal\feeds_ex\Json;
 
 /**
  * Various helpers for handling JSON.
  */
-class FeedsExJsonUtility {
+class Utility {
 
   /**
    * Translates an error message.
@@ -79,7 +81,7 @@ class FeedsExJsonUtility {
    *   Thrown if the encoded JSON does not result in an array.
    */
   public static function decodeJsonArray($json) {
-    $parsed = drupal_json_decode($json);
+    $parsed = \Drupal\Component\Serialization\Json::decode($json);
 
     if (!is_array($parsed)) {
       throw new RuntimeException(t('The JSON is invalid.'));

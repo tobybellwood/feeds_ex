@@ -2,8 +2,10 @@
 
 /**
  * @file
- * Contains FeedsExBase.
+ * Contains \Drupal\feeds_ex\FeedsExBase.
  */
+
+namespace Drupal\feeds_ex;
 
 /**
  * The Feeds extensible parser.
@@ -391,7 +393,7 @@ abstract class FeedsExBase extends FeedsParser {
     foreach ($data as $key => $value) {
       $data[$key] = check_plain($value);
     }
-    $output .= theme('item_list', array('items' => $data));
+    $output .= _theme('item_list', array('items' => $data));
     $this->getMessenger()->setMessage($output);
   }
 
@@ -777,80 +779,3 @@ abstract class FeedsExBase extends FeedsParser {
   }
 
 }
-
-/**
- * Displays messages to the user.
- */
-interface FeedsExMessengerInterface {
-
-  /**
-   * Sets a message to display to the user.
-   *
-   * @param string $message
-   *   The message.
-   * @param string $type
-   *   (optional) The type of message. Defaults to 'status'.
-   * @param bool $repeat
-   *   (optional) Whether to allow the message to repeat. Defaults to true.
-   *
-   * @see drupal_set_message()
-   */
-  public function setMessage($message = NULL, $type = 'status', $repeat = TRUE);
-
-}
-
-/**
- * Uses drupal_set_message() to show messages.
- */
-class FeedsExMessenger implements FeedsExMessengerInterface {
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setMessage($message = NULL, $type = 'status', $repeat = TRUE) {
-    drupal_set_message($message, $type, $repeat);
-  }
-
-}
-
-/**
- * Stores messages without calling drupal_set_mesage().
- */
-class FeedsExTestMessenger implements FeedsExMessengerInterface {
-
-  /**
-   * The messages that have been set.
-   *
-   * @var array
-   */
-  protected $messages = array();
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setMessage($message = NULL, $type = 'status', $repeat = TRUE) {
-    $this->messages[] = array(
-      'message' => $message,
-      'type' => $type,
-      'repeat' => $repeat,
-    );
-  }
-
-  /**
-   * Returns the messages.
-   *
-   * This is used to inspect messages that have been set.
-   *
-   * @return array
-   *   A list of message arrays.
-   */
-  public function getMessages() {
-    return $this->messages;
-  }
-
-}
-
-/**
- * An exception thrown by parsers when they receive an empty feed.
- */
-class FeedsExEmptyException extends RuntimeException {}

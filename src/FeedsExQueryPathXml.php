@@ -2,8 +2,10 @@
 
 /**
  * @file
- * Contains FeedsExXml.
+ * Contains \Drupal\feeds_ex\FeedsExQueryPathXml.
  */
+
+namespace Drupal\feeds_ex;
 
 /**
  * Parses XML documents with QueryPath.

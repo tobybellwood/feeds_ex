@@ -2,60 +2,15 @@
 
 /**
  * @file
- * Contains FeedsExEncoderInterface and FeedsExTextEncoder.
+ * Contains \Drupal\feeds_ex\Text\TextEncoder.
  */
 
-/**
- * Coverts text encodings.
- */
-interface FeedsExEncoderInterface {
-
-  /**
-   * Constructs a FeedsExEncoderInterface object.
-   *
-   * @param array $encoding_list
-   *   The list of encodings to search through.
-   */
-  public function __construct(array $encoding_list);
-
-  /**
-   * Converts a string to UTF-8.
-   *
-   * @param string $data
-   *   The string to convert.
-   *
-   * @return string
-   *   The encoded string, or the original string if encoding failed.
-   */
-  public function convertEncoding($data);
-
-  /**
-   * Returns the configuration form to select encodings.
-   *
-   * @param array $form
-   *   The current form.
-   * @param array &$form_state
-   *   The form state.
-   *
-   * @return array
-   *   The modified form array.
-   */
-  public function configForm(array $form, array &$form_state);
-
-  /**
-   * Validates the encoding configuration form.
-   *
-   * @param array &$values
-   *   The form values.
-   */
-  public function configFormValidate(array &$values);
-
-}
+namespace Drupal\feeds_ex\Text;
 
 /**
  * Generic text encoder.
  */
-class FeedsExTextEncoder implements FeedsExEncoderInterface {
+class TextEncoder implements EncoderInterface {
 
   /**
    * Whether the current system handles mb_* functions.
@@ -83,7 +38,7 @@ class FeedsExTextEncoder implements FeedsExEncoderInterface {
    */
   public function __construct(array $encoding_list) {
     $this->encodingList = $encoding_list;
-    $this->isMultibyte = $GLOBALS['multibyte'] == UNICODE_MULTIBYTE;
+    $this->isMultibyte = $GLOBALS['multibyte'] == \Drupal\Component\Utility\Unicode::STATUS_MULTIBYTE;
   }
 
   /**
@@ -176,7 +131,7 @@ class FeedsExTextEncoder implements FeedsExEncoderInterface {
     if (in_array(strtolower($source_encoding), self::$utf8Compatible)) {
       return $data;
     }
-    $converted = drupal_convert_to_utf8($data, $source_encoding);
+    $converted = \Drupal\Component\Utility\Unicode::convertToUtf8($data, $source_encoding);
     if ($converted === FALSE) {
       return $data;
     }

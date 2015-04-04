@@ -2,12 +2,10 @@
 
 /**
  * @file
- * Contains FeedsExJmesPath.
+ * Contains \Drupal\feeds_ex\FeedsExJmesPath.
  */
 
-use JmesPath\Runtime\AstRuntime;
-use JmesPath\Runtime\CompilerRuntime;
-use JmesPath\SyntaxErrorException;
+namespace Drupal\feeds_ex;
 
 /**
  * Parses JSON documents with JMESPath.
@@ -34,7 +32,7 @@ class FeedsExJmesPath extends FeedsExBase {
   protected function setUp(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
     // This is probably overly paranoid, but safety first.
     if (!$path = $this->getCompileDirectory()) {
-      $path = file_directory_temp() . '/' . drupal_base64_encode(drupal_random_bytes(40)) . '_feeds_ex_jmespath_dir';
+      $path = file_directory_temp() . '/' . drupal_base64_encode(\Drupal\Component\Utility\Crypt::randomBytes(40)) . '_feeds_ex_jmespath_dir';
     }
     try {
       $this->jmesPath = new CompilerRuntime(array('dir' => $path));
@@ -54,7 +52,11 @@ class FeedsExJmesPath extends FeedsExBase {
    */
   protected function getCompileDirectory() {
     if (!isset($this->compileDirectory)) {
-      $this->compileDirectory = variable_get('feeds_ex_jmespath_compile_dir');
+      // @FIXME
+// Could not extract the default value because it is either indeterminate, or
+// not scalar. You'll need to provide a default value in
+// config/install/feeds_ex.settings.yml and config/schema/feeds_ex.schema.yml.
+$this->compileDirectory = \Drupal::config('feeds_ex.settings')->get('feeds_ex_jmespath_compile_dir');
     }
 
     return $this->compileDirectory;
@@ -69,7 +71,7 @@ class FeedsExJmesPath extends FeedsExBase {
   protected function setCompileDirectory($directory) {
     if ($this->compileDirectory !== $directory) {
       $this->compileDirectory = $directory;
-      variable_set('feeds_ex_jmespath_compile_dir', $directory);
+      \Drupal::configFactory()->getEditable('feeds_ex.settings')->set('feeds_ex_jmespath_compile_dir', $directory)->save();
     }
   }
 
@@ -175,7 +177,7 @@ class FeedsExJmesPath extends FeedsExBase {
       throw new RuntimeException(t('The JMESPath library is not installed.'));
     }
 
-    require_once DRUPAL_ROOT . '/' . $path;
+    require_once \Drupal::root() . '/' . $path;
   }
 
 }

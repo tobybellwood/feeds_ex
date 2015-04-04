@@ -2,13 +2,15 @@
 
 /**
  * @file
- * Contains FeedsExJsonPathLines.
+ * Contains \Drupal\feeds_ex\FeedsExJmesPathLines.
  */
 
+namespace Drupal\feeds_ex;
+
 /**
- * Parses the JSON Lines format via JSONPath.
+ * Parses JSON Lines documents with JMESPath.
  */
-class FeedsExJsonPathLines extends FeedsExJsonPath {
+class FeedsExJmesPathLines extends FeedsExJmesPath {
 
   /**
    * The file iterator.
@@ -28,6 +30,7 @@ class FeedsExJsonPathLines extends FeedsExJsonPath {
    * {@inheritdoc}
    */
   protected function setUp(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
+    parent::setUp($source, $fetcher_result);
     $this->iterator = new FeedsExLineIterator($fetcher_result->getFilePath());
 
     if (!$this->iterator->getSize()) {
@@ -40,6 +43,7 @@ class FeedsExJsonPathLines extends FeedsExJsonPath {
     if (!$state->total) {
       $state->total = $this->iterator->getSize();
     }
+
     $this->iterator->setStartPosition((int) $state->pointer);
   }
 
@@ -79,7 +83,8 @@ class FeedsExJsonPathLines extends FeedsExJsonPath {
    * {@inheritdoc}
    */
   protected function executeSourceExpression($machine_name, $expression, $row) {
-    $result = jsonPath($row, $expression);
+    // Row is a JSON string.
+    $result = $this->jmesPath->search($expression, $row);
 
     if (is_scalar($result)) {
       return $result;
