@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\feeds_ex\Text\TextEncoder.
+ * Contains \Drupal\feeds_ex\Encoder\TextEncoder.
  */
 
-namespace Drupal\feeds_ex\Text;
+namespace Drupal\feeds_ex\Encoder;
 
 /**
  * Generic text encoder.

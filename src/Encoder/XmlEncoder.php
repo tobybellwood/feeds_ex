@@ -2,12 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\feeds_ex\Xml\XmlEncoder.
+ * Contains \Drupal\feeds_ex\Encoder\XmlEncoder.
  */
 
-namespace Drupal\feeds_ex\Xml;
-
-use Drupal\feeds_ex\Text\TextEncoder;
+namespace Drupal\feeds_ex\Encoder;
 
 /**
  * Converts the encoding of an XML document to UTF-8.

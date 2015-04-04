@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\feeds_ex\Text\EncoderInterface.
+ * Contains \Drupal\feeds_ex\Encoder\EncoderInterface.
  */
 
-namespace Drupal\feeds_ex\Text;
+namespace Drupal\feeds_ex\Encoder;
 
 /**
  * Coverts text encodings.

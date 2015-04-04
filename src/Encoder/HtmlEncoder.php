@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\feeds_ex\Xml\HtmlEncoder.
+ * Contains \Drupal\feeds_ex\Encoder\HtmlEncoder.
  */
 
-namespace Drupal\feeds_ex\Xml;
+namespace Drupal\feeds_ex\Encoder;
 
 /**
  * Converts the encoding of an HTML document to UTF-8.
