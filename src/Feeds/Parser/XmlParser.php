@@ -8,7 +8,13 @@
 namespace Drupal\feeds_ex\Feeds\Parser;
 
 /**
- * Parses XML documents with XPath.
+ * Defines a XML parser using XPath.
+ *
+ * @FeedsParser(
+ *   id = "xml",
+ *   title = @Translation("XML"),
+ *   description = @Translation("Parse XML with XPath.")
+ * )
  */
 class XmlParser extends ParserBase {
 

@@ -8,7 +8,13 @@
 namespace Drupal\feeds_ex\Feeds\Parser;
 
 /**
- * Parses JSON via JSONPath.
+ * Defines a JSON parser using JSONPath.
+ *
+ * @FeedsParser(
+ *   id = "jsonpath",
+ *   title = @Translation("JsonPath"),
+ *   description = @Translation("Parse JSON with JSONPath.")
+ * )
  */
 class JsonPathParser extends ParserBase {
 

@@ -8,7 +8,13 @@
 namespace Drupal\feeds_ex\Feeds\Parser;
 
 /**
- * Parses XML documents with QueryPath.
+ * Defines a XML parser using QueryPath.
+ *
+ * @FeedsParser(
+ *   id = "querypathxml",
+ *   title = @Translation("QueryPath XML"),
+ *   description = @Translation("Parse XML with QueryPath.")
+ * )
  */
 class QueryPathXmlParser extends XmlParser {
 

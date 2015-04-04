@@ -8,7 +8,13 @@
 namespace Drupal\feeds_ex\Feeds\Parser;
 
 /**
- * Parses the JSON Lines format via JSONPath.
+ * Defines a JSON Lines parser using JSONPath.
+ *
+ * @FeedsParser(
+ *   id = "jsonpathlines",
+ *   title = @Translation("JSON Lines JSONPath"),
+ *   description = @Translation("Parse JSON Lines with JSONPath.")
+ * )
  */
 class JsonPathLinesParser extends JsonPathParser {
 

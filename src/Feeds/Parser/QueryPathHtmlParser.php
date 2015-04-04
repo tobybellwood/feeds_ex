@@ -8,10 +8,16 @@
 namespace Drupal\feeds_ex\Feeds\Parser;
 
 /**
- * Parses HTML documents with QueryPath.
+ * Defines a HTML parser using QueryPath.
  *
  * @todo Make convertEncoding() into a helper function so that they aren't \
  *   copied in 2 places.
+ *
+ * @FeedsParser(
+ *   id = "querypathhtml",
+ *   title = @Translation("QueryPath HTML"),
+ *   description = @Translation("Parse HTML with QueryPath.")
+ * )
  */
 class QueryPathHtmlParser extends QueryPathXmlParser {
 

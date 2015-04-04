@@ -8,7 +8,13 @@
 namespace Drupal\feeds_ex\Feeds\Parser;
 
 /**
- * Parses JSON documents with JMESPath.
+ * Defines a JSON parser using JMESPath.
+ *
+ * @FeedsParser(
+ *   id = "jmespath",
+ *   title = @Translation("JSON JMESPath"),
+ *   description = @Translation("Parse JSON with JMESPath.")
+ * )
  */
 class JmesPathParser extends ParserBase {
 
