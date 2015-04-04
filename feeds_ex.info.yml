@@ -1,0 +1,7 @@
+name: Feeds extensible parser
+type: module
+description: A generic Feeds parser used to create extensible parsers.
+core: 8.x
+package: Feeds
+dependencies:
+  - feeds
