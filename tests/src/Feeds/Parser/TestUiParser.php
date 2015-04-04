@@ -2,13 +2,17 @@
 
 /**
  * @file
- * Contains TestUi.
+ * Contains \Drupal\feeds_ex_test\Feeds\Parser\TestUiParser.
  */
+
+namespace Drupal\feeds_ex_test\Feeds\Parser;
+
+use Drupal\feeds_ex\Feeds\Parser\ParserBase;
 
 /**
  * A minimal implementation of a parser for UI testing.
  */
-class TestUi extends Base {
+class TestUiParser extends ParserBase {
 
   /**
    * {@inheritdoc}
