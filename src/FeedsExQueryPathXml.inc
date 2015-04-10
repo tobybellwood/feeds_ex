@@ -55,17 +55,21 @@ class FeedsExQueryPathXml extends FeedsExXml {
       return;
     }
 
-    if (strlen($this->config['sources'][$machine_name]['attribute'])) {
-      return $result->attr($this->config['sources'][$machine_name]['attribute']);
-    }
+    $config = $this->config['sources'][$machine_name];
 
     $return = array();
-    if (!empty($this->config['sources'][$machine_name]['inner'])) {
+
+    if (strlen($config['attribute'])) {
+      foreach ($result as $node) {
+        $return[] = $node->attr($config['attribute']);
+      }
+    }
+    elseif (!empty($config['inner'])) {
       foreach ($result as $node) {
         $return[] = $node->innerXML();
       }
     }
-    elseif (!empty($this->config['sources'][$machine_name]['raw'])) {
+    elseif (!empty($config['raw'])) {
       foreach ($result as $node) {
         $return[] = $this->getRawValue($node);
       }
