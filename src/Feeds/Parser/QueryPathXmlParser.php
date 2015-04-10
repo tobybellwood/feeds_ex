@@ -72,7 +72,7 @@ class QueryPathXmlParser extends XmlParser {
 
     $config = $this->configuration['sources'][$machine_name];
 
-    $return = array();
+    $return = [];
 
     if (strlen($config['attribute'])) {
       foreach ($result as $node) {

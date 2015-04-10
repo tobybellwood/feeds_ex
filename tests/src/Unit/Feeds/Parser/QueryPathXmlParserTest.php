@@ -172,29 +172,29 @@ class QueryPathXmlParserTest extends ParserTestBase {
    * Tests grabbing multiple attributes.
    */
   public function testMultipleAttributeParsing() {
-    $parser = $this->getParserInstance();
-    $fetcher_result = new FeedsFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test.xml'));
+    $fetcher_result = new RawFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test.xml'));
 
-    $parser->setConfig(array(
-      'context' => array(
+    $config = [
+      'context' => [
         'value' => 'items thing',
-      ),
-      'sources' => array(
-        'url' => array(
+      ],
+      'sources' => [
+        'url' => [
           'name' => 'URL',
           'value' => 'img',
           'attribute' => 'src',
-        ),
-      ),
-    ));
+        ],
+      ],
+    ];
+    $this->parser->setConfiguration($config);
 
-    $result = $parser->parse($this->source, $fetcher_result);
-    $this->assertParserResultItemCount($result, 1);
+    $result = $this->parser->parse($this->feed, $fetcher_result, $this->state);
+    $this->assertSame(count($result), 1);
 
-    $this->assertEqual(count($result->items[0]['url']), 2);
-
-    $this->assertEqual($result->items[0]['url'][0], 'http://drupal.org');
-    $this->assertEqual($result->items[0]['url'][1], 'http://drupal.org/project/feeds_ex');
+    $url = $result[0]->get('url');
+    $this->assertSame(count($url), 2);
+    $this->assertSame($url[0], 'http://drupal.org');
+    $this->assertSame($url[1], 'http://drupal.org/project/feeds_ex');
   }
 
   /**
