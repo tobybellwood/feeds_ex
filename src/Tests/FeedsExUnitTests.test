@@ -34,7 +34,7 @@ abstract class FeedsExUnitTestBase extends TUnit {
     require_once $feeds . '/plugins/FeedsNodeProcessor.inc';
 
     // This is out test feed source.
-    require_once dirname(__FILE__) . '/FeedsExTestFeedsSource.php';
+    require_once dirname(__FILE__) . '/FeedsExTestFeedsSource.inc';
 
     drupal_load('module', 'feeds_ex');
     $this->moduleDir = DRUPAL_ROOT . '/' . drupal_get_path('module', 'feeds_ex');
