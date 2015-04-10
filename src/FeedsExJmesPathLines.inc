@@ -77,19 +77,4 @@ class FeedsExJmesPathLines extends FeedsExJmesPath {
     parent::cleanUp($source, $result);
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  protected function executeSourceExpression($machine_name, $expression, $row) {
-    // Row is a JSON string.
-    $result = $this->jmesPath->search($expression, $row);
-
-    if (is_scalar($result)) {
-      return $result;
-    }
-
-    // Return a single value if there's only one value.
-    return count($result) === 1 ? reset($result) : $result;
-  }
-
 }
