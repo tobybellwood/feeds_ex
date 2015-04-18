@@ -11,6 +11,12 @@ use Drupal\feeds_ex\Feeds\Parser\ParserBase;
 
 /**
  * A minimal implementation of a parser for UI testing.
+ *
+ * @FeedsParser(
+ *   id = "feeds_ex_test_ui",
+ *   title = @Translation("Test UI parser"),
+ *   description = @Translation("Do not use this.")
+ * )
  */
 class TestUiParser extends ParserBase {
 

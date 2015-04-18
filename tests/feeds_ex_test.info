@@ -1,5 +1,0 @@
-name = Feeds extensible parser tests
-package = Testing
-hidden = TRUE
-dependencies[] = feeds_ex
-core = 7.x
