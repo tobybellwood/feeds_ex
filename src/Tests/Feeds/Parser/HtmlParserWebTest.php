@@ -7,17 +7,21 @@
 
 namespace Drupal\feeds_ex\Tests\Feeds\Parser;
 
-use Drupal\feeds_ex\UnitTestBase;
+use Drupal\simpletest\WebTestBase;
 
 /**
  * Integration tests for Html.
  *
  * @group feeds_ex
  */
-class HtmlParserWebTest extends FeedsWebTestCase {
+class HtmlParserWebTest extends WebTestBase {
+
+  /**
+   * {@inheritdoc}
+   */
+  public static $modules = ['feeds_ex'];
 
   public function setUp() {
-    parent::setUp('feeds_ex');
     $this->createImporterConfiguration();
     $this->setSettings('syndication', '', array('content_type' => ''));
     $this->setPlugin('syndication', 'Html');

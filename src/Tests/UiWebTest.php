@@ -7,12 +7,14 @@
 
 namespace Drupal\feeds_ex\Tests;
 
+use Drupal\simpletest\WebTestBase;
+
 /**
  * User interface tests.
  *
  * @group feeds_ex
  */
-class UiWebTest extends FeedsWebTestCase {
+class UiWebTest extends WebTestBase {
 
   public static $modules = [
     'feeds_ex',
