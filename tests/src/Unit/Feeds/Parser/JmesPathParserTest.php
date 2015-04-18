@@ -2,19 +2,19 @@
 
 /**
  * @file
- * Contains \Drupal\feeds_ex\Tests\Feeds\Parser\JmesPathParserUnitTest.
+ * Contains \Drupal\Tests\feeds_ex\Unit\Feeds\Parser\JmesPathParserTest.
  */
 
-namespace Drupal\feeds_ex\Tests\Feeds\Parser;
+namespace Drupal\Tests\feeds_ex\Unit\Feeds\Parser;
 
-use Drupal\feeds_ex\UnitTestBase;
+use Drupal\Tests\feeds_ex\Unit\UnitTestBase;
 
 /**
  * Unit tests for JmesPath.
  *
  * @group feeds_ex
  */
-class JmesPathParserUnitTest extends UnitTestBase {
+class JmesPathParserTest extends UnitTestBase {
 
   /**
    * The mocked FeedsSource.

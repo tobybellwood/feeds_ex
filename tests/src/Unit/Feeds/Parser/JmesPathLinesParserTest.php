@@ -2,19 +2,19 @@
 
 /**
  * @file
- * Contains \Drupal\feeds_ex\Tests\Feeds\Parser\JmesPathLinesParserUnitTest.
+ * Contains \Drupal\Tests\feeds_ex\Unit\Feeds\Parser\JmesPathLinesParserTest.
  */
 
-namespace Drupal\feeds_ex\Tests\Feeds\Parser;
+namespace Drupal\Tests\feeds_ex\Unit\Feeds\Parser;
 
-use Drupal\feeds_ex\UnitTestBase;
+use Drupal\Tests\feeds_ex\Unit\UnitTestBase;
 
 /**
  * Unit tests for JmesPathLines.
  *
  * @group feeds_ex
  */
-class JmesPathLinesParserUnitTest extends JsonPathLinesParserUnitTest {
+class JmesPathLinesParserTest extends JsonPathLinesParserTest {
 
   public function setUp() {
     parent::setUp();

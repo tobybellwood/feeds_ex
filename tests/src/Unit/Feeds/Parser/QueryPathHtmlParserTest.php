@@ -2,19 +2,19 @@
 
 /**
  * @file
- * Contains \Drupal\feeds_ex\Tests\Feeds\Parser\QueryPathHtmlParserUnitTest.
+ * Contains \Drupal\Tests\feeds_ex\Unit\Feeds\Parser\QueryPathHtmlParserTest.
  */
 
-namespace Drupal\feeds_ex\Tests\Feeds\Parser;
+namespace Drupal\Tests\feeds_ex\Unit\Feeds\Parser;
 
-use Drupal\feeds_ex\UnitTestBase;
+use Drupal\Tests\feeds_ex\Unit\UnitTestBase;
 
 /**
  * Unit tests for QueryPathHtml.
  *
  * @group feeds_ex
  */
-class QueryPathHtmlParserUnitTest extends UnitTestBase {
+class QueryPathHtmlParserTest extends UnitTestBase {
 
   /**
    * The mocked FeedsSource.

@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\feeds_ex\Tests\File\LineIteratorUnitTest.
+ * Contains \Drupal\Tests\feeds_ex\Unit\File\LineIteratorTest.
  */
 
-namespace Drupal\feeds_ex\Tests\File;
+namespace Drupal\Tests\feeds_ex\Unit\File;
 
 use Drupal\Tests\UnitTestCase;
 
@@ -14,7 +14,7 @@ use Drupal\Tests\UnitTestCase;
  *
  * @group feeds_ex
  */
-class LineIteratorUnitTest extends DrupalUnitTestCase {
+class LineIteratorTest extends UnitTestCase {
 
   /**
    * The module directory path.

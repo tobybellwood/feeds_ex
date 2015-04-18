@@ -2,19 +2,19 @@
 
 /**
  * @file
- * Contains \Drupal\feeds_ex\Tests\Feeds\Parser\HtmlParserUnitTest.
+ * Contains \Drupal\Tests\feeds_ex\Unit\Feeds\Parser\HtmlParserTest.
  */
 
-namespace Drupal\feeds_ex\Tests\Feeds\Parser;
+namespace Drupal\Tests\feeds_ex\Unit\Feeds\Parser;
 
-use Drupal\feeds_ex\UnitTestBase;
+use Drupal\Tests\feeds_ex\Unit\UnitTestBase;
 
 /**
  * Unit tests for Html.
  *
  * @group feeds_ex
  */
-class HtmlParserUnitTest extends UnitTestBase {
+class HtmlParserTest extends UnitTestBase {
 
   /**
    * The mocked FeedsSource.

@@ -2,19 +2,19 @@
 
 /**
  * @file
- * Contains \Drupal\feeds_ex\Tests\Feeds\Parser\QueryPathXmlParserUnitTest.
+ * Contains \Drupal\Tests\feeds_ex\Unit\Feeds\Parser\XmlParserTest.
  */
 
-namespace Drupal\feeds_ex\Tests\Feeds\Parser;
+namespace Drupal\Tests\feeds_ex\Unit\Feeds\Parser;
 
-use Drupal\feeds_ex\UnitTestBase;
+use Drupal\Tests\feeds_ex\Unit\UnitTestBase;
 
 /**
- * Unit tests for QueryPathXml.
+ * Unit tests for Xml.
  *
  * @group feeds_ex
  */
-class QueryPathXmlParserUnitTest extends UnitTestBase {
+class XmlParserTest extends UnitTestBase {
 
   /**
    * The mocked FeedsSource.
@@ -23,18 +23,10 @@ class QueryPathXmlParserUnitTest extends UnitTestBase {
    */
   protected $source;
 
-  public static $modules = [
-    'querypath',
-  ];
-
   public function setUp() {
     parent::setUp();
 
-    $query_path = drupal_get_path('module', 'querypath');
-    require_once DRUPAL_ROOT . '/' . $query_path .  '/QueryPath/QueryPath.php';
-
     require_once $this->moduleDir . '/src/Xml.inc';
-    require_once $this->moduleDir . '/src/QueryPathXml.inc';
 
     $this->source = $this->getMockFeedsSource();
   }
@@ -48,18 +40,16 @@ class QueryPathXmlParserUnitTest extends UnitTestBase {
 
     $parser->setConfig(array(
       'context' => array(
-        'value' => 'items item',
+        'value' => '/items/item',
       ),
       'sources' => array(
         'title' => array(
           'name' => 'Title',
           'value' => 'title',
-          'attribute' => '',
         ),
         'description' => array(
           'name' => 'Title',
           'value' => 'description',
-          'attribute' => '',
         ),
       ),
     ));
@@ -82,18 +72,16 @@ class QueryPathXmlParserUnitTest extends UnitTestBase {
 
     $parser->setConfig(array(
       'context' => array(
-        'value' => 'items item',
+        'value' => '/items/item',
       ),
       'sources' => array(
         'title' => array(
           'name' => 'Title',
           'value' => 'title',
-          'attribute' => '',
         ),
         'description' => array(
           'name' => 'Title',
           'value' => 'description',
-          'attribute' => '',
           'raw' => TRUE,
         ),
       ),
@@ -109,7 +97,7 @@ class QueryPathXmlParserUnitTest extends UnitTestBase {
   }
 
   /**
-   * Tests inner xml.
+   * Tests simple parsing.
    */
   public function testInner() {
     $parser = $this->getParserInstance();
@@ -117,18 +105,16 @@ class QueryPathXmlParserUnitTest extends UnitTestBase {
 
     $parser->setConfig(array(
       'context' => array(
-        'value' => 'items item',
+        'value' => '/items/item',
       ),
       'sources' => array(
         'title' => array(
           'name' => 'Title',
           'value' => 'title',
-          'attribute' => '',
         ),
         'description' => array(
           'name' => 'Title',
           'value' => 'description',
-          'attribute' => '',
           'raw' => TRUE,
           'inner' => TRUE,
         ),
@@ -145,69 +131,6 @@ class QueryPathXmlParserUnitTest extends UnitTestBase {
   }
 
   /**
-   * Tests grabbing an attribute.
-   */
-  public function testAttributeParsing() {
-    $parser = $this->getParserInstance();
-    $fetcher_result = new FeedsFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test.xml'));
-
-    $parser->setConfig(array(
-      'context' => array(
-        'value' => 'items item',
-      ),
-      'sources' => array(
-        'title' => array(
-          'name' => 'Title',
-          'value' => 'title',
-          'attribute' => 'attr',
-        ),
-        'description' => array(
-          'name' => 'Title',
-          'value' => 'description',
-          'attribute' => '',
-        ),
-      ),
-    ));
-
-    $result = $parser->parse($this->source, $fetcher_result);
-    $this->assertParserResultItemCount($result, 3);
-
-    foreach ($result->items as $delta => $item) {
-      $this->assertEqual('attribute' . $delta, $item['title']);
-      $this->assertEqual('I am a description' . $delta, $item['description']);
-    }
-  }
-
-  /**
-   * Tests grabbing multiple attributes.
-   */
-  public function testMultipleAttributeParsing() {
-    $parser = $this->getParserInstance();
-    $fetcher_result = new FeedsFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test.xml'));
-
-    $parser->setConfig(array(
-      'context' => array(
-        'value' => 'items thing',
-      ),
-      'sources' => array(
-        'url' => array(
-          'name' => 'URL',
-          'value' => 'img',
-          'attribute' => 'src',
-        ),
-      ),
-    ));
-
-    $result = $parser->parse($this->source, $fetcher_result);
-    $this->assertParserResultItemCount($result, 1);
-
-    $this->assertEqual(count($result->items[0]['url']), 2);
-
-    $this->assertEqual($result->items[0]['url'][0], 'http://drupal.org');
-    $this->assertEqual($result->items[0]['url'][1], 'http://drupal.org/project/feeds_ex');
-  }
-
-  /**
    * Tests parsing a CP866 (Russian) encoded file.
    */
   public function testCP866Encoded() {
@@ -216,18 +139,16 @@ class QueryPathXmlParserUnitTest extends UnitTestBase {
 
     $parser->setConfig(array(
       'context' => array(
-        'value' => 'items item',
+        'value' => '/items/item',
       ),
       'sources' => array(
         'title' => array(
           'name' => 'Title',
           'value' => 'title',
-          'attribute' => '',
         ),
         'description' => array(
           'name' => 'Title',
           'value' => 'description',
-          'attribute' => '',
         ),
       ),
     ));
@@ -252,18 +173,16 @@ class QueryPathXmlParserUnitTest extends UnitTestBase {
 
     $parser->setConfig(array(
       'context' => array(
-        'value' => 'items item',
+        'value' => '/items/item',
       ),
       'sources' => array(
         'title' => array(
           'name' => 'Title',
           'value' => 'title',
-          'attribute' => '',
         ),
         'description' => array(
           'name' => 'Title',
           'value' => 'description',
-          'attribute' => '',
         ),
       ),
       'source_encoding' => array('EUC-JP'),
@@ -279,26 +198,24 @@ class QueryPathXmlParserUnitTest extends UnitTestBase {
   }
 
   /**
-   * Tests that batch parsing works.
+   * Tests batching.
    */
-  public function testBatchParsing() {
+  public function testBatching() {
     $parser = $this->getParserInstance();
     $fetcher_result = new FeedsFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test.xml'));
 
     $parser->setConfig(array(
       'context' => array(
-        'value' => 'items item',
+        'value' => '/items/item',
       ),
       'sources' => array(
         'title' => array(
           'name' => 'Title',
           'value' => 'title',
-          'attribute' => '',
         ),
         'description' => array(
           'name' => 'Title',
           'value' => 'description',
-          'attribute' => '',
         ),
       ),
     ));
@@ -312,21 +229,42 @@ class QueryPathXmlParserUnitTest extends UnitTestBase {
       $this->assertEqual('I am a description' . $delta, $result->items[0]['description']);
     }
 
+    // Should be empty.
     $result = $parser->parse($this->source, $fetcher_result);
     $this->assertParserResultItemCount($result, 0);
   }
 
   /**
-   * Tests QueryPath validation.
+   * Tests that the link propery is set.
+   */
+  public function testLinkIsSet() {
+    $this->setProperty($this->source, 'config', array(
+      'FeedsFileFetcher' => array(
+        'source' => 'file fetcher source path',
+      ),
+    ));
+
+    $parser = $this->getParserInstance();
+    $parser->setConfig(array('context' => array('value' => '/beep')));
+
+    $result = $parser->parse($this->source, new FeedsFetcherResult('<?xml version="1.0" encoding="UTF-8"?><item></item>'));
+    $this->assertEqual($result->link, 'file fetcher source path');
+  }
+
+  /**
+   * Tests XPath validation.
    */
   public function testValidateExpression() {
     // Invalid expression.
     $parser = $this->getParserInstance();
     $expression = array('!!');
-    $this->assertEqual('CSS selector is not well formed.', $this->invokeMethod($parser, 'validateExpression', $expression));
+    $this->assertEqual('Invalid expression', $this->invokeMethod($parser, 'validateExpression', $expression));
 
     // Test that value was trimmed.
     $this->assertEqual($expression[0], '!!', 'Value was trimmed.');
+
+    // Unknown namespace.
+    $this->assertEqual(NULL, $this->invokeMethod($parser, 'validateExpression', array('thing:asdf')));
 
     // Empty.
     $this->assertEqual(NULL, $this->invokeMethod($parser, 'validateExpression', array('')));
@@ -338,17 +276,21 @@ class QueryPathXmlParserUnitTest extends UnitTestBase {
   public function testEmptyFeed() {
     $parser = $this->getParserInstance();
     $parser->parse($this->source, new FeedsFetcherResult(' '));
-    $this->assertEmptyFeedMessage($parser->getMessenger()->getMessages());
+    $messages = $parser->getMessenger()->getMessages();
+    $this->assertEqual(1, count($messages), 'The expected number of messages.');
+    $this->assertEqual($messages[0]['message'], 'The feed is empty.', 'Message text is correct.');
+    $this->assertEqual($messages[0]['type'], 'warning', 'Message type is warning.');
+    $this->assertFalse($messages[0]['repeat'], 'Repeat is set to false.');
   }
 
   /**
    * Returns a new instance of the parser.
    *
-   * @return QueryPathXml
+   * @return Xml
    *   A parser instance.
    */
   protected function getParserInstance() {
-    $parser = FeedsConfigurable::instance('QueryPathXml', strtolower($this->randomName()));
+    $parser = FeedsConfigurable::instance('Xml', strtolower($this->randomName()));
     $parser->setMessenger(new TestMessenger());
     return $parser;
   }

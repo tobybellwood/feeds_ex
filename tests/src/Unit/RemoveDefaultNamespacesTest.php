@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\feeds_ex\Tests\RemoveDefaultNamespacesTest.
+ * Contains \Drupal\Tests\feeds_ex\Unit\RemoveDefaultNamespacesTest.
  */
 
-namespace Drupal\feeds_ex\Tests;
+namespace Drupal\Tests\feeds_ex\Unit;
 
 use Drupal\Tests\UnitTestCase;
 

@@ -2,12 +2,12 @@
 
 /**
  * @file
- * Contains \Drupal\feeds_ex\Tests\UnitTestBase.
+ * Contains \Drupal\Tests\feeds_ex\Unit\UnitTestBase.
  */
 
-namespace Drupal\feeds_ex\Tests;
+namespace Drupal\Tests\feeds_ex\Unit;
 
-use Drupal\feeds\Tests\FeedsUnitTestCase;
+use Drupal\Tests\feeds\Unit\FeedsUnitTestCase;
 
 /**
  * Base class for units tests.
