@@ -7,6 +7,7 @@
 
 namespace Drupal\feeds_ex\Encoder;
 
+use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
@@ -40,7 +41,7 @@ class TextEncoder implements EncoderInterface {
    */
   public function __construct(array $encoding_list) {
     $this->encodingList = $encoding_list;
-    $this->isMultibyte = $GLOBALS['multibyte'] == \Drupal\Component\Utility\Unicode::STATUS_MULTIBYTE;
+    $this->isMultibyte = Unicode::getStatus() == Unicode::STATUS_MULTIBYTE;
   }
 
   /**
@@ -133,7 +134,7 @@ class TextEncoder implements EncoderInterface {
     if (in_array(strtolower($source_encoding), self::$utf8Compatible)) {
       return $data;
     }
-    $converted = \Drupal\Component\Utility\Unicode::convertToUtf8($data, $source_encoding);
+    $converted = Unicode::convertToUtf8($data, $source_encoding);
     if ($converted === FALSE) {
       return $data;
     }

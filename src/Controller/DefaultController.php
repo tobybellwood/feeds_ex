@@ -7,6 +7,7 @@
 
 namespace Drupal\feeds_ex\Controller;
 
+use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Controller\ControllerBase;
 
 /**
@@ -17,7 +18,7 @@ class DefaultController extends ControllerBase {
   public function feeds_ex_encoding_autocomplete($string = '') {
     $matches = [];
 
-    if (!strlen($string) || $GLOBALS['multibyte'] != \Drupal\Component\Utility\Unicode::STATUS_MULTIBYTE) {
+    if (!strlen($string) || Unicode::getStatus() != Unicode::STATUS_MULTIBYTE) {
       drupal_json_output($matches);
       return;
     }
@@ -31,7 +32,7 @@ class DefaultController extends ControllerBase {
     $prefix = '';
     $encodings = [];
     foreach (mb_list_encodings() as $suggestion) {
-      if (in_array(\Drupal\Component\Utility\Unicode::strtolower($suggestion), $lower_added)) {
+      if (in_array(Unicode::strtolower($suggestion), $lower_added)) {
         $prefix .= $suggestion . ', ';
         continue;
       }
