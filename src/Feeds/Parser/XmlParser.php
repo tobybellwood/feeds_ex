@@ -7,10 +7,14 @@
 
 namespace Drupal\feeds_ex\Feeds\Parser;
 
+use \DOMNode;
+use \DOMNodeList;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\feeds\FeedInterface;
 use Drupal\feeds\Result\FetcherResultInterface;
 use Drupal\feeds\Result\ParserResultInterface;
+use Drupal\feeds_ex\Utility\XmlUtility;
+use Drupal\feeds_ex\XpathDomXpath;
 
 /**
  * Defines a XML parser using XPath.
@@ -47,7 +51,7 @@ class XmlParser extends ParserBase {
   /**
    * {@inheritdoc}
    */
-  protected $encoderClass = 'XmlEncoder';
+  protected $encoderClass = '\Drupal\feeds_ex\Encoder\XmlEncoder';
 
   /**
    * {@inheritdoc}
@@ -263,7 +267,7 @@ class XmlParser extends ParserBase {
   /**
    * Returns the raw XML of a DOM node.
    *
-   * @param DOMNode $node
+   * @param \DOMNode $node
    *   The node to convert to raw XML.
    *
    * @return string
@@ -276,7 +280,7 @@ class XmlParser extends ParserBase {
   /**
    * Returns the inner XML of a DOM node.
    *
-   * @param DOMNode $node
+   * @param \DOMNode $node
    *   The node to convert to raw XML.
    *
    * @return string

@@ -7,6 +7,9 @@
 
 namespace Drupal\feeds_ex\Utility;
 
+use \DOMDocument;
+use \RuntimeException;
+
 /**
  * Simple XML helpers.
  */

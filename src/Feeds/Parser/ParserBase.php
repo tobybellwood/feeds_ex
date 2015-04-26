@@ -7,6 +7,8 @@
 
 namespace Drupal\feeds_ex\Feeds\Parser;
 
+use \EmptyException;
+use \Exception;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\feeds\FeedInterface;
 use Drupal\feeds\Plugin\Type\ConfigurablePluginBase;
@@ -16,6 +18,7 @@ use Drupal\feeds\Result\FetcherResultInterface;
 use Drupal\feeds\Result\ParserResult;
 use Drupal\feeds\Result\ParserResultInterface;
 use Drupal\feeds\StateInterface;
+use Drupal\feeds_ex\Encoder\EncoderInterface;
 
 /**
  * The Feeds extensible parser.
@@ -34,7 +37,7 @@ abstract class ParserBase extends ConfigurablePluginBase implements FeedPluginFo
    *
    * @var string
    */
-  protected $encoderClass = 'TextEncoder';
+  protected $encoderClass = '\Drupal\feeds_ex\Encoder\TextEncoder';
 
   /**
    * The encoder used to convert encodings.
@@ -763,7 +766,7 @@ abstract class ParserBase extends ConfigurablePluginBase implements FeedPluginFo
   /**
    * Sets the encoder.
    *
-   * @param EncoderInterface $encoder
+   * @param \Drupal\feeds_ex\Encoder\EncoderInterface $encoder
    *   The encoder.
    *
    * @return $this
@@ -777,7 +780,7 @@ abstract class ParserBase extends ConfigurablePluginBase implements FeedPluginFo
   /**
    * Returns the encoder.
    *
-   * @return EncoderInterface
+   * @return \Drupal\feeds_ex\Encoder\EncoderInterface
    *   The encoder object.
    */
   public function getEncoder() {

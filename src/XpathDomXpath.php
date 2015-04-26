@@ -7,6 +7,10 @@
 
 namespace Drupal\feeds_ex;
 
+use \DOMDocument;
+use \DOMNode;
+use \DOMXPath;
+
 /**
  * Wraps DOMXPath simplifying usage.
  */
