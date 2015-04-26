@@ -7,6 +7,8 @@
 
 namespace Drupal\feeds_ex\Tests;
 
+use Drupal\Core\Logger\RfcLogLevel;
+
 /**
  * A FeedsSource class used during testing.
  */
@@ -20,7 +22,7 @@ class TestFeedsSource extends FeedsSource {
   /**
    * {@inheritdoc}
    */
-  public function log($type, $message, $variables = array(), $severity = WATCHDOG_NOTICE) {
+  public function log($type, $message, $variables = array(), $severity = RfcLogLevel::NOTICE) {
     $this->logMessages[] = array(
       'type' => $type,
       'message' => $message,

@@ -7,6 +7,7 @@
 
 namespace Drupal\feeds_ex\Feeds\Parser;
 
+use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\feeds\FeedInterface;
 use Drupal\feeds\Result\FetcherResultInterface;
 use Drupal\feeds\Result\ParserResultInterface;
@@ -96,7 +97,7 @@ class JsonPathParser extends ParserBase {
     $message = array(
       'message' => JsonUtility::translateError($error),
       'variables' => array(),
-      'severity' => WATCHDOG_ERROR,
+      'severity' => RfcLogLevel::ERROR,
     );
     return array($message);
   }

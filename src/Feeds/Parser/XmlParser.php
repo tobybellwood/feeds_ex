@@ -10,6 +10,7 @@ namespace Drupal\feeds_ex\Feeds\Parser;
 use \DOMNode;
 use \DOMNodeList;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\feeds\FeedInterface;
 use Drupal\feeds\Result\FetcherResultInterface;
 use Drupal\feeds\Result\ParserResultInterface;
@@ -334,15 +335,15 @@ class XmlParser extends ParserBase {
       // Translate error values.
       switch ($error->level) {
         case LIBXML_ERR_FATAL:
-          $severity = WATCHDOG_ERROR;
+          $severity = RfcLogLevel::ERROR;
           break;
 
         case LIBXML_ERR_ERROR:
-          $severity = WATCHDOG_WARNING;
+          $severity = RfcLogLevel::WARNING;
           break;
 
         default:
-          $severity = WATCHDOG_NOTICE;
+          $severity = RfcLogLevel::NOTICE;
           break;
       }
 

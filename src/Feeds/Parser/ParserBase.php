@@ -10,6 +10,7 @@ namespace Drupal\feeds_ex\Feeds\Parser;
 use \EmptyException;
 use \Exception;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\feeds\FeedInterface;
 use Drupal\feeds\Plugin\Type\ConfigurablePluginBase;
 use Drupal\feeds\Plugin\Type\FeedPluginFormInterface;
@@ -217,7 +218,7 @@ abstract class ParserBase extends ConfigurablePluginBase implements FeedPluginFo
 
     // Display and log errors.
     $errors = $this->getErrors();
-    $this->printErrors($errors, $this->config['display_errors'] ? WATCHDOG_DEBUG : WATCHDOG_ERROR);
+    $this->printErrors($errors, $this->config['display_errors'] ? RfcLogLevel::DEBUG : RfcLogLevel::ERROR);
     $this->logErrors($feed, $errors);
 
     $this->stopErrorHandling();
@@ -332,16 +333,16 @@ abstract class ParserBase extends ConfigurablePluginBase implements FeedPluginFo
    *   A list of errors as returned by stopErrorHandling().
    * @param int $severity
    *   (optional) Limit to only errors of the specified severity. Defaults to
-   *   WATCHDOG_ERROR.
+   *   RfcLogLevel::ERROR.
    *
    * @see watchdog()
    */
-  protected function printErrors(array $errors, $severity = WATCHDOG_ERROR) {
+  protected function printErrors(array $errors, $severity = RfcLogLevel::ERROR) {
     foreach ($errors as $error) {
       if ($error['severity'] > $severity) {
         continue;
       }
-      $this->getMessenger()->setMessage(t($error['message'], $error['variables']), $error['severity'] <= WATCHDOG_ERROR ? 'error' : 'warning', FALSE);
+      $this->getMessenger()->setMessage(t($error['message'], $error['variables']), $error['severity'] <= RfcLogLevel::ERROR ? 'error' : 'warning', FALSE);
     }
   }
 
@@ -354,11 +355,11 @@ abstract class ParserBase extends ConfigurablePluginBase implements FeedPluginFo
    *   A list of errors as returned by stopErrorHandling().
    * @param int $severity
    *   (optional) Limit to only errors of the specified severity. Defaults to
-   *   WATCHDOG_ERROR.
+   *   RfcLogLevel::ERROR.
    *
    * @see watchdog()
    */
-  protected function logErrors(FeedInterface $feed, array $errors, $severity = WATCHDOG_ERROR) {
+  protected function logErrors(FeedInterface $feed, array $errors, $severity = RfcLogLevel::ERROR) {
     foreach ($errors as $error) {
       if ($error['severity'] > $severity) {
         continue;
