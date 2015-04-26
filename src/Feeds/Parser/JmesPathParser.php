@@ -7,6 +7,10 @@
 
 namespace Drupal\feeds_ex\Feeds\Parser;
 
+use Drupal\feeds\FeedInterface;
+use Drupal\feeds\Result\FetcherResultInterface;
+use Drupal\feeds\Result\ParserResultInterface;
+
 /**
  * Defines a JSON parser using JMESPath.
  *
@@ -35,7 +39,7 @@ class JmesPathParser extends ParserBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
+  protected function setUp(FeedInterface $feed, FetcherResultInterface $fetcher_result) {
     // This is probably overly paranoid, but safety first.
     if (!$path = $this->getCompileDirectory()) {
       $path = file_directory_temp() . '/' . drupal_base64_encode(\Drupal\Component\Utility\Crypt::randomBytes(40)) . '_feeds_ex_jmespath_dir';
@@ -84,7 +88,7 @@ $this->compileDirectory = \Drupal::config('feeds_ex.settings')->get('feeds_ex_jm
   /**
    * {@inheritdoc}
    */
-  protected function executeContext(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
+  protected function executeContext(FeedInterface $feed, FetcherResultInterface $fetcher_result) {
     $raw = $this->prepareRaw($fetcher_result);
     $parsed = JsonUtility::decodeJsonArray($raw);
     $parsed = $this->jmesPath->search($this->config['context']['value'], $parsed);
@@ -92,24 +96,24 @@ $this->compileDirectory = \Drupal::config('feeds_ex.settings')->get('feeds_ex_jm
       throw new RuntimeException(t('The context expression must return an object or array.'));
     }
 
-    $state = $source->state(FEEDS_PARSE);
+    $state = $feed->state(FEEDS_PARSE);
     if (!$state->total) {
       $state->total = count($parsed);
     }
 
     // @todo Consider using array slice syntax when it is supported.
     $start = (int) $state->pointer;
-    $state->pointer = $start + $source->importer->getLimit();
-    return array_slice($parsed, $start, $source->importer->getLimit());
+    $state->pointer = $start + $feed->importer->getLimit();
+    return array_slice($parsed, $start, $feed->importer->getLimit());
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function cleanUp(FeedsSource $source, FeedsParserResult $result) {
+  protected function cleanUp(FeedInterface $feed, ParserResultInterface $result) {
     unset($this->jmesPath);
     // Calculate progress.
-    $state = $source->state(FEEDS_PARSE);
+    $state = $feed->state(FEEDS_PARSE);
     $state->progress($state->total, $state->pointer);
   }
 

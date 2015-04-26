@@ -8,9 +8,14 @@
 namespace Drupal\feeds_ex\Feeds\Parser;
 
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\feeds\FeedInterface;
 use Drupal\feeds\Plugin\Type\ConfigurablePluginBase;
 use Drupal\feeds\Plugin\Type\FeedPluginFormInterface;
 use Drupal\feeds\Plugin\Type\Parser\ParserInterface;
+use Drupal\feeds\Result\FetcherResultInterface;
+use Drupal\feeds\Result\ParserResult;
+use Drupal\feeds\Result\ParserResultInterface;
+use Drupal\feeds\StateInterface;
 
 /**
  * The Feeds extensible parser.
@@ -41,15 +46,15 @@ abstract class ParserBase extends ConfigurablePluginBase implements FeedPluginFo
   /**
    * Returns rows to be parsed.
    *
-   * @param FeedsSource $source
+   * @param \Drupal\feeds\FeedInterface $feed
    *   Source information.
-   * @param FeedsFetcherResult $fetcher_result
+   * @param \Drupal\feeds\Result\FetcherResultInterface $fetcher_result
    *   The result returned by the fetcher.
    *
    * @return array|Traversable
    *   Some iterable that returns rows.
    */
-  abstract protected function executeContext(FeedsSource $source, FeedsFetcherResult $fetcher_result);
+  abstract protected function executeContext(FeedInterface $feed, FetcherResultInterface $fetcher_result);
 
   /**
    * Executes a single source expression.
@@ -94,23 +99,23 @@ abstract class ParserBase extends ConfigurablePluginBase implements FeedPluginFo
   /**
    * Allows subclasses to prepare for parsing.
    *
-   * @param FeedsSource $source
-   *   The feed source.
-   * @param FeedsFetcherResult $fetcher_result
+   * @param \Drupal\feeds\FeedInterface $feed
+   *   The feed we are parsing for.
+   * @param \Drupal\feeds\Result\FetcherResultInterface $fetcher_result
    *   The result of the fetching stage.
    */
-  protected function setUp(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
+  protected function setUp(FeedInterface $feed, FetcherResultInterface $fetcher_result) {
   }
 
   /**
    * Allows subclasses to cleanup after parsing.
    *
-   * @param FeedsSource $source
-   *   The feed source.
-   * @param FeedsParserResult $parser_result
+   * @param \Drupal\feeds\FeedInterface $feed
+   *   The feed we are parsing for.
+   * @param \Drupal\feeds\Result\ParserResultInterface $parser_result
    *   The result of parsing.
    */
-  protected function cleanUp(FeedsSource $source, FeedsParserResult $parser_result) {
+  protected function cleanUp(FeedInterface $feed, ParserResultInterface $parser_result) {
   }
 
   /**
@@ -186,18 +191,18 @@ abstract class ParserBase extends ConfigurablePluginBase implements FeedPluginFo
   /**
    * {@inheritdoc}
    */
-  public function parse(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
+  public function parse(FeedInterface $feed, FetcherResultInterface $fetcher_result, StateInterface $state) {
     $this->loadLibrary();
     $this->startErrorHandling();
-    $result = new FeedsParserResult();
+    $result = new ParserResult();
     // Set link.
-    $fetcher_config = $source->getConfigFor($source->importer->fetcher);
+    $fetcher_config = $feed->getConfigFor($feed->importer->fetcher);
     $result->link = is_string($fetcher_config['source']) ? $fetcher_config['source'] : '';
 
     try {
-      $this->setUp($source, $fetcher_result);
-      $this->parseItems($source, $fetcher_result, $result);
-      $this->cleanUp($source, $result);
+      $this->setUp($feed, $fetcher_result);
+      $this->parseItems($feed, $fetcher_result, $result);
+      $this->cleanUp($feed, $result);
     }
     catch (EmptyException $e) {
       // The feed is empty.
@@ -210,7 +215,7 @@ abstract class ParserBase extends ConfigurablePluginBase implements FeedPluginFo
     // Display and log errors.
     $errors = $this->getErrors();
     $this->printErrors($errors, $this->config['display_errors'] ? WATCHDOG_DEBUG : WATCHDOG_ERROR);
-    $this->logErrors($source, $errors);
+    $this->logErrors($feed, $errors);
 
     $this->stopErrorHandling();
 
@@ -224,18 +229,18 @@ abstract class ParserBase extends ConfigurablePluginBase implements FeedPluginFo
   /**
    * Performs the actual parsing.
    *
-   * @param FeedsSource $source
+   * @param \Drupal\feeds\FeedInterface $feed
    *   The feed source.
-   * @param FeedsFetcherResult $fetcher_result
+   * @param \Drupal\feeds\Result\FetcherResultInterface $fetcher_result
    *   The fetcher result.
-   * @param FeedsParserResult $result
+   * @param \Drupal\feeds\Result\ParserResultInterface $result
    *   The parser result object to populate.
    */
-  protected function parseItems(FeedsSource $source, FeedsFetcherResult $fetcher_result, FeedsParserResult $result) {
+  protected function parseItems(FeedInterface $feed, FetcherResultInterface $fetcher_result, ParserResultInterface $result) {
     $expressions = $this->prepareExpressions();
     $variable_map = $this->prepareVariables($expressions);
 
-    foreach ($this->executeContext($source, $fetcher_result) as $row) {
+    foreach ($this->executeContext($feed, $fetcher_result) as $row) {
       if ($item = $this->executeSources($row, $expressions, $variable_map)) {
         $result->items[] = $item;
       }
@@ -340,7 +345,7 @@ abstract class ParserBase extends ConfigurablePluginBase implements FeedPluginFo
   /**
    * Logs errors.
    *
-   * @param FeedsSource $source
+   * @param \Drupal\feeds\FeedInterface $feed
    *   The feed source being importerd.
    * @param array $errors
    *   A list of errors as returned by stopErrorHandling().
@@ -350,26 +355,26 @@ abstract class ParserBase extends ConfigurablePluginBase implements FeedPluginFo
    *
    * @see watchdog()
    */
-  protected function logErrors(FeedsSource $source, array $errors, $severity = WATCHDOG_ERROR) {
+  protected function logErrors(FeedInterface $feed, array $errors, $severity = WATCHDOG_ERROR) {
     foreach ($errors as $error) {
       if ($error['severity'] > $severity) {
         continue;
       }
 
-      $source->log('feeds_ex', $error['message'], $error['variables'], $error['severity']);
+      $feed->log('feeds_ex', $error['message'], $error['variables'], $error['severity']);
     }
   }
 
   /**
    * Prepares the raw string for parsing.
    *
-   * @param FeedsFetcherResult $fetcher_result
+   * @param \Drupal\feeds\Result\FetcherResultInterface $fetcher_result
    *   The fetcher result.
    *
    * @return string
    *   The prepared raw string.
    */
-  protected function prepareRaw(FeedsFetcherResult $fetcher_result) {
+  protected function prepareRaw(FetcherResultInterface $fetcher_result) {
     $raw = trim($this->getEncoder()->convertEncoding($fetcher_result->getRaw()));
 
     if (!strlen($raw)) {
@@ -689,9 +694,9 @@ abstract class ParserBase extends ConfigurablePluginBase implements FeedPluginFo
   /**
    * {@inheritdoc}
    */
-  public function sourceSave(FeedsSource $source) {
-    $config = $source->getConfigFor($this);
-    $source->setConfigFor($this, array());
+  public function sourceSave(FeedInterface $feed) {
+    $config = $feed->getConfigFor($this);
+    $feed->setConfigFor($this, array());
 
     if ($this->hasSourceConfig() && $config) {
       $this->setConfig($config);

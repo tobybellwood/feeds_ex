@@ -7,6 +7,10 @@
 
 namespace Drupal\feeds_ex\Feeds\Parser;
 
+use Drupal\feeds\FeedInterface;
+use Drupal\feeds\Result\FetcherResultInterface;
+use Drupal\feeds\Result\ParserResultInterface;
+
 /**
  * Defines a JSON parser using JSONPath.
  *
@@ -21,7 +25,7 @@ class JsonPathParser extends ParserBase {
   /**
    * {@inheritdoc}
    */
-  protected function executeContext(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
+  protected function executeContext(FeedInterface $feed, FetcherResultInterface $fetcher_result) {
     $raw = $this->prepareRaw($fetcher_result);
     $parsed = JsonUtility::decodeJsonArray($raw);
     $parsed = jsonPath($parsed, $this->config['context']['value']);
@@ -29,22 +33,22 @@ class JsonPathParser extends ParserBase {
       throw new RuntimeException(t('The context expression must return an object or array.'));
     }
 
-    $state = $source->state(FEEDS_PARSE);
+    $state = $feed->state(FEEDS_PARSE);
     if (!$state->total) {
       $state->total = count($parsed);
     }
 
     $start = (int) $state->pointer;
-    $state->pointer = $start + $source->importer->getLimit();
-    return array_slice($parsed, $start, $source->importer->getLimit());
+    $state->pointer = $start + $feed->importer->getLimit();
+    return array_slice($parsed, $start, $feed->importer->getLimit());
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function cleanUp(FeedsSource $source, FeedsParserResult $result) {
+  protected function cleanUp(FeedInterface $feed, ParserResultInterface $result) {
     // Calculate progress.
-    $state = $source->state(FEEDS_PARSE);
+    $state = $feed->state(FEEDS_PARSE);
     $state->progress($state->total, $state->pointer);
   }
 

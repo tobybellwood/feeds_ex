@@ -7,6 +7,9 @@
 
 namespace Drupal\feeds_ex\Feeds\Parser;
 
+use Drupal\feeds\FeedInterface;
+use Drupal\feeds\Result\FetcherResultInterface;
+
 /**
  * Defines a HTML parser using QueryPath.
  *
@@ -29,7 +32,7 @@ class QueryPathHtmlParser extends QueryPathXmlParser {
   /**
    * {@inheritdoc}
    */
-  protected function setUp(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
+  protected function setUp(FeedInterface $feed, FetcherResultInterface $fetcher_result) {
     // Change some parser settings.
     $this->queryPathOptions['use_parser'] = 'html';
   }
@@ -51,7 +54,7 @@ class QueryPathHtmlParser extends QueryPathXmlParser {
   /**
    * {@inheritdoc}
    */
-  protected function prepareDocument(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
+  protected function prepareDocument(FeedInterface $feed, FetcherResultInterface $fetcher_result) {
     $raw = $this->prepareRaw($fetcher_result);
     if ($this->config['use_tidy'] && extension_loaded('tidy')) {
       $raw = tidy_repair_string($raw, $this->getTidyConfig(), 'utf8');

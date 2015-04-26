@@ -7,6 +7,10 @@
 
 namespace Drupal\feeds_ex\Feeds\Parser;
 
+use Drupal\feeds\FeedInterface;
+use Drupal\feeds\Result\FetcherResultInterface;
+use Drupal\feeds\Result\ParserResultInterface;
+
 /**
  * Defines a JSON Lines parser using JSONPath.
  *
@@ -35,16 +39,16 @@ class JsonPathLinesParser extends JsonPathParser {
   /**
    * {@inheritdoc}
    */
-  protected function setUp(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
+  protected function setUp(FeedInterface $feed, FetcherResultInterface $fetcher_result) {
     $this->iterator = new LineIterator($fetcher_result->getFilePath());
 
     if (!$this->iterator->getSize()) {
       throw new EmptyException();
     }
 
-    $this->iterator->setLineLimit($source->importer->getLimit());
+    $this->iterator->setLineLimit($feed->importer->getLimit());
 
-    $state = $source->state(FEEDS_PARSE);
+    $state = $feed->state(FEEDS_PARSE);
     if (!$state->total) {
       $state->total = $this->iterator->getSize();
     }
@@ -54,7 +58,7 @@ class JsonPathLinesParser extends JsonPathParser {
   /**
    * {@inheritdoc}
    */
-  protected function parseItems(FeedsSource $source, FeedsFetcherResult $fetcher_result, FeedsParserResult $result) {
+  protected function parseItems(FeedInterface $feed, FetcherResultInterface $fetcher_result, ParserResultInterface $result) {
     $expressions = $this->prepareExpressions();
     $variable_map = $this->prepareVariables($expressions);
 
@@ -77,10 +81,10 @@ class JsonPathLinesParser extends JsonPathParser {
   /**
    * {@inheritdoc}
    */
-  protected function cleanUp(FeedsSource $source, FeedsParserResult $result) {
-    $source->state(FEEDS_PARSE)->pointer = $this->iterator->ftell();
+  protected function cleanUp(FeedInterface $feed, ParserResultInterface $result) {
+    $feed->state(FEEDS_PARSE)->pointer = $this->iterator->ftell();
     unset($this->iterator);
-    parent::cleanUp($source, $result);
+    parent::cleanUp($feed, $result);
   }
 
   /**

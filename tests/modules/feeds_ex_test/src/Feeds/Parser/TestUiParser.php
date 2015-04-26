@@ -7,6 +7,8 @@
 
 namespace Drupal\feeds_ex_test\Feeds\Parser;
 
+use Drupal\feeds\FeedInterface;
+use Drupal\feeds\Result\FetcherResultInterface;
 use Drupal\feeds_ex\Feeds\Parser\ParserBase;
 
 /**
@@ -23,7 +25,7 @@ class TestUiParser extends ParserBase {
   /**
    * {@inheritdoc}
    */
-  protected function executeContext(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
+  protected function executeContext(FeedInterface $feed, FetcherResultInterface $fetcher_result) {
     return array();
   }
 

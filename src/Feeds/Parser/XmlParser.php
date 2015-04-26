@@ -8,6 +8,9 @@
 namespace Drupal\feeds_ex\Feeds\Parser;
 
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\feeds\FeedInterface;
+use Drupal\feeds\Result\FetcherResultInterface;
+use Drupal\feeds\Result\ParserResultInterface;
 
 /**
  * Defines a XML parser using XPath.
@@ -49,36 +52,36 @@ class XmlParser extends ParserBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
-    $document = $this->prepareDocument($source, $fetcher_result);
+  protected function setUp(FeedInterface $feed, FetcherResultInterface $fetcher_result) {
+    $document = $this->prepareDocument($feed, $fetcher_result);
     $this->xpath = new XpathDomXpath($document);
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function cleanUp(FeedsSource $source, FeedsParserResult $result) {
+  protected function cleanUp(FeedInterface $feed, ParserResultInterface $result) {
     // Try to free up some memory. There shouldn't be any other references to
     // $this->xpath or the DOMDocument.
     unset($this->xpath);
 
     // Calculate progress.
-    $state = $source->state(FEEDS_PARSE);
+    $state = $feed->state(FEEDS_PARSE);
     $state->progress($state->total, $state->pointer);
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function executeContext(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
-    $state = $source->state(FEEDS_PARSE);
+  protected function executeContext(FeedInterface $feed, FetcherResultInterface $fetcher_result) {
+    $state = $feed->state(FEEDS_PARSE);
 
     if (!$state->total) {
       $state->total = $this->xpath->evaluate('count(' . $this->config['context']['value'] . ')');
     }
 
     $start = (int) $state->pointer;
-    $state->pointer = $start + $source->importer->getLimit();
+    $state->pointer = $start + $feed->importer->getLimit();
 
     // A batched XPath expression.
     $context_query = '(' . $this->config['context']['value'] . ")[position() > $start and position() <= {$state->pointer}]";
@@ -237,15 +240,15 @@ class XmlParser extends ParserBase {
   /**
    * Prepares the DOM document.
    *
-   * @param FeedsSource $source
+   * @param \Drupal\feeds\FeedInterface $feed
    *   The feed source.
-   * @param FeedsFetcherResult $fetcher_result
+   * @param \Drupal\feeds\Result\FetcherResultInterface $fetcher_result
    *   The fetcher result.
    *
    * @return DOMDocument
    *   The DOM document.
    */
-  protected function prepareDocument(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
+  protected function prepareDocument(FeedInterface $feed, FetcherResultInterface $fetcher_result) {
     $raw = $this->prepareRaw($fetcher_result);
     // Remove default namespaces. This has to run after the encoding conversion
     // because a limited set of encodings are supported in regular expressions.

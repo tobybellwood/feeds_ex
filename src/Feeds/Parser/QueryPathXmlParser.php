@@ -8,6 +8,8 @@
 namespace Drupal\feeds_ex\Feeds\Parser;
 
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\feeds\FeedInterface;
+use Drupal\feeds\Result\FetcherResultInterface;
 
 /**
  * Defines a XML parser using QueryPath.
@@ -37,22 +39,22 @@ class QueryPathXmlParser extends XmlParser {
   /**
    * {@inheritdoc}
    */
-  protected function executeContext(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
-    $document = $this->prepareDocument($source, $fetcher_result);
+  protected function executeContext(FeedInterface $feed, FetcherResultInterface $fetcher_result) {
+    $document = $this->prepareDocument($feed, $fetcher_result);
     $parser = new QueryPath($document, NULL, $this->queryPathOptions);
     $query_path = $parser->find($this->config['context']['value']);
 
-    $state = $source->state(FEEDS_PARSE);
+    $state = $feed->state(FEEDS_PARSE);
 
     if (!$state->total) {
       $state->total = $query_path->size();
     }
 
     $start = (int) $state->pointer;
-    $state->pointer = $start + $source->importer->getLimit();
+    $state->pointer = $start + $feed->importer->getLimit();
     $state->progress($state->total, $state->pointer);
 
-    return $query_path->slice($start, $source->importer->getLimit());
+    return $query_path->slice($start, $feed->importer->getLimit());
   }
 
   /**
