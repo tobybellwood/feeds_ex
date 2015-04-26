@@ -7,6 +7,7 @@
 
 namespace Drupal\feeds_ex\Feeds\Parser;
 
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\feeds\Plugin\Type\ConfigurablePluginBase;
 use Drupal\feeds\Plugin\Type\FeedPluginFormInterface;
 use Drupal\feeds\Plugin\Type\Parser\ParserInterface;
@@ -166,7 +167,7 @@ abstract class ParserBase extends ConfigurablePluginBase implements FeedPluginFo
   /**
    * Returns a form element for a specific column.
    *
-   * @param array &$form_state
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The current form state.
    * @param array $values
    *   The individual source item values.
@@ -178,7 +179,7 @@ abstract class ParserBase extends ConfigurablePluginBase implements FeedPluginFo
    * @return array
    *   A single form element.
    */
-  protected function configFormTableColumn(array &$form_state, array $values, $column, $machine_name) {
+  protected function configFormTableColumn(FormStateInterface $form_state, array $values, $column, $machine_name) {
     return array();
   }
 
@@ -426,7 +427,7 @@ abstract class ParserBase extends ConfigurablePluginBase implements FeedPluginFo
   /**
    * {@inheritdoc}
    */
-  public function configForm(&$form_state) {
+  public function configForm(FormStateInterface $form_state) {
     $form = array(
       '#tree' => TRUE,
       '#theme' => 'feeds_ex_configuration_table',

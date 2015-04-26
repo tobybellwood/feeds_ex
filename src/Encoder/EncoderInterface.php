@@ -7,6 +7,8 @@
 
 namespace Drupal\feeds_ex\Encoder;
 
+use Drupal\Core\Form\FormStateInterface;
+
 /**
  * Coverts text encodings.
  */
@@ -36,13 +38,13 @@ interface EncoderInterface {
    *
    * @param array $form
    *   The current form.
-   * @param array &$form_state
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The form state.
    *
    * @return array
    *   The modified form array.
    */
-  public function configForm(array $form, array &$form_state);
+  public function configForm(array $form, FormStateInterface $form_state);
 
   /**
    * Validates the encoding configuration form.

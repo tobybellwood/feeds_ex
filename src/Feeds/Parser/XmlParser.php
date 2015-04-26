@@ -7,6 +7,8 @@
 
 namespace Drupal\feeds_ex\Feeds\Parser;
 
+use Drupal\Core\Form\FormStateInterface;
+
 /**
  * Defines a XML parser using XPath.
  *
@@ -129,7 +131,7 @@ class XmlParser extends ParserBase {
   /**
    * {@inheritdoc}
    */
-  public function configForm(&$form_state) {
+  public function configForm(FormStateInterface $form_state) {
     $form = parent::configForm($form_state);
     if (extension_loaded('tidy')) {
       $form['use_tidy'] = array(
@@ -153,7 +155,7 @@ class XmlParser extends ParserBase {
   /**
    * {@inheritdoc}
    */
-  protected function configFormTableColumn(array &$form_state, array $values, $column, $machine_name) {
+  protected function configFormTableColumn(FormStateInterface $form_state, array $values, $column, $machine_name) {
     $id = 'feeds-ex-xml-raw-' . check_plain($machine_name);
 
     switch ($column) {

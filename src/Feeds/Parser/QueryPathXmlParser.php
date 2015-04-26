@@ -7,6 +7,8 @@
 
 namespace Drupal\feeds_ex\Feeds\Parser;
 
+use Drupal\Core\Form\FormStateInterface;
+
 /**
  * Defines a XML parser using QueryPath.
  *
@@ -133,7 +135,7 @@ class QueryPathXmlParser extends XmlParser {
   /**
    * {@inheritdoc}
    */
-  protected function configFormTableColumn(array &$form_state, array $values, $column, $machine_name) {
+  protected function configFormTableColumn(FormStateInterface $form_state, array $values, $column, $machine_name) {
     switch ($column) {
       case 'attribute':
         return array(

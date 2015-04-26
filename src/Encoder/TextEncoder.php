@@ -7,6 +7,8 @@
 
 namespace Drupal\feeds_ex\Encoder;
 
+use Drupal\Core\Form\FormStateInterface;
+
 /**
  * Generic text encoder.
  */
@@ -54,7 +56,7 @@ class TextEncoder implements EncoderInterface {
   /**
    * {@inheritdoc}
    */
-  public function configForm(array $form, array &$form_state) {
+  public function configForm(array $form, FormStateInterface $form_state) {
     if (!$this->isMultibyte) {
       return $form;
     }
