@@ -44,7 +44,7 @@ interface EncoderInterface {
    * @return array
    *   The modified form array.
    */
-  public function configForm(array $form, FormStateInterface $form_state);
+  public function buildConfigurationForm(array $form, FormStateInterface $form_state);
 
   /**
    * Validates the encoding configuration form.

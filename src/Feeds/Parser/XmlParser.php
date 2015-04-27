@@ -79,15 +79,16 @@ class XmlParser extends ParserBase {
    * {@inheritdoc}
    */
   protected function executeContext(FeedInterface $feed, FetcherResultInterface $fetcher_result, StateInterface $state) {
+    $feed_config = $feed->getConfigurationFor($this);
     if (!$state->total) {
-      $state->total = $this->xpath->evaluate('count(' . $this->config['context']['value'] . ')');
+      $state->total = $this->xpath->evaluate('count(' . $feed_config['context']['value'] . ')');
     }
 
     $start = (int) $state->pointer;
-    $state->pointer = $start + $feed->importer->getLimit();
+    $state->pointer = $start + $feed_config['line_limit'];
 
     // A batched XPath expression.
-    $context_query = '(' . $this->config['context']['value'] . ")[position() > $start and position() <= {$state->pointer}]";
+    $context_query = '(' . $feed_config['context']['value'] . ")[position() > $start and position() <= {$state->pointer}]";
     return $this->xpath->query($context_query);
   }
 
@@ -105,12 +106,12 @@ class XmlParser extends ParserBase {
     }
 
     $return = array();
-    if (!empty($this->config['sources'][$machine_name]['inner'])) {
+    if (!empty($this->configuration['sources'][$machine_name]['inner'])) {
       foreach ($result as $node) {
         $return[] = $this->getInnerXml($node);
       }
     }
-    elseif (!empty($this->config['sources'][$machine_name]['raw'])) {
+    elseif (!empty($this->configuration['sources'][$machine_name]['raw'])) {
       foreach ($result as $node) {
         $return[] = $this->getRaw($node);
       }
@@ -128,23 +129,23 @@ class XmlParser extends ParserBase {
   /**
    * {@inheritdoc}
    */
-  public function configDefaults() {
-    return array(
+  public function defaultConfiguration() {
+    return [
       'use_tidy' => FALSE,
-    ) + parent::configDefaults();
+    ] + parent::defaultConfiguration();
   }
 
   /**
    * {@inheritdoc}
    */
-  public function configForm(FormStateInterface $form_state) {
-    $form = parent::configForm($form_state);
+  public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
+    $form = parent::buildConfigurationForm($form, $form_state);
     if (extension_loaded('tidy')) {
       $form['use_tidy'] = array(
         '#type' => 'checkbox',
         '#title' => t('Use tidy'),
         '#description' => t('The <a href="http://php.net/manual/en/book.tidy.php">Tidy PHP</a> extension has been detected. Select this to clean the markup before parsing.'),
-        '#default_value' => $this->config['use_tidy'],
+        '#default_value' => $this->configuration['use_tidy'],
       );
     }
 
@@ -237,7 +238,7 @@ class XmlParser extends ParserBase {
    * {@inheritdoc}
    */
   protected function convertEncoding($data, $encoding = 'UTF-8') {
-    return XmlUtility::convertXmlEncoding($data, $this->config['source_encoding']);
+    return XmlUtility::convertXmlEncoding($data, $this->configuration['source_encoding']);
   }
 
   /**
@@ -257,7 +258,7 @@ class XmlParser extends ParserBase {
     // because a limited set of encodings are supported in regular expressions.
     $raw = XmlUtility::removeDefaultNamespaces($raw);
 
-    if ($this->config['use_tidy'] && extension_loaded('tidy')) {
+    if ($this->configuration['use_tidy'] && extension_loaded('tidy')) {
       $raw = tidy_repair_string($raw, $this->getTidyConfig(), 'utf8');
     }
     return XmlUtility::createXmlDocument($raw);

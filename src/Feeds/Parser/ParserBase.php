@@ -202,11 +202,12 @@ abstract class ParserBase extends ConfigurablePluginBase implements FeedPluginFo
    * {@inheritdoc}
    */
   public function parse(FeedInterface $feed, FetcherResultInterface $fetcher_result, StateInterface $state) {
+    $feed_config = $feed->getConfigurationFor($this);
     $this->loadLibrary();
     $this->startErrorHandling();
     $result = new ParserResult();
     // Set link.
-    $fetcher_config = $feed->getConfigFor($feed->importer->fetcher);
+    $fetcher_config = $feed->getConfigurationFor($feed->importer->fetcher);
     $result->link = is_string($fetcher_config['source']) ? $fetcher_config['source'] : '';
 
     try {
@@ -224,7 +225,7 @@ abstract class ParserBase extends ConfigurablePluginBase implements FeedPluginFo
 
     // Display and log errors.
     $errors = $this->getErrors();
-    $this->printErrors($errors, $this->config['display_errors'] ? RfcLogLevel::DEBUG : RfcLogLevel::ERROR);
+    $this->printErrors($errors, $feed_config['display_errors'] ? RfcLogLevel::DEBUG : RfcLogLevel::ERROR);
     $this->logErrors($feed, $errors);
 
     $this->stopErrorHandling();
@@ -249,11 +250,11 @@ abstract class ParserBase extends ConfigurablePluginBase implements FeedPluginFo
    *   The state object.
    */
   protected function parseItems(FeedInterface $feed, FetcherResultInterface $fetcher_result, ParserResultInterface $result, StateInterface $state) {
-    $expressions = $this->prepareExpressions();
+    $expressions = $this->prepareExpressions($feed);
     $variable_map = $this->prepareVariables($expressions);
 
     foreach ($this->executeContext($feed, $fetcher_result, $state) as $row) {
-      if ($item = $this->executeSources($row, $expressions, $variable_map)) {
+      if ($item = $this->executeSources($feed, $row, $expressions, $variable_map)) {
         $result->items[] = $item;
       }
     }
@@ -264,12 +265,17 @@ abstract class ParserBase extends ConfigurablePluginBase implements FeedPluginFo
    *
    * At this point we just remove empty expressions.
    *
+   * @param \Drupal\feeds\FeedInterface $feed
+   *   The feed source.
+   *
    * @return array
    *   A map of machine name to expression.
    */
-  protected function prepareExpressions() {
+  protected function prepareExpressions(FeedInterface $feed) {
+    $feed_config = $feed->getConfigurationFor($this);
+
     $expressions = array();
-    foreach ($this->config['sources'] as $machine_name => $source) {
+    foreach ($feed_config['sources'] as $machine_name => $source) {
       if (strlen($source['value'])) {
         $expressions[$machine_name] = $source['value'];
       }
@@ -298,6 +304,8 @@ abstract class ParserBase extends ConfigurablePluginBase implements FeedPluginFo
   /**
    * Executes the source expressions.
    *
+   * @param \Drupal\feeds\FeedInterface $feed
+   *   The feed source.
    * @param mixed $row
    *   A single item returned from the context expression.
    * @param array $expressions
@@ -308,7 +316,9 @@ abstract class ParserBase extends ConfigurablePluginBase implements FeedPluginFo
    * @return array
    *   The fully-parsed item array.
    */
-  protected function executeSources($row, array $expressions, array $variable_map) {
+  protected function executeSources(FeedInterface $feed, $row, array $expressions, array $variable_map) {
+    $feed_config = $feed->getConfigurationFor($this);
+
     $item = array();
     $variables = array();
 
@@ -318,7 +328,7 @@ abstract class ParserBase extends ConfigurablePluginBase implements FeedPluginFo
 
       $result = $this->executeSourceExpression($machine_name, $expression, $row);
 
-      if (!empty($this->config['sources'][$machine_name]['debug'])) {
+      if (!empty($feed_config['sources'][$machine_name]['debug'])) {
         $this->debug($result, $machine_name);
       }
 
@@ -405,9 +415,11 @@ abstract class ParserBase extends ConfigurablePluginBase implements FeedPluginFo
    *   The source key that produced this query.
    */
   protected function debug($data, $machine_name) {
+    $feed_config = $feed->getConfigurationFor($this);
+
     $name = $machine_name;
-    if ($this->config['sources'][$machine_name]['name']) {
-      $name = $this->config['sources'][$machine_name]['name'];
+    if ($feed_config['sources'][$machine_name]['name']) {
+      $name = $feed_config['sources'][$machine_name]['name'];
     }
 
     $output = '<strong>' . $name . ':</strong>';
@@ -423,28 +435,29 @@ abstract class ParserBase extends ConfigurablePluginBase implements FeedPluginFo
    * {@inheritdoc}
    */
   public function getMappingSources() {
-    return parent::getMappingSources() + $this->config['sources'];
+    return parent::getMappingSources() + $this->configuration['sources'];
   }
 
   /**
    * {@inheritdoc}
    */
-  public function configDefaults() {
-    return array(
-      'sources' => array(),
-      'context' => array(
+  public function defaultConfiguration() {
+    return [
+      'sources' => [],
+      'context' => [
         'value' => '',
-      ),
+      ],
       'display_errors' => FALSE,
-      'source_encoding' => array('auto'),
+      'source_encoding' => ['auto'],
       'debug_mode' => FALSE,
-    );
+      'line_limit' => 100,
+    ];
   }
 
   /**
    * {@inheritdoc}
    */
-  public function configForm(FormStateInterface $form_state) {
+  public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
     $form = array(
       '#tree' => TRUE,
       '#theme' => 'feeds_ex_configuration_table',
@@ -461,7 +474,7 @@ abstract class ParserBase extends ConfigurablePluginBase implements FeedPluginFo
         '#type' => 'textfield',
         '#title' => t('Context value'),
         '#title_display' => 'invisible',
-        '#default_value' => $this->config['context']['value'],
+        '#default_value' => $this->configuration['context']['value'],
         '#size' => 50,
         '#required' => TRUE,
         // We're hiding the title, so add a little hint.
@@ -476,7 +489,7 @@ abstract class ParserBase extends ConfigurablePluginBase implements FeedPluginFo
     );
 
     $max_weight = 0;
-    foreach ($this->config['sources'] as $machine_name => $source) {
+    foreach ($this->configuration['sources'] as $machine_name => $source) {
       $form['sources'][$machine_name]['name'] = array(
         '#type' => 'textfield',
         '#title' => t('Name'),
@@ -572,16 +585,16 @@ abstract class ParserBase extends ConfigurablePluginBase implements FeedPluginFo
       '#type' => 'checkbox',
       '#title' => t('Display errors'),
       '#description' => t('Display all error messages after parsing. Fatal errors will always be displayed.'),
-      '#default_value' => $this->config['display_errors'],
+      '#default_value' => $this->configuration['display_errors'],
     );
     $form['debug_mode'] = array(
       '#type' => 'checkbox',
       '#title' => t('Enable debug mode'),
       '#description' => t('Displays the configuration form on the feed source page to ease figuring out the expressions. Any values entered on that page will be saved here.'),
-      '#default_value' => $this->config['debug_mode'],
+      '#default_value' => $this->configuration['debug_mode'],
     );
 
-    $form = $this->getEncoder()->configForm($form, $form_state);
+    $form = $this->getEncoder()->buildConfigurationForm($form, $form_state);
 
     $form['#attached']['drupal_add_tabledrag'][] = array(
       'feeds-ex-source-table',
@@ -609,7 +622,7 @@ abstract class ParserBase extends ConfigurablePluginBase implements FeedPluginFo
     }
 
     // @todo We should do this in Feeds automatically.
-    $values += $this->configDefaults();
+    $values += $this->defaultConfiguration();
 
     // Remove sources.
     foreach ($values['sources'] as $machine_name => $source) {
@@ -679,13 +692,12 @@ abstract class ParserBase extends ConfigurablePluginBase implements FeedPluginFo
   /**
    * {@inheritdoc}
    */
-  public function sourceForm($source_config) {
+  public function buildFeedForm(array $form, FormStateInterface $form_state, FeedInterface $feed) {
     if (!$this->hasSourceConfig()) {
       return array();
     }
-    $form_state = array();
 
-    $form = $this->configForm($form_state);
+    $form = $this->buildConfigurationForm($form, $form_state);
     $form['add']['machine_name']['#machine_name']['source'] = array(
       'feeds',
       get_class($this),
@@ -707,7 +719,7 @@ abstract class ParserBase extends ConfigurablePluginBase implements FeedPluginFo
    * {@inheritdoc}
    */
   public function sourceSave(FeedInterface $feed) {
-    $config = $feed->getConfigFor($this);
+    $config = $feed->getConfigurationFor($this);
     $feed->setConfigFor($this, array());
 
     if ($this->hasSourceConfig() && $config) {
@@ -720,7 +732,7 @@ abstract class ParserBase extends ConfigurablePluginBase implements FeedPluginFo
    * {@inheritdoc}
    */
   public function hasSourceConfig() {
-    return !empty($this->config['debug_mode']);
+    return !empty($this->configuration['debug_mode']);
   }
 
   /**
@@ -795,7 +807,7 @@ abstract class ParserBase extends ConfigurablePluginBase implements FeedPluginFo
   public function getEncoder() {
     if (!isset($this->encoder)) {
       $class = $this->encoderClass;
-      $this->encoder = new $class($this->config['source_encoding']);
+      $this->encoder = new $class($this->configuration['source_encoding']);
     }
     return $this->encoder;
   }

@@ -57,7 +57,7 @@ class TextEncoder implements EncoderInterface {
   /**
    * {@inheritdoc}
    */
-  public function configForm(array $form, FormStateInterface $form_state) {
+  public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
     if (!$this->isMultibyte) {
       return $form;
     }
