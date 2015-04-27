@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\feeds_ex\Messenger.
+ * Contains \Drupal\feeds_ex\Messenger\Messenger.
  */
 
-namespace Drupal\feeds_ex;
+namespace Drupal\feeds_ex\Messenger;
 
 /**
  * Uses drupal_set_message() to show messages.

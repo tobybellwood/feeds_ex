@@ -21,6 +21,8 @@ use Drupal\feeds\Result\ParserResult;
 use Drupal\feeds\Result\ParserResultInterface;
 use Drupal\feeds\StateInterface;
 use Drupal\feeds_ex\Encoder\EncoderInterface;
+use Drupal\feeds_ex\Messenger\Messenger;
+use Drupal\feeds_ex\Messenger\MessengerInterface;
 
 /**
  * The Feeds extensible parser.

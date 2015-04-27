@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\feeds_ex\TestMessenger.
+ * Contains \Drupal\feeds_ex\Messenger\TestMessenger.
  */
 
-namespace Drupal\feeds_ex;
+namespace Drupal\feeds_ex\Messenger;
 
 /**
  * Stores messages without calling drupal_set_mesage().
@@ -23,11 +23,11 @@ class TestMessenger implements MessengerInterface {
    * {@inheritdoc}
    */
   public function setMessage($message = NULL, $type = 'status', $repeat = TRUE) {
-    $this->messages[] = array(
+    $this->messages[] = [
       'message' => $message,
       'type' => $type,
       'repeat' => $repeat,
-    );
+    ];
   }
 
   /**
