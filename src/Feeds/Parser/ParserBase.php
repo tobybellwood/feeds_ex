@@ -7,10 +7,10 @@
 
 namespace Drupal\feeds_ex\Feeds\Parser;
 
-use \EmptyException;
 use \Exception;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Logger\RfcLogLevel;
+use Drupal\feeds\Exception\EmptyFeedException;
 use Drupal\feeds\FeedInterface;
 use Drupal\feeds\Feeds\Item\DynamicItem;
 use Drupal\feeds\Plugin\Type\ConfigurablePluginBase;
@@ -216,7 +216,7 @@ abstract class ParserBase extends ConfigurablePluginBase implements FeedPluginFo
       $this->parseItems($feed, $fetcher_result, $result, $state);
       $this->cleanUp($feed, $result, $state);
     }
-    catch (EmptyException $e) {
+    catch (EmptyFeedException $e) {
       // The feed is empty.
       $this->getMessenger()->setMessage(t('The feed is empty.'), 'warning', FALSE);
     }
@@ -401,7 +401,7 @@ abstract class ParserBase extends ConfigurablePluginBase implements FeedPluginFo
     $raw = trim($this->getEncoder()->convertEncoding($fetcher_result->getRaw()));
 
     if (!strlen($raw)) {
-      throw new EmptyException();
+      throw new EmptyFeedException();
     }
 
     return $raw;

@@ -7,6 +7,7 @@
 
 namespace Drupal\feeds_ex\Feeds\Parser;
 
+use Drupal\feeds\Exception\EmptyFeedException;
 use Drupal\feeds\FeedInterface;
 use Drupal\feeds\Result\FetcherResultInterface;
 use Drupal\feeds\Result\ParserResultInterface;
@@ -45,7 +46,7 @@ class JmesPathLinesParser extends JmesPathParser {
     $this->iterator = new LineIterator($fetcher_result->getFilePath());
 
     if (!$this->iterator->getSize()) {
-      throw new EmptyException();
+      throw new EmptyFeedException();
     }
 
     $this->iterator->setLineLimit($feed->importer->getLimit());
