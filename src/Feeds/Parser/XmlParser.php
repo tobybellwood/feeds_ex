@@ -14,6 +14,7 @@ use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\feeds\FeedInterface;
 use Drupal\feeds\Result\FetcherResultInterface;
 use Drupal\feeds\Result\ParserResultInterface;
+use Drupal\feeds\StateInterface;
 use Drupal\feeds_ex\Utility\XmlUtility;
 use Drupal\feeds_ex\XpathDomXpath;
 
@@ -57,7 +58,7 @@ class XmlParser extends ParserBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp(FeedInterface $feed, FetcherResultInterface $fetcher_result) {
+  protected function setUp(FeedInterface $feed, FetcherResultInterface $fetcher_result, StateInterface $state) {
     $document = $this->prepareDocument($feed, $fetcher_result);
     $this->xpath = new XpathDomXpath($document);
   }
@@ -65,22 +66,19 @@ class XmlParser extends ParserBase {
   /**
    * {@inheritdoc}
    */
-  protected function cleanUp(FeedInterface $feed, ParserResultInterface $result) {
+  protected function cleanUp(FeedInterface $feed, ParserResultInterface $result, StateInterface $state) {
     // Try to free up some memory. There shouldn't be any other references to
     // $this->xpath or the DOMDocument.
     unset($this->xpath);
 
     // Calculate progress.
-    $state = $feed->state(FEEDS_PARSE);
     $state->progress($state->total, $state->pointer);
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function executeContext(FeedInterface $feed, FetcherResultInterface $fetcher_result) {
-    $state = $feed->state(FEEDS_PARSE);
-
+  protected function executeContext(FeedInterface $feed, FetcherResultInterface $fetcher_result, StateInterface $state) {
     if (!$state->total) {
       $state->total = $this->xpath->evaluate('count(' . $this->config['context']['value'] . ')');
     }

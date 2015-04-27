@@ -11,6 +11,7 @@ use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\feeds\FeedInterface;
 use Drupal\feeds\Result\FetcherResultInterface;
 use Drupal\feeds\Result\ParserResultInterface;
+use Drupal\feeds\StateInterface;
 
 /**
  * Defines a JSON parser using JMESPath.
@@ -40,7 +41,7 @@ class JmesPathParser extends ParserBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp(FeedInterface $feed, FetcherResultInterface $fetcher_result) {
+  protected function setUp(FeedInterface $feed, FetcherResultInterface $fetcher_result, StateInterface $state) {
     // This is probably overly paranoid, but safety first.
     if (!$path = $this->getCompileDirectory()) {
       $path = file_directory_temp() . '/' . drupal_base64_encode(\Drupal\Component\Utility\Crypt::randomBytes(40)) . '_feeds_ex_jmespath_dir';
@@ -89,7 +90,7 @@ $this->compileDirectory = \Drupal::config('feeds_ex.settings')->get('feeds_ex_jm
   /**
    * {@inheritdoc}
    */
-  protected function executeContext(FeedInterface $feed, FetcherResultInterface $fetcher_result) {
+  protected function executeContext(FeedInterface $feed, FetcherResultInterface $fetcher_result, StateInterface $state) {
     $raw = $this->prepareRaw($fetcher_result);
     $parsed = JsonUtility::decodeJsonArray($raw);
     $parsed = $this->jmesPath->search($this->config['context']['value'], $parsed);
@@ -97,7 +98,6 @@ $this->compileDirectory = \Drupal::config('feeds_ex.settings')->get('feeds_ex_jm
       throw new RuntimeException(t('The context expression must return an object or array.'));
     }
 
-    $state = $feed->state(FEEDS_PARSE);
     if (!$state->total) {
       $state->total = count($parsed);
     }
@@ -111,10 +111,9 @@ $this->compileDirectory = \Drupal::config('feeds_ex.settings')->get('feeds_ex_jm
   /**
    * {@inheritdoc}
    */
-  protected function cleanUp(FeedInterface $feed, ParserResultInterface $result) {
+  protected function cleanUp(FeedInterface $feed, ParserResultInterface $result, StateInterface $state) {
     unset($this->jmesPath);
     // Calculate progress.
-    $state = $feed->state(FEEDS_PARSE);
     $state->progress($state->total, $state->pointer);
   }
 

@@ -10,6 +10,7 @@ namespace Drupal\feeds_ex\Feeds\Parser;
 use Drupal\feeds\FeedInterface;
 use Drupal\feeds\Result\FetcherResultInterface;
 use Drupal\feeds\Result\ParserResultInterface;
+use Drupal\feeds\StateInterface;
 
 /**
  * Defines a JSON Lines parser using JMESPath.
@@ -39,8 +40,8 @@ class JmesPathLinesParser extends JmesPathParser {
   /**
    * {@inheritdoc}
    */
-  protected function setUp(FeedInterface $feed, FetcherResultInterface $fetcher_result) {
-    parent::setUp($feed, $fetcher_result);
+  protected function setUp(FeedInterface $feed, FetcherResultInterface $fetcher_result, StateInterface $state) {
+    parent::setUp($feed, $fetcher_result, $state);
     $this->iterator = new LineIterator($fetcher_result->getFilePath());
 
     if (!$this->iterator->getSize()) {
@@ -49,7 +50,6 @@ class JmesPathLinesParser extends JmesPathParser {
 
     $this->iterator->setLineLimit($feed->importer->getLimit());
 
-    $state = $feed->state(FEEDS_PARSE);
     if (!$state->total) {
       $state->total = $this->iterator->getSize();
     }
@@ -83,10 +83,10 @@ class JmesPathLinesParser extends JmesPathParser {
   /**
    * {@inheritdoc}
    */
-  protected function cleanUp(FeedInterface $feed, ParserResultInterface $result) {
-    $feed->state(FEEDS_PARSE)->pointer = $this->iterator->ftell();
+  protected function cleanUp(FeedInterface $feed, ParserResultInterface $result, StateInterface $state) {
+    $state->pointer = $this->iterator->ftell();
     unset($this->iterator);
-    parent::cleanUp($feed, $result);
+    parent::cleanUp($feed, $result, $state);
   }
 
   /**

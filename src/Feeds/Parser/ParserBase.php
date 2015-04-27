@@ -54,11 +54,13 @@ abstract class ParserBase extends ConfigurablePluginBase implements FeedPluginFo
    *   Source information.
    * @param \Drupal\feeds\Result\FetcherResultInterface $fetcher_result
    *   The result returned by the fetcher.
+   * @param \Drupal\feeds\StateInterface $state
+   *   The state object.
    *
    * @return array|Traversable
    *   Some iterable that returns rows.
    */
-  abstract protected function executeContext(FeedInterface $feed, FetcherResultInterface $fetcher_result);
+  abstract protected function executeContext(FeedInterface $feed, FetcherResultInterface $fetcher_result, StateInterface $state);
 
   /**
    * Executes a single source expression.
@@ -107,8 +109,10 @@ abstract class ParserBase extends ConfigurablePluginBase implements FeedPluginFo
    *   The feed we are parsing for.
    * @param \Drupal\feeds\Result\FetcherResultInterface $fetcher_result
    *   The result of the fetching stage.
+   * @param \Drupal\feeds\StateInterface $state
+   *   The state object.
    */
-  protected function setUp(FeedInterface $feed, FetcherResultInterface $fetcher_result) {
+  protected function setUp(FeedInterface $feed, FetcherResultInterface $fetcher_result, StateInterface $state) {
   }
 
   /**
@@ -118,8 +122,10 @@ abstract class ParserBase extends ConfigurablePluginBase implements FeedPluginFo
    *   The feed we are parsing for.
    * @param \Drupal\feeds\Result\ParserResultInterface $parser_result
    *   The result of parsing.
+   * @param \Drupal\feeds\StateInterface $state
+   *   The state object.
    */
-  protected function cleanUp(FeedInterface $feed, ParserResultInterface $parser_result) {
+  protected function cleanUp(FeedInterface $feed, ParserResultInterface $parser_result, StateInterface $state) {
   }
 
   /**
@@ -204,9 +210,9 @@ abstract class ParserBase extends ConfigurablePluginBase implements FeedPluginFo
     $result->link = is_string($fetcher_config['source']) ? $fetcher_config['source'] : '';
 
     try {
-      $this->setUp($feed, $fetcher_result);
-      $this->parseItems($feed, $fetcher_result, $result);
-      $this->cleanUp($feed, $result);
+      $this->setUp($feed, $fetcher_result, $state);
+      $this->parseItems($feed, $fetcher_result, $result, $state);
+      $this->cleanUp($feed, $result, $state);
     }
     catch (EmptyException $e) {
       // The feed is empty.
@@ -239,12 +245,14 @@ abstract class ParserBase extends ConfigurablePluginBase implements FeedPluginFo
    *   The fetcher result.
    * @param \Drupal\feeds\Result\ParserResultInterface $result
    *   The parser result object to populate.
+   * @param \Drupal\feeds\StateInterface $state
+   *   The state object.
    */
-  protected function parseItems(FeedInterface $feed, FetcherResultInterface $fetcher_result, ParserResultInterface $result) {
+  protected function parseItems(FeedInterface $feed, FetcherResultInterface $fetcher_result, ParserResultInterface $result, StateInterface $state) {
     $expressions = $this->prepareExpressions();
     $variable_map = $this->prepareVariables($expressions);
 
-    foreach ($this->executeContext($feed, $fetcher_result) as $row) {
+    foreach ($this->executeContext($feed, $fetcher_result, $state) as $row) {
       if ($item = $this->executeSources($row, $expressions, $variable_map)) {
         $result->items[] = $item;
       }

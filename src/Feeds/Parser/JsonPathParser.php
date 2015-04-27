@@ -11,6 +11,7 @@ use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\feeds\FeedInterface;
 use Drupal\feeds\Result\FetcherResultInterface;
 use Drupal\feeds\Result\ParserResultInterface;
+use Drupal\feeds\StateInterface;
 
 /**
  * Defines a JSON parser using JSONPath.
@@ -26,7 +27,7 @@ class JsonPathParser extends ParserBase {
   /**
    * {@inheritdoc}
    */
-  protected function executeContext(FeedInterface $feed, FetcherResultInterface $fetcher_result) {
+  protected function executeContext(FeedInterface $feed, FetcherResultInterface $fetcher_result, StateInterface $state) {
     $raw = $this->prepareRaw($fetcher_result);
     $parsed = JsonUtility::decodeJsonArray($raw);
     $parsed = jsonPath($parsed, $this->config['context']['value']);
@@ -34,7 +35,6 @@ class JsonPathParser extends ParserBase {
       throw new RuntimeException(t('The context expression must return an object or array.'));
     }
 
-    $state = $feed->state(FEEDS_PARSE);
     if (!$state->total) {
       $state->total = count($parsed);
     }
@@ -47,9 +47,8 @@ class JsonPathParser extends ParserBase {
   /**
    * {@inheritdoc}
    */
-  protected function cleanUp(FeedInterface $feed, ParserResultInterface $result) {
+  protected function cleanUp(FeedInterface $feed, ParserResultInterface $result, StateInterface $state) {
     // Calculate progress.
-    $state = $feed->state(FEEDS_PARSE);
     $state->progress($state->total, $state->pointer);
   }
 

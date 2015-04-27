@@ -9,6 +9,7 @@ namespace Drupal\feeds_ex\Feeds\Parser;
 
 use Drupal\feeds\FeedInterface;
 use Drupal\feeds\Result\FetcherResultInterface;
+use Drupal\feeds\StateInterface;
 
 /**
  * Defines a HTML parser using QueryPath.
@@ -32,7 +33,7 @@ class QueryPathHtmlParser extends QueryPathXmlParser {
   /**
    * {@inheritdoc}
    */
-  protected function setUp(FeedInterface $feed, FetcherResultInterface $fetcher_result) {
+  protected function setUp(FeedInterface $feed, FetcherResultInterface $fetcher_result, StateInterface $state) {
     // Change some parser settings.
     $this->queryPathOptions['use_parser'] = 'html';
   }

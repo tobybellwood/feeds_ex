@@ -25,7 +25,7 @@ class TestUiParser extends ParserBase {
   /**
    * {@inheritdoc}
    */
-  protected function executeContext(FeedInterface $feed, FetcherResultInterface $fetcher_result) {
+  protected function executeContext(FeedInterface $feed, FetcherResultInterface $fetcher_result, StateInterface $state) {
     return array();
   }
 
