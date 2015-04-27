@@ -7,59 +7,90 @@
 
 namespace Drupal\Tests\feeds_ex\Unit\Feeds\Parser;
 
+use Drupal\feeds\Result\RawFetcherResult;
+use Drupal\feeds\State;
+use Drupal\feeds_ex\Feeds\Parser\XmlParser;
 use Drupal\Tests\feeds_ex\Unit\UnitTestBase;
 
 /**
- * Unit tests for Xml.
- *
+ * @coversDefaultClass \Drupal\feeds_ex\Feeds\Parser\XmlParser
  * @group feeds_ex
  */
 class XmlParserTest extends UnitTestBase {
 
   /**
-   * The mocked FeedsSource.
-   *
-   * @var FeedsSource
+   * @var \Drupal\feeds_ex\Feeds\Parser\XmlParser
    */
-  protected $source;
+  protected $parser;
 
+  /**
+   * @var \Drupal\feeds\FeedTypeInterface
+   */
+  protected $feedType;
+
+  /**
+   * @var \Drupal\feeds\FeedInterface
+   */
+  protected $feed;
+
+  /**
+   * @var \Drupal\feeds\State
+   */
+  protected $state;
+
+  /**
+   * {@inheritdoc}
+   */
   public function setUp() {
     parent::setUp();
 
-    require_once $this->moduleDir . '/src/Xml.inc';
+    $this->feedType = $this->getMock('Drupal\feeds\FeedTypeInterface');
+    $configuration = ['feed_type' => $this->feedType];
+    $this->parser = new XmlParser($configuration, 'xml', []);
+    $this->parser->setStringTranslation($this->getStringTranslationStub());
 
-    $this->source = $this->getMockFeedsSource();
+    $this->state = new State();
+
+    $this->feed = $this->getMock('Drupal\feeds\FeedInterface');
+    $this->feed->expects($this->any())
+      ->method('getType')
+      ->will($this->returnValue($this->feedType));
   }
 
   /**
    * Tests simple parsing.
    */
   public function testSimpleParsing() {
-    $parser = $this->getParserInstance();
-    $fetcher_result = new FeedsFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test.xml'));
+    $file = dirname(dirname(dirname(dirname(dirname(dirname(__FILE__)))))) . '/tests/resources/test.xml';
+    $fetcher_result = new RawFetcherResult(file_get_contents($file));
 
-    $parser->setConfig(array(
-      'context' => array(
+    $config = [
+      'context' => [
         'value' => '/items/item',
-      ),
-      'sources' => array(
-        'title' => array(
+      ],
+      'sources' => [
+        'title' => [
           'name' => 'Title',
           'value' => 'title',
-        ),
-        'description' => array(
+        ],
+        'description' => [
           'name' => 'Title',
           'value' => 'description',
-        ),
-      ),
-    ));
+        ],
+      ],
+    ] + $this->parser->defaultConfiguration();
 
-    $result = $parser->parse($this->source, $fetcher_result);
-    $this->assertParserResultItemCount($result, 3);
+    $this->feed->expects($this->any())
+      ->method('getConfigurationFor')
+      ->with($this->parser)
+      ->will($this->returnValue($config));
 
-    foreach ($result->items as $delta => $item) {
-      $this->assertEqual('I am a title' . $delta, $item['title']);
-      $this->assertEqual('I am a description' . $delta, $item['description']);
+    $result = $this->parser->parse($this->feed, $fetcher_result, $this->state);
+    $this->assertSame(count($result), 3);
+
+    foreach ($result as $delta => $item) {
+      $this->assertSame('I am a title' . $delta, $item->get('title'));
+      $this->assertSame('I am a description' . $delta, $item->get('description'));
     }
   }
 
@@ -91,8 +122,8 @@ class XmlParserTest extends UnitTestBase {
     $this->assertParserResultItemCount($result, 3);
 
     foreach ($result->items as $delta => $item) {
-      $this->assertEqual('I am a title' . $delta, $item['title']);
-      $this->assertEqual('<description><text>I am a description' . $delta . '</text></description>', $item['description']);
+      $this->assertEqual('I am a title' . $delta, $item->get('title'));
+      $this->assertEqual('<description><text>I am a description' . $delta . '</text></description>', $item->get('description'));
     }
   }
 

@@ -8,6 +8,7 @@
 namespace Drupal\Tests\feeds_ex\Unit;
 
 use Drupal\Component\Utility\SafeMarkup;
+use Drupal\feeds\Result\ParserResultInterface;
 use Drupal\Tests\feeds\Unit\FeedsUnitTestCase;
 
 /**
@@ -21,34 +22,6 @@ abstract class UnitTestBase extends FeedsUnitTestCase {
    * @var string
    */
   protected $moduleDir;
-
-  public function setUp() {
-    parent::setUp();
-
-    // Isn't this fun!
-    drupal_load('module', 'feeds');
-    $feeds = DRUPAL_ROOT . '/' . drupal_get_path('module', 'feeds');
-    require_once $feeds . '/includes/FeedsConfigurable.inc';
-    require_once $feeds . '/includes/FeedsSource.inc';
-    require_once $feeds . '/includes/FeedsImporter.inc';
-    require_once $feeds . '/plugins/FeedsPlugin.inc';
-    require_once $feeds . '/plugins/FeedsFetcher.inc';
-    require_once $feeds . '/plugins/FeedsFileFetcher.inc';
-    require_once $feeds . '/plugins/FeedsParser.inc';
-    require_once $feeds . '/plugins/FeedsProcessor.inc';
-    require_once $feeds . '/plugins/FeedsNodeProcessor.inc';
-
-    // This is out test feed source.
-    require_once dirname(__FILE__) . '/TestFeedsSource.php';
-
-    drupal_load('module', 'feeds_ex');
-    $this->moduleDir = DRUPAL_ROOT . '/' . drupal_get_path('module', 'feeds_ex');
-    require_once $this->moduleDir . '/src/Json/Utility.php';
-    require_once $this->moduleDir . '/src/Text/Utility.php';
-    require_once $this->moduleDir . '/src/Xml/Utility.php';
-    require_once $this->moduleDir . '/src/File/LineIterator.php';
-    require_once $this->moduleDir . '/src/Base.inc';
-  }
 
   /**
    * Returns a mocked FeedsSource object.
@@ -127,13 +100,13 @@ abstract class UnitTestBase extends FeedsUnitTestCase {
   /**
    * Asserts that the correct number of items have been parsed.
    *
-   * @param FeedsParserResult $result
+   * @param \Drupal\feeds\Result\ParserResultInterface $result
    *   The parser result.
    * @param int $count
    *   The number of items that should exist.
    */
-  protected function assertParserResultItemCount(FeedsParserResult $result, $count) {
-    $this->assertEqual(count($result->items), $count, SafeMarkup::format('@count items parsed.', array('@count' => count($result->items))));
+  protected function assertParserResultItemCount(ParserResultInterface $result, $count) {
+    $this->assertSame(count($result->items), $count, SafeMarkup::format('@count items parsed.', array('@count' => count($result->items))));
   }
 
   /**
