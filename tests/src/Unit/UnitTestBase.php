@@ -7,6 +7,7 @@
 
 namespace Drupal\Tests\feeds_ex\Unit;
 
+use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Tests\feeds\Unit\FeedsUnitTestCase;
 
 /**
@@ -117,7 +118,7 @@ abstract class UnitTestBase extends FeedsUnitTestCase {
     }
 
     // Verify that the file was successfully downloaded.
-    $this->assertTrue(file_exists($local_file), format_string('@file found.', array('@file' => $local_file)));
+    $this->assertTrue(file_exists($local_file), SafeMarkup::format('@file found.', array('@file' => $local_file)));
 
     // Set the library directory.
     define('FEEDS_EX_LIBRARY_PATH', $library_dir);
@@ -132,7 +133,7 @@ abstract class UnitTestBase extends FeedsUnitTestCase {
    *   The number of items that should exist.
    */
   protected function assertParserResultItemCount(FeedsParserResult $result, $count) {
-    $this->assertEqual(count($result->items), $count, format_string('@count items parsed.', array('@count' => count($result->items))));
+    $this->assertEqual(count($result->items), $count, SafeMarkup::format('@count items parsed.', array('@count' => count($result->items))));
   }
 
   /**

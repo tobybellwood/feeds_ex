@@ -7,6 +7,7 @@
 
 namespace Drupal\Tests\feeds_ex\Unit\File;
 
+use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Tests\UnitTestCase;
 
 /**
@@ -45,7 +46,7 @@ class LineIteratorTest extends UnitTestCase {
       $iterator = new LineIterator($this->moduleDir . '/tests/resources/test.jsonl');
       $iterator->setLineLimit($limit);
       $array = iterator_to_array($iterator);
-      $this->assertEqual(count($array), $limit, format_string('@count lines read.', array('@count' => count($array))));
+      $this->assertEqual(count($array), $limit, SafeMarkup::format('@count lines read.', array('@count' => count($array))));
     }
   }
 
