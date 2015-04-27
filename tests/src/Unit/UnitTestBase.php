@@ -24,6 +24,15 @@ abstract class UnitTestBase extends FeedsUnitTestCase {
   protected $moduleDir;
 
   /**
+   * {@inheritdoc}
+   */
+  public function setUp() {
+    $this->moduleDir = dirname(dirname(dirname(dirname(__FILE__))));
+
+    parent::setUp();
+  }
+
+  /**
    * Returns a mocked FeedsSource object.
    *
    * @param string $fetcher
