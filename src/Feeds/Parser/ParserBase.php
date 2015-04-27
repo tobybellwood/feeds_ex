@@ -12,6 +12,7 @@ use \Exception;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\feeds\FeedInterface;
+use Drupal\feeds\Feeds\Item\DynamicItem;
 use Drupal\feeds\Plugin\Type\ConfigurablePluginBase;
 use Drupal\feeds\Plugin\Type\FeedPluginFormInterface;
 use Drupal\feeds\Plugin\Type\Parser\ParserInterface;
@@ -255,7 +256,7 @@ abstract class ParserBase extends ConfigurablePluginBase implements FeedPluginFo
 
     foreach ($this->executeContext($feed, $fetcher_result, $state) as $row) {
       if ($item = $this->executeSources($feed, $row, $expressions, $variable_map)) {
-        $result->items[] = $item;
+        $result->addItem($item);
       }
     }
   }
@@ -319,7 +320,7 @@ abstract class ParserBase extends ConfigurablePluginBase implements FeedPluginFo
   protected function executeSources(FeedInterface $feed, $row, array $expressions, array $variable_map) {
     $feed_config = $feed->getConfigurationFor($this);
 
-    $item = array();
+    $item = new DynamicItem();
     $variables = array();
 
     foreach ($expressions as $machine_name => $expression) {
@@ -337,7 +338,7 @@ abstract class ParserBase extends ConfigurablePluginBase implements FeedPluginFo
         continue;
       }
 
-      $item[$machine_name] = $result;
+      $item->set($machine_name, $result);
       $variables[$variable_map[$machine_name]] = is_array($result) ? reset($result) : $result;
     }
 
