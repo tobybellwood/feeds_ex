@@ -9,6 +9,7 @@ namespace Drupal\feeds_ex\Feeds\Parser;
 
 use \DOMNode;
 use \DOMNodeList;
+use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\feeds\FeedInterface;
@@ -163,7 +164,7 @@ class XmlParser extends ParserBase {
    * {@inheritdoc}
    */
   protected function configFormTableColumn(FormStateInterface $form_state, array $values, $column, $machine_name) {
-    $id = 'feeds-ex-xml-raw-' . check_plain($machine_name);
+    $id = 'feeds-ex-xml-raw-' . SafeMarkup::checkPlain($machine_name);
 
     switch ($column) {
       case 'raw':
@@ -212,7 +213,7 @@ class XmlParser extends ParserBase {
       // Error code 1219 is an undefined namespace prefix.
       // Our sample doc doesn't have any namespaces.
       elseif ($error->code != 1219) {
-        $message = check_plain(trim($error->message));
+        $message = SafeMarkup::checkPlain(trim($error->message));
       }
     }
 

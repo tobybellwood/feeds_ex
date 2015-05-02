@@ -7,6 +7,7 @@
 
 namespace Drupal\feeds_ex\Feeds\Parser;
 
+use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\feeds\FeedInterface;
 use Drupal\feeds\Result\FetcherResultInterface;
@@ -120,7 +121,7 @@ class QueryPathXmlParser extends XmlParser {
       $parser = new QueryPath(NULL, $expression);
     }
     catch (CSSParseException $e) {
-      return check_plain($e->getMessage());
+      return SafeMarkup::checkPlain($e->getMessage());
     }
   }
 

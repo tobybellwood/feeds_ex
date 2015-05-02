@@ -7,6 +7,7 @@
 
 namespace Drupal\feeds_ex\Controller;
 
+use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Controller\ControllerBase;
 
@@ -44,7 +45,7 @@ class DefaultController extends ControllerBase {
       if (stripos($encoding, $string) !== 0) {
         continue;
       }
-      $matches[$prefix . $encoding] = check_plain($encoding);
+      $matches[$prefix . $encoding] = SafeMarkup::checkPlain($encoding);
       // Remove matches so we don't search them again.
       unset($encodings[$delta]);
     }
@@ -52,7 +53,7 @@ class DefaultController extends ControllerBase {
     // Find contains next.
     foreach ($encodings as $encoding) {
       if (stripos($encoding, $string) !== FALSE) {
-        $matches[$prefix . $encoding] = check_plain($encoding);
+        $matches[$prefix . $encoding] = SafeMarkup::checkPlain($encoding);
       }
     }
 

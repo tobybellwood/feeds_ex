@@ -7,6 +7,7 @@
 
 namespace Drupal\feeds_ex\Feeds\Parser;
 
+use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\feeds\FeedInterface;
 use Drupal\feeds\Result\FetcherResultInterface;
@@ -147,7 +148,7 @@ $this->compileDirectory = \Drupal::config('feeds_ex.settings')->get('feeds_ex_jm
     }
     catch (SyntaxErrorException $e) {
       // Remove newlines after nl2br() to make testing easier.
-      return str_replace("\n", '', nl2br(check_plain(trim($e->getMessage()))));
+      return str_replace("\n", '', nl2br(SafeMarkup::checkPlain(trim($e->getMessage()))));
     }
   }
 

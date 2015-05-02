@@ -8,6 +8,7 @@
 namespace Drupal\feeds_ex\Feeds\Parser;
 
 use \Exception;
+use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\feeds\Exception\EmptyFeedException;
@@ -428,7 +429,7 @@ abstract class ParserBase extends ConfigurablePluginBase implements FeedPluginFo
     $output = '<strong>' . $name . ':</strong>';
     $data = is_array($data) ? $data : array($data);
     foreach ($data as $key => $value) {
-      $data[$key] = check_plain($value);
+      $data[$key] = SafeMarkup::checkPlain($value);
     }
     $output .= _theme('item_list', array('items' => $data));
     $this->getMessenger()->setMessage($output);
