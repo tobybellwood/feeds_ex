@@ -80,16 +80,15 @@ class XmlParser extends ParserBase {
    * {@inheritdoc}
    */
   protected function executeContext(FeedInterface $feed, FetcherResultInterface $fetcher_result, StateInterface $state) {
-    $feed_config = $feed->getConfigurationFor($this);
     if (!$state->total) {
-      $state->total = $this->xpath->evaluate('count(' . $feed_config['context']['value'] . ')');
+      $state->total = $this->xpath->evaluate('count(' . $this->configuration['context']['value'] . ')');
     }
 
     $start = (int) $state->pointer;
-    $state->pointer = $start + $feed_config['line_limit'];
+    $state->pointer = $start + $this->configuration['line_limit'];
 
     // A batched XPath expression.
-    $context_query = '(' . $feed_config['context']['value'] . ")[position() > $start and position() <= {$state->pointer}]";
+    $context_query = '(' . $this->configuration['context']['value'] . ")[position() > $start and position() <= {$state->pointer}]";
     return $this->xpath->query($context_query);
   }
 

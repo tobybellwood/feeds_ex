@@ -80,11 +80,6 @@ class XmlParserTest extends UnitTestBase {
         ],
       ],
     ] + $this->parser->defaultConfiguration();
-
-    $this->feed->expects($this->any())
-      ->method('getConfigurationFor')
-      ->with($this->parser)
-      ->will($this->returnValue($config));
     $this->parser->setConfiguration($config);
 
     $result = $this->parser->parse($this->feed, $fetcher_result, $this->state);
@@ -118,13 +113,7 @@ class XmlParserTest extends UnitTestBase {
         ],
       ],
     ] + $this->parser->defaultConfiguration();
-
-    $this->feed->expects($this->any())
-      ->method('getConfigurationFor')
-      ->with($this->parser)
-      ->will($this->returnValue($config));
     $this->parser->setConfiguration($config);
-
 
     $result = $this->parser->parse($this->feed, $fetcher_result, $this->state);
     $this->assertSame(count($result), 3);
@@ -158,11 +147,6 @@ class XmlParserTest extends UnitTestBase {
         ],
       ],
     ] + $this->parser->defaultConfiguration();
-
-    $this->feed->expects($this->any())
-      ->method('getConfigurationFor')
-      ->with($this->parser)
-      ->will($this->returnValue($config));
     $this->parser->setConfiguration($config);
 
     $result = $this->parser->parse($this->feed, $fetcher_result, $this->state);
@@ -195,11 +179,6 @@ class XmlParserTest extends UnitTestBase {
         ],
       ],
     ] + $this->parser->defaultConfiguration();
-
-    $this->feed->expects($this->any())
-      ->method('getConfigurationFor')
-      ->with($this->parser)
-      ->will($this->returnValue($config));
     $this->parser->setConfiguration($config);
 
     $result = $this->parser->parse($this->feed, $fetcher_result, $this->state);
@@ -235,11 +214,6 @@ class XmlParserTest extends UnitTestBase {
       ],
       'source_encoding' => ['EUC-JP'],
     ] + $this->parser->defaultConfiguration();
-
-    $this->feed->expects($this->any())
-      ->method('getConfigurationFor')
-      ->with($this->parser)
-      ->will($this->returnValue($config));
     $this->parser->setConfiguration($config);
 
     $result = $this->parser->parse($this->feed, $fetcher_result, $this->state);
@@ -273,11 +247,6 @@ class XmlParserTest extends UnitTestBase {
       ],
       'line_limit' => 1,
     ] + $this->parser->defaultConfiguration();
-
-    $this->feed->expects($this->any())
-      ->method('getConfigurationFor')
-      ->with($this->parser)
-      ->will($this->returnValue($config));
     $this->parser->setConfiguration($config);
 
     foreach (range(0, 2) as $delta) {

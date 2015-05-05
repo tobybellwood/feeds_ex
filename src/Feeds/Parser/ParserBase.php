@@ -206,7 +206,6 @@ abstract class ParserBase extends ConfigurablePluginBase implements FeedPluginFo
    * {@inheritdoc}
    */
   public function parse(FeedInterface $feed, FetcherResultInterface $fetcher_result, StateInterface $state) {
-    $feed_config = $feed->getConfigurationFor($this);
     $this->loadLibrary();
     $this->startErrorHandling();
     $result = new ParserResult();
@@ -229,7 +228,7 @@ abstract class ParserBase extends ConfigurablePluginBase implements FeedPluginFo
 
     // Display and log errors.
     $errors = $this->getErrors();
-    $this->printErrors($errors, $feed_config['display_errors'] ? RfcLogLevel::DEBUG : RfcLogLevel::ERROR);
+    $this->printErrors($errors, $this->configuration['display_errors'] ? RfcLogLevel::DEBUG : RfcLogLevel::ERROR);
     $this->logErrors($feed, $errors);
 
     $this->stopErrorHandling();
@@ -254,11 +253,11 @@ abstract class ParserBase extends ConfigurablePluginBase implements FeedPluginFo
    *   The state object.
    */
   protected function parseItems(FeedInterface $feed, FetcherResultInterface $fetcher_result, ParserResultInterface $result, StateInterface $state) {
-    $expressions = $this->prepareExpressions($feed);
+    $expressions = $this->prepareExpressions();
     $variable_map = $this->prepareVariables($expressions);
 
     foreach ($this->executeContext($feed, $fetcher_result, $state) as $row) {
-      if ($item = $this->executeSources($feed, $row, $expressions, $variable_map)) {
+      if ($item = $this->executeSources($row, $expressions, $variable_map)) {
         $result->addItem($item);
       }
     }
@@ -269,17 +268,12 @@ abstract class ParserBase extends ConfigurablePluginBase implements FeedPluginFo
    *
    * At this point we just remove empty expressions.
    *
-   * @param \Drupal\feeds\FeedInterface $feed
-   *   The feed source.
-   *
    * @return array
    *   A map of machine name to expression.
    */
-  protected function prepareExpressions(FeedInterface $feed) {
-    $feed_config = $feed->getConfigurationFor($this);
-
+  protected function prepareExpressions() {
     $expressions = array();
-    foreach ($feed_config['sources'] as $machine_name => $source) {
+    foreach ($this->configuration['sources'] as $machine_name => $source) {
       if (strlen($source['value'])) {
         $expressions[$machine_name] = $source['value'];
       }
@@ -308,8 +302,6 @@ abstract class ParserBase extends ConfigurablePluginBase implements FeedPluginFo
   /**
    * Executes the source expressions.
    *
-   * @param \Drupal\feeds\FeedInterface $feed
-   *   The feed source.
    * @param mixed $row
    *   A single item returned from the context expression.
    * @param array $expressions
@@ -320,9 +312,7 @@ abstract class ParserBase extends ConfigurablePluginBase implements FeedPluginFo
    * @return array
    *   The fully-parsed item array.
    */
-  protected function executeSources(FeedInterface $feed, $row, array $expressions, array $variable_map) {
-    $feed_config = $feed->getConfigurationFor($this);
-
+  protected function executeSources($row, array $expressions, array $variable_map) {
     $item = new DynamicItem();
     $variables = array();
 
@@ -332,7 +322,7 @@ abstract class ParserBase extends ConfigurablePluginBase implements FeedPluginFo
 
       $result = $this->executeSourceExpression($machine_name, $expression, $row);
 
-      if (!empty($feed_config['sources'][$machine_name]['debug'])) {
+      if (!empty($this->configuration['sources'][$machine_name]['debug'])) {
         $this->debug($result, $machine_name);
       }
 
@@ -419,11 +409,9 @@ abstract class ParserBase extends ConfigurablePluginBase implements FeedPluginFo
    *   The source key that produced this query.
    */
   protected function debug($data, $machine_name) {
-    $feed_config = $feed->getConfigurationFor($this);
-
     $name = $machine_name;
-    if ($feed_config['sources'][$machine_name]['name']) {
-      $name = $feed_config['sources'][$machine_name]['name'];
+    if ($this->configuration['sources'][$machine_name]['name']) {
+      $name = $this->configuration['sources'][$machine_name]['name'];
     }
 
     $output = '<strong>' . $name . ':</strong>';
@@ -439,7 +427,7 @@ abstract class ParserBase extends ConfigurablePluginBase implements FeedPluginFo
    * {@inheritdoc}
    */
   public function getMappingSources() {
-    return parent::getMappingSources() + $this->configuration['sources'];
+    return $this->configuration['sources'];
   }
 
   /**
