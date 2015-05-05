@@ -8,36 +8,14 @@
 namespace Drupal\Tests\feeds_ex\Unit\Feeds\Parser;
 
 use Drupal\feeds\Result\RawFetcherResult;
-use Drupal\feeds\State;
 use Drupal\feeds_ex\Feeds\Parser\XmlParser;
 use Drupal\feeds_ex\Messenger\TestMessenger;
-use Drupal\Tests\feeds_ex\Unit\UnitTestBase;
 
 /**
  * @coversDefaultClass \Drupal\feeds_ex\Feeds\Parser\XmlParser
  * @group feeds_ex
  */
-class XmlParserTest extends UnitTestBase {
-
-  /**
-   * @var \Drupal\feeds_ex\Feeds\Parser\XmlParser
-   */
-  protected $parser;
-
-  /**
-   * @var \Drupal\feeds\FeedTypeInterface
-   */
-  protected $feedType;
-
-  /**
-   * @var \Drupal\feeds\FeedInterface
-   */
-  protected $feed;
-
-  /**
-   * @var \Drupal\feeds\State
-   */
-  protected $state;
+class XmlParserTest extends ParserTestBase {
 
   /**
    * {@inheritdoc}
@@ -45,18 +23,10 @@ class XmlParserTest extends UnitTestBase {
   public function setUp() {
     parent::setUp();
 
-    $this->feedType = $this->getMock('Drupal\feeds\FeedTypeInterface');
     $configuration = ['feed_type' => $this->feedType];
     $this->parser = new XmlParser($configuration, 'xml', []);
     $this->parser->setStringTranslation($this->getStringTranslationStub());
     $this->parser->setMessenger(new TestMessenger());
-
-    $this->state = new State();
-
-    $this->feed = $this->getMock('Drupal\feeds\FeedInterface');
-    $this->feed->expects($this->any())
-      ->method('getType')
-      ->will($this->returnValue($this->feedType));
   }
 
   /**
