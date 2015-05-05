@@ -100,7 +100,7 @@ abstract class UnitTestBase extends FeedsUnitTestCase {
     }
 
     // Verify that the file was successfully downloaded.
-    $this->assertTrue(file_exists($local_file), SafeMarkup::format('@file found.', array('@file' => $local_file)));
+    $this->assertTrue(file_exists($local_file), SafeMarkup::format('@file found.', ['@file' => $local_file]));
 
     // Set the library directory.
     define('FEEDS_EX_LIBRARY_PATH', $library_dir);
@@ -115,7 +115,7 @@ abstract class UnitTestBase extends FeedsUnitTestCase {
    *   The number of items that should exist.
    */
   protected function assertParserResultItemCount(ParserResultInterface $result, $count) {
-    $this->assertSame(count($result->items), $count, SafeMarkup::format('@count items parsed.', array('@count' => count($result->items))));
+    $this->assertSame(count($result->items), $count, SafeMarkup::format('@count items parsed.', ['@count' => count($result->items)]));
   }
 
   /**
@@ -125,9 +125,9 @@ abstract class UnitTestBase extends FeedsUnitTestCase {
    *   The list of error messages.
    */
   protected function assertEmptyFeedMessage(array $messages) {
-    $this->assertEqual(1, count($messages), 'The expected number of messages.');
-    $this->assertEqual($messages[0]['message'], 'The feed is empty.', 'Message text is correct.');
-    $this->assertEqual($messages[0]['type'], 'warning', 'Message type is warning.');
+    $this->assertSame(1, count($messages), 'The expected number of messages.');
+    $this->assertSame($messages[0]['message'], 'The feed is empty.', 'Message text is correct.');
+    $this->assertSame($messages[0]['type'], 'warning', 'Message type is warning.');
     $this->assertFalse($messages[0]['repeat'], 'Repeat is set to false.');
   }
 

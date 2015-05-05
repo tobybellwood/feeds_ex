@@ -7,8 +7,10 @@
 
 namespace Drupal\feeds_ex\Feeds\Parser;
 
+use \DOMNode;
 use Drupal\feeds\FeedInterface;
 use Drupal\feeds\Result\FetcherResultInterface;
+use Drupal\feeds_ex\Utility\XmlUtility;
 
 /**
  * Defines a HTML parser using XPath.
@@ -31,22 +33,13 @@ class HtmlParser extends XmlParser {
   /**
    * {@inheritdoc}
    */
-  protected $encoderClass = 'HtmlEncoder';
-
-  /**
-   * {@inheritdoc}
-   */
-  public function __construct($id) {
-    parent::__construct($id);
-    // DOMDocument::saveHTML() cannot take $node as an argument prior to 5.3.6.
-    $this->useSaveHTML = version_compare(PHP_VERSION, '5.3.6', '>=');
-  }
+  protected $encoderClass = '\Drupal\feeds_ex\Encoder\HtmlEncoder';
 
   /**
    * {@inheritdoc}
    */
   protected function convertEncoding($data, $encoding = 'UTF-8') {
-    return XmlUtility::convertHtmlEncoding($data, $this->config['source_encoding']);
+    return XmlUtility::convertHtmlEncoding($data, $this->configuration['source_encoding']);
   }
 
   /**
@@ -54,7 +47,7 @@ class HtmlParser extends XmlParser {
    */
   protected function prepareDocument(FeedInterface $feed, FetcherResultInterface $fetcher_result) {
     $raw = $this->prepareRaw($fetcher_result);
-    if ($this->config['use_tidy'] && extension_loaded('tidy')) {
+    if ($this->configuration['use_tidy'] && extension_loaded('tidy')) {
       $raw = tidy_repair_string($raw, $this->getTidyConfig(), 'utf8');
     }
     return XmlUtility::createHtmlDocument($raw);
@@ -64,10 +57,7 @@ class HtmlParser extends XmlParser {
    * {@inheritdoc}
    */
   protected function getRaw(DOMNode $node) {
-    if ($this->useSaveHTML) {
-      return $node->ownerDocument->saveHTML($node);
-    }
-    return $node->ownerDocument->saveXML($node, LIBXML_NOEMPTYTAG);
+    return $node->ownerDocument->saveHTML($node);
   }
 
   /**
