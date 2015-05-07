@@ -12,6 +12,9 @@ use Drupal\feeds\FeedInterface;
 use Drupal\feeds\Result\FetcherResultInterface;
 use Drupal\feeds\Result\ParserResultInterface;
 use Drupal\feeds\StateInterface;
+use Drupal\feeds_ex\File\LineIterator;
+use Drupal\feeds_ex\Utility\JsonUtility;
+use Peekmo\JsonPath\JsonStore;
 
 /**
  * Defines a JSON Lines parser using JSONPath.
@@ -27,7 +30,7 @@ class JsonPathLinesParser extends JsonPathParser {
   /**
    * The file iterator.
    *
-   * @var LineIterator
+   * @var \Drupal\feeds_ex\File\LineIterator
    */
   protected $iterator;
 
@@ -48,7 +51,7 @@ class JsonPathLinesParser extends JsonPathParser {
       throw new EmptyFeedException();
     }
 
-    $this->iterator->setLineLimit($feed->importer->getLimit());
+    $this->iterator->setLineLimit($this->configuration['line_limit']);
 
     if (!$state->total) {
       $state->total = $this->iterator->getSize();
@@ -74,7 +77,7 @@ class JsonPathLinesParser extends JsonPathParser {
       }
 
       if ($item = $this->executeSources($row, $expressions, $variable_map)) {
-        $result->items[] = $item;
+        $result->addItem($item);
       }
     }
   }
@@ -92,7 +95,8 @@ class JsonPathLinesParser extends JsonPathParser {
    * {@inheritdoc}
    */
   protected function executeSourceExpression($machine_name, $expression, $row) {
-    $result = jsonPath($row, $expression);
+    $store = new JsonStore($row);
+    $result = $store->get($expression);
 
     if (is_scalar($result)) {
       return $result;

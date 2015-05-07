@@ -7,67 +7,56 @@
 
 namespace Drupal\Tests\feeds_ex\Unit\Feeds\Parser;
 
-use Drupal\Tests\feeds_ex\Unit\UnitTestBase;
+use Drupal\feeds\Result\FetcherResult;
+use Drupal\feeds_ex\Feeds\Parser\JsonPathLinesParser;
+use Drupal\feeds_ex\Messenger\TestMessenger;
 
 /**
- * Unit tests for JsonPathLines.
- *
+ * @coversDefaultClass \Drupal\feeds_ex\Feeds\Parser\JsonPathLinesParser
  * @group feeds_ex
  */
-class JsonPathLinesParserTest extends UnitTestBase {
-
-  /**
-   * The mocked FeedsSource.
-   *
-   * @var FeedsSource
-   */
-  protected $source;
-
-  /**
-   * The parser being tested.
-   *
-   * @var FeedsParser
-   */
-  protected $parser;
+class JsonPathLinesParserTest extends ParserTestBase {
 
   /**
    * The fetcher result used during parsing.
    *
-   * @var FeedsFetcherResult
+   * @var \Drupal\feeds\Result\FetcherResult
    */
   protected $fetcherResult;
 
+  /**
+   * {@inheritdoc}
+   */
   public function setUp() {
     parent::setUp();
 
-    require_once $this->moduleDir . '/src/JsonPath.inc';
-    require_once $this->moduleDir . '/src/JsonPathLines.inc';
-
-    $this->downloadJsonPath();
-
-    $this->source = $this->getMockFeedsSource();
-    $this->parser = FeedsConfigurable::instance('JsonPathLines', strtolower($this->randomName()));
+    $configuration = ['feed_type' => $this->feedType];
+    $this->parser = new JsonPathLinesParser($configuration, 'jsonpathlines', []);
+    $this->parser->setStringTranslation($this->getStringTranslationStub());
     $this->parser->setMessenger(new TestMessenger());
-    $this->parser->addConfig(array(
-      'sources' => array(
-        'title' => array(
+
+    $config = [
+      'sources' => [
+        'title' => [
           'name' => 'Title',
           'value' => 'name',
-        ),
-      ),
-    ));
-    $this->fetcherResult = new FeedsFileFetcherResult($this->moduleDir . '/tests/resources/test.jsonl');
+        ],
+      ],
+    ];
+    $this->parser->setConfiguration($config);
+
+    $this->fetcherResult = new FetcherResult($this->moduleDir . '/tests/resources/test.jsonl');
   }
 
   /**
    * Tests simple parsing.
    */
   public function testSimpleParsing() {
-    $result = $this->parser->parse($this->source, $this->fetcherResult);
-    $this->assertParserResultItemCount($result, 4);
+    $result = $this->parser->parse($this->feed, $this->fetcherResult, $this->state);
+    $this->assertSame(count($result), 4);
 
-    foreach (array('Gilbert', 'Alexa', 'May', 'Deloise') as $delta => $name) {
-      $this->assertEqual($name, $result->items[$delta]['title']);
+    foreach (['Gilbert', 'Alexa', 'May', 'Deloise'] as $delta => $name) {
+      $this->assertSame($name, $result[$delta]->get('title'));
     }
   }
 
@@ -75,24 +64,33 @@ class JsonPathLinesParserTest extends UnitTestBase {
    * Tests batch parsing.
    */
   public function testBatching() {
-    $this->variableSet('feeds_process_limit', 1);
+    $config = [
+      'sources' => [
+        'title' => [
+          'name' => 'Title',
+          'value' => 'name',
+        ],
+      ],
+      'line_limit' => 1,
+    ];
+    $this->parser->setConfiguration($config);
 
-    foreach (array('Gilbert', 'Alexa', 'May', 'Deloise') as $name) {
-      $result = $this->parser->parse($this->source, $this->fetcherResult);
-      $this->assertParserResultItemCount($result, 1);
-      $this->assertEqual($result->items[0]['title'], $name);
+    foreach (['Gilbert', 'Alexa', 'May', 'Deloise'] as $name) {
+      $result = $this->parser->parse($this->feed, $this->fetcherResult, $this->state);
+      $this->assertSame(count($result), 1);
+      $this->assertSame($result[0]->get('title'), $name);
     }
 
     // We should be out of items.
-    $result = $this->parser->parse($this->source, $this->fetcherResult);
-    $this->assertParserResultItemCount($result, 0);
+    $result = $this->parser->parse($this->feed, $this->fetcherResult, $this->state);
+    $this->assertSame(count($result), 0);
   }
 
   /**
    * Tests empty feed handling.
    */
   public function testEmptyFeed() {
-    $this->parser->parse($this->source, new FeedsFileFetcherResult($this->moduleDir . '/tests/resources/empty.txt'));
+    $this->parser->parse($this->feed, new FetcherResult($this->moduleDir . '/tests/resources/empty.txt'), $this->state);
     $this->assertEmptyFeedMessage($this->parser->getMessenger()->getMessages());
   }
 
