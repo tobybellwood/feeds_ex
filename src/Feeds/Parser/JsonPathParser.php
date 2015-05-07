@@ -7,11 +7,14 @@
 
 namespace Drupal\feeds_ex\Feeds\Parser;
 
+use \RuntimeException;
 use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\feeds\FeedInterface;
 use Drupal\feeds\Result\FetcherResultInterface;
 use Drupal\feeds\Result\ParserResultInterface;
 use Drupal\feeds\StateInterface;
+use Drupal\feeds_ex\Utility\JsonUtility;
+use Peekmo\JsonPath\JsonStore;
 
 /**
  * Defines a JSON parser using JSONPath.
@@ -30,18 +33,16 @@ class JsonPathParser extends ParserBase {
   protected function executeContext(FeedInterface $feed, FetcherResultInterface $fetcher_result, StateInterface $state) {
     $raw = $this->prepareRaw($fetcher_result);
     $parsed = JsonUtility::decodeJsonArray($raw);
-    $parsed = jsonPath($parsed, $this->config['context']['value']);
-    if (!is_array($parsed)) {
-      throw new RuntimeException(t('The context expression must return an object or array.'));
-    }
+    $store = new JsonStore($raw);
+    $parsed = $store->get($this->configuration['context']['value']);
 
     if (!$state->total) {
       $state->total = count($parsed);
     }
 
     $start = (int) $state->pointer;
-    $state->pointer = $start + $feed->importer->getLimit();
-    return array_slice($parsed, $start, $feed->importer->getLimit());
+    $state->pointer = $start + $this->configuration['line_limit'];
+    return array_slice($parsed, $start, $this->configuration['line_limit']);
   }
 
   /**
@@ -56,7 +57,8 @@ class JsonPathParser extends ParserBase {
    * {@inheritdoc}
    */
   protected function executeSourceExpression($machine_name, $expression, $row) {
-    $result = jsonPath($row, $expression);
+    $store = new JsonStore($row);
+    $result = $store->get($expression);
 
     if (is_scalar($result)) {
       return $result;
@@ -105,11 +107,9 @@ class JsonPathParser extends ParserBase {
    * {@inheritdoc}
    */
   protected function loadLibrary() {
-    if (!$path = feeds_ex_jsonpath_library_path()) {
+    if (!class_exists('Peekmo\JsonPath\JsonStore')) {
       throw new RuntimeException(t('The JSONPath library is not installed.'));
     }
-
-    require_once \Drupal::root() . '/' . $path;
   }
 
 }

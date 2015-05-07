@@ -7,6 +7,9 @@
 
 namespace Drupal\feeds_ex\Utility;
 
+use \RuntimeException;
+use Drupal\Component\Serialization\Json;
+
 /**
  * Various helpers for handling JSON.
  */
@@ -22,18 +25,6 @@ class JsonUtility {
    *   The JSON parsing error message.
    */
   public static function translateError($error) {
-    // This shouldn't really get called for PHP < 5.3.0.
-    if (version_compare(PHP_VERSION, '5.3.0', '<')) {
-      return 'Unknown error';
-    }
-
-    if (version_compare(PHP_VERSION, '5.3.3', '>=')) {
-      switch ($error) {
-        case JSON_ERROR_UTF8:
-          return 'Malformed UTF-8 characters, possibly incorrectly encoded';
-      }
-    }
-
     if (version_compare(PHP_VERSION, '5.5.0', '>=')) {
       switch ($error) {
         case JSON_ERROR_RECURSION:
@@ -48,6 +39,9 @@ class JsonUtility {
     }
 
     switch ($error) {
+      case JSON_ERROR_UTF8:
+        return 'Malformed UTF-8 characters, possibly incorrectly encoded';
+
       case JSON_ERROR_NONE:
         return 'No error has occurred';
 
@@ -81,7 +75,7 @@ class JsonUtility {
    *   Thrown if the encoded JSON does not result in an array.
    */
   public static function decodeJsonArray($json) {
-    $parsed = \Drupal\Component\Serialization\Json::decode($json);
+    $parsed = Json::decode($json);
 
     if (!is_array($parsed)) {
       throw new RuntimeException(t('The JSON is invalid.'));

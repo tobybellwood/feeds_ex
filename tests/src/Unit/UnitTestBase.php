@@ -59,54 +59,6 @@ abstract class UnitTestBase extends FeedsUnitTestCase {
   }
 
   /**
-   * Downloads JSONPath.
-   */
-  protected function downloadJsonPath() {
-    // We don't use a variable_set() here since we want this to be a unit test.
-    if (defined('FEEDS_EX_LIBRARY_PATH')) {
-      return;
-    }
-    $url = 'https://jsonpath.googlecode.com/svn/trunk/src/php/jsonpath.php';
-    $filename = 'jsonpath.php';
-
-    // Avoid downloading the file dozens of times.
-    $library_dir = $this->originalFileDirectory . '/simpletest/feeds_ex';
-    $jsonpath_library_dir = DRUPAL_ROOT . '/' . $library_dir . '/jsonpath';
-
-    if (!file_exists(DRUPAL_ROOT . '/' . $library_dir)) {
-      drupal_mkdir(DRUPAL_ROOT . '/' . $library_dir);
-    }
-
-    if (!file_exists($jsonpath_library_dir)) {
-      drupal_mkdir($jsonpath_library_dir);
-    }
-
-    // Local file name.
-    $local_file = $jsonpath_library_dir . '/' . $filename;
-
-    // Begin single threaded code.
-    if (function_exists('sem_get')) {
-      $semaphore = sem_get(ftok(__FILE__, 1));
-      sem_acquire($semaphore);
-    }
-
-    // Download and extact the archive, but only in one thread.
-    if (!file_exists($local_file)) {
-      $local_file = system_retrieve_file($url, $local_file, FALSE, FILE_EXISTS_REPLACE);
-    }
-
-    if (function_exists('sem_get')) {
-      sem_release($semaphore);
-    }
-
-    // Verify that the file was successfully downloaded.
-    $this->assertTrue(file_exists($local_file), SafeMarkup::format('@file found.', ['@file' => $local_file]));
-
-    // Set the library directory.
-    define('FEEDS_EX_LIBRARY_PATH', $library_dir);
-  }
-
-  /**
    * Asserts that the correct number of items have been parsed.
    *
    * @param \Drupal\feeds\Result\ParserResultInterface $result
