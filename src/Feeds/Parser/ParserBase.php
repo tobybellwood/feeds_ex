@@ -226,10 +226,9 @@ abstract class ParserBase extends ConfigurablePluginBase implements FeedPluginFo
       // Do nothing. Store for later.
     }
 
-    // Display and log errors.
+    // Display errors.
     $errors = $this->getErrors();
     $this->printErrors($errors, $this->configuration['display_errors'] ? RfcLogLevel::DEBUG : RfcLogLevel::ERROR);
-    $this->logErrors($feed, $errors);
 
     $this->stopErrorHandling();
 
@@ -355,29 +354,6 @@ abstract class ParserBase extends ConfigurablePluginBase implements FeedPluginFo
         continue;
       }
       $this->getMessenger()->setMessage(t($error['message'], $error['variables']), $error['severity'] <= RfcLogLevel::ERROR ? 'error' : 'warning', FALSE);
-    }
-  }
-
-  /**
-   * Logs errors.
-   *
-   * @param \Drupal\feeds\FeedInterface $feed
-   *   The feed source being importerd.
-   * @param array $errors
-   *   A list of errors as returned by stopErrorHandling().
-   * @param int $severity
-   *   (optional) Limit to only errors of the specified severity. Defaults to
-   *   RfcLogLevel::ERROR.
-   *
-   * @see watchdog()
-   */
-  protected function logErrors(FeedInterface $feed, array $errors, $severity = RfcLogLevel::ERROR) {
-    foreach ($errors as $error) {
-      if ($error['severity'] > $severity) {
-        continue;
-      }
-
-      $feed->log('feeds_ex', $error['message'], $error['variables'], $error['severity']);
     }
   }
 
