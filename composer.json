@@ -10,6 +10,7 @@
       "source": "http://cgit.drupalcode.org/feeds_ex"
     },
     "require": {
-      "peekmo/jsonpath": "dev-master"
+      "peekmo/jsonpath": "dev-master",
+      "querypath/QueryPath": ">=3.0.0"
     }
 }
