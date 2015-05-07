@@ -64,9 +64,8 @@ class JsonPathParserTest extends ParserTestBase {
 
   /**
    * Tests parsing error handling.
-   * @todo replace invokeMethod().
    */
-  public function _testErrorHandling() {
+  public function testErrorHandling() {
     // Parse some invalid JSON.
     json_decode('\\"asdfasfd');
 
@@ -114,9 +113,8 @@ class JsonPathParserTest extends ParserTestBase {
    * Tests JSONPath validation.
    *
    * @todo Do real validation.
-   * @todo replace invokeMethod().
    */
-  public function _testValidateExpression() {
+  public function testValidateExpression() {
     // Invalid expression.
     $expression = ['!! '];
     $this->assertSame(NULL, $this->invokeMethod($this->parser, 'validateExpression', $expression));

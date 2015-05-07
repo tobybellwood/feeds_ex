@@ -252,13 +252,11 @@ class XmlParserTest extends ParserTestBase {
 
   /**
    * Tests XPath validation.
-   *
-   * @todo replace invokeMethod().
    */
-  public function _testValidateExpression() {
+  public function testValidateExpression() {
     // Invalid expression.
     $expression = ['!!'];
-    $this->assertSame('Invalid expression', $this->invokeMethod($parser, 'validateExpression', $expression));
+    $this->assertSame('Invalid expression', $this->invokeMethod($this->parser, 'validateExpression', $expression));
 
     // Test that value was trimmed.
     $this->assertSame($expression[0], '!!', 'Value was trimmed.');
@@ -267,7 +265,7 @@ class XmlParserTest extends ParserTestBase {
     $this->assertSame(NULL, $this->invokeMethod($this->parser, 'validateExpression', ['thing:asdf']));
 
     // Empty.
-    $this->assertSame(NULL, $this->invokeMethod($this->parser, 'validateExpression', [['']]));
+    $this->assertSame(NULL, $this->invokeMethod($this->parser, 'validateExpression', ['']));
   }
 
   /**

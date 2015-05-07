@@ -7,6 +7,7 @@
 
 namespace Drupal\Tests\feeds_ex\Unit;
 
+use \ReflectionMethod;
 use Drupal\Component\Utility\SafeMarkup;
 use Drupal\feeds\Result\ParserResultInterface;
 use Drupal\Tests\feeds\Unit\FeedsUnitTestCase;
@@ -56,6 +57,26 @@ abstract class UnitTestBase extends FeedsUnitTestCase {
     $this->setProperty($source, 'importer', $importer);
 
     return $source;
+  }
+
+  /**
+   * Calls a private or protected method on an object.
+   *
+   * @param object $object
+   *   The object to invoke a method on.
+   * @param string $method
+   *   The name of the method.
+   * @param array $arguments
+   *   (optional) The arguments to provide to the method. Defaults to an empty
+   *   array.
+   *
+   * @return mixed
+   *   Whatever the method returns.
+   */
+  protected function invokeMethod($object, $method, array $arguments = array()) {
+    $reflector = new ReflectionMethod($object, $method);
+    $reflector->setAccessible(TRUE);
+    return $reflector->invokeArgs($object, $arguments);
   }
 
   /**

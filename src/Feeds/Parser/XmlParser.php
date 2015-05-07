@@ -9,6 +9,7 @@ namespace Drupal\feeds_ex\Feeds\Parser;
 
 use \DOMNode;
 use \DOMNodeList;
+use \SimpleXMLElement;
 use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Logger\RfcLogLevel;
