@@ -10,6 +10,8 @@ namespace Drupal\feeds_ex\Feeds\Parser;
 use Drupal\feeds\FeedInterface;
 use Drupal\feeds\Result\FetcherResultInterface;
 use Drupal\feeds\StateInterface;
+use Drupal\feeds_ex\Utility\XmlUtility;
+use QueryPath\DOMQuery;
 
 /**
  * Defines a HTML parser using QueryPath.
@@ -28,7 +30,7 @@ class QueryPathHtmlParser extends QueryPathXmlParser {
   /**
    * {@inheritdoc}
    */
-  protected $encoderClass = 'HtmlEncoder';
+  protected $encoderClass = '\Drupal\feeds_ex\Encoder\HtmlEncoder';
 
   /**
    * {@inheritdoc}
@@ -41,7 +43,7 @@ class QueryPathHtmlParser extends QueryPathXmlParser {
   /**
    * {@inheritdoc}
    */
-  protected function getRawValue(QueryPath $node) {
+  protected function getRawValue(DOMQuery $node) {
     return $node->html();
   }
 
@@ -49,7 +51,7 @@ class QueryPathHtmlParser extends QueryPathXmlParser {
    * {@inheritdoc}
    */
   protected function convertEncoding($data, $encoding = 'UTF-8') {
-    return XmlUtility::convertHtmlEncoding($data, $this->config['source_encoding']);
+    return XmlUtility::convertHtmlEncoding($data, $this->configuration['source_encoding']);
   }
 
   /**
@@ -57,7 +59,7 @@ class QueryPathHtmlParser extends QueryPathXmlParser {
    */
   protected function prepareDocument(FeedInterface $feed, FetcherResultInterface $fetcher_result) {
     $raw = $this->prepareRaw($fetcher_result);
-    if ($this->config['use_tidy'] && extension_loaded('tidy')) {
+    if ($this->configuration['use_tidy'] && extension_loaded('tidy')) {
       $raw = tidy_repair_string($raw, $this->getTidyConfig(), 'utf8');
     }
     return XmlUtility::createHtmlDocument($raw);
@@ -67,7 +69,7 @@ class QueryPathHtmlParser extends QueryPathXmlParser {
    * {@inheritdoc}
    */
   protected function getTidyConfig() {
-    return array(
+    return [
       'merge-divs' => FALSE,
       'merge-spans' => FALSE,
       'join-styles' => FALSE,
@@ -76,7 +78,7 @@ class QueryPathHtmlParser extends QueryPathXmlParser {
       'tidy-mark' => FALSE,
       'escape-cdata' => TRUE,
       'word-2000' => TRUE,
-    );
+    ];
   }
 
 }

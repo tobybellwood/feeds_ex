@@ -7,177 +7,170 @@
 
 namespace Drupal\Tests\feeds_ex\Unit\Feeds\Parser;
 
-use Drupal\Tests\feeds_ex\Unit\UnitTestBase;
+use Drupal\feeds\Result\RawFetcherResult;
+use Drupal\feeds_ex\Feeds\Parser\QueryPathHtmlParser;
+use Drupal\feeds_ex\Messenger\TestMessenger;
 
 /**
- * Unit tests for QueryPathHtml.
- *
+ * @coversDefaultClass \Drupal\feeds_ex\Feeds\Parser\QueryPathHtmlParser
  * @group feeds_ex
  */
-class QueryPathHtmlParserTest extends UnitTestBase {
+class QueryPathHtmlParserTest extends ParserTestBase {
 
   /**
-   * The mocked FeedsSource.
-   *
-   * @var FeedsSource
+   * {@inheritdoc}
    */
-  protected $source;
-
   public function setUp() {
     parent::setUp();
 
-    $query_path = drupal_get_path('module', 'querypath');
-    require_once DRUPAL_ROOT . '/' . $query_path .  '/QueryPath/QueryPath.php';
-
-    require_once $this->moduleDir . '/src/Xml.inc';
-    require_once $this->moduleDir . '/src/QueryPathXml.inc';
-    require_once $this->moduleDir . '/src/QueryPathHtml.inc';
-
-    $this->source = $this->getMockFeedsSource();
+    $configuration = ['feed_type' => $this->feedType];
+    $this->parser = new QueryPathHtmlParser($configuration, 'querypathhtml', []);
+    $this->parser->setStringTranslation($this->getStringTranslationStub());
+    $this->parser->setMessenger(new TestMessenger());
   }
 
   /**
    * Tests simple parsing.
    */
   public function testSimpleParsing() {
-    $parser = $this->getParserInstance();
-    $fetcher_result = new FeedsFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test.html'));
+    $fetcher_result = new RawFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test.html'));
 
-    $parser->setConfig(array(
-      'context' => array(
+    $config = [
+      'context' => [
         'value' => '.post',
-      ),
-      'sources' => array(
-        'title' => array(
+      ],
+      'sources' => [
+        'title' => [
           'name' => 'Title',
           'value' => 'h3',
           'attribute' => '',
-        ),
-        'description' => array(
+        ],
+        'description' => [
           'name' => 'Title',
           'value' => 'p',
           'attribute' => '',
-        ),
-      ),
-    ));
+        ],
+      ],
+    ];
+    $this->parser->setConfiguration($config);
 
-    $result = $parser->parse($this->source, $fetcher_result);
-    $this->assertParserResultItemCount($result, 3);
+    $result = $this->parser->parse($this->feed, $fetcher_result, $this->state);
+    $this->assertSame(count($result), 3);
 
-    $this->assertEqual('I am a title<thing>Stuff</thing>', $result->items[0]['title']);
-    $this->assertEqual('I am a description0', $result->items[0]['description']);
-    $this->assertEqual('I am a title1', $result->items[1]['title']);
-    $this->assertEqual('I am a description1', $result->items[1]['description']);
-    $this->assertEqual('I am a title2', $result->items[2]['title']);
-    $this->assertEqual('I am a description2', $result->items[2]['description']);
+    $this->assertSame('I am a title<thing>Stuff</thing>', $result[0]->get('title'));
+    $this->assertSame('I am a description0', $result[0]->get('description'));
+    $this->assertSame('I am a title1', $result[1]->get('title'));
+    $this->assertSame('I am a description1', $result[1]->get('description'));
+    $this->assertSame('I am a title2', $result[2]->get('title'));
+    $this->assertSame('I am a description2', $result[2]->get('description'));
   }
 
   /**
    * Tests raw.
    */
   public function testRaw() {
-    $parser = $this->getParserInstance();
-    $fetcher_result = new FeedsFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test.html'));
+    $fetcher_result = new RawFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test.html'));
 
-    $parser->setConfig(array(
-      'context' => array(
+    $config = [
+      'context' => [
         'value' => '.post',
-      ),
-      'sources' => array(
-        'title' => array(
+      ],
+      'sources' => [
+        'title' => [
           'name' => 'Title',
           'value' => 'h3',
           'attribute' => '',
-        ),
-        'description' => array(
+        ],
+        'description' => [
           'name' => 'Title',
           'value' => 'p',
           'attribute' => '',
           'raw' => TRUE,
-        ),
-      ),
-    ));
+        ],
+      ],
+    ];
+    $this->parser->setConfiguration($config);
 
-    $result = $parser->parse($this->source, $fetcher_result);
-    $this->assertParserResultItemCount($result, 3);
+    $result = $this->parser->parse($this->feed, $fetcher_result, $this->state);
+    $this->assertSame(count($result), 3);
 
-    $this->assertEqual('I am a title<thing>Stuff</thing>', $result->items[0]['title']);
-    $this->assertEqual('<p>I am a description0</p>', $result->items[0]['description']);
-    $this->assertEqual('I am a title1', $result->items[1]['title']);
-    $this->assertEqual('<p>I am a description1</p>', $result->items[1]['description']);
-    $this->assertEqual('I am a title2', $result->items[2]['title']);
-    $this->assertEqual('<p>I am a description2</p>', $result->items[2]['description']);
+    $this->assertSame('I am a title<thing>Stuff</thing>', $result[0]->get('title'));
+    $this->assertSame('<p>I am a description0</p>', $result[0]->get('description'));
+    $this->assertSame('I am a title1', $result[1]->get('title'));
+    $this->assertSame('<p>I am a description1</p>', $result[1]->get('description'));
+    $this->assertSame('I am a title2', $result[2]->get('title'));
+    $this->assertSame('<p>I am a description2</p>', $result[2]->get('description'));
   }
 
   /**
    * Tests inner xml.
    */
   public function testInner() {
-    $parser = $this->getParserInstance();
-    $fetcher_result = new FeedsFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test.html'));
+    $fetcher_result = new RawFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test.html'));
 
-    $parser->setConfig(array(
-      'context' => array(
+    $config = [
+      'context' => [
         'value' => '.post',
-      ),
-      'sources' => array(
-        'title' => array(
+      ],
+      'sources' => [
+        'title' => [
           'name' => 'Title',
           'value' => 'h3',
           'attribute' => '',
-        ),
-        'description' => array(
+        ],
+        'description' => [
           'name' => 'Title',
           'value' => 'p',
           'attribute' => '',
           'raw' => TRUE,
           'inner' => TRUE,
-        ),
-      ),
-    ));
+        ],
+      ],
+    ];
+    $this->parser->setConfiguration($config);
 
-    $result = $parser->parse($this->source, $fetcher_result);
-    $this->assertParserResultItemCount($result, 3);
+    $result = $this->parser->parse($this->feed, $fetcher_result, $this->state);
+    $this->assertSame(count($result), 3);
 
-    $this->assertEqual('I am a title<thing>Stuff</thing>', $result->items[0]['title']);
-    $this->assertEqual('I am a description0', $result->items[0]['description']);
-    $this->assertEqual('I am a title1', $result->items[1]['title']);
-    $this->assertEqual('I am a description1', $result->items[1]['description']);
-    $this->assertEqual('I am a title2', $result->items[2]['title']);
-    $this->assertEqual('I am a description2', $result->items[2]['description']);
+    $this->assertSame('I am a title<thing>Stuff</thing>', $result[0]->get('title'));
+    $this->assertSame('I am a description0', $result[0]->get('description'));
+    $this->assertSame('I am a title1', $result[1]->get('title'));
+    $this->assertSame('I am a description1', $result[1]->get('description'));
+    $this->assertSame('I am a title2', $result[2]->get('title'));
+    $this->assertSame('I am a description2', $result[2]->get('description'));
   }
 
   /**
    * Tests grabbing an attribute.
    */
   public function testAttributeParsing() {
-    $parser = $this->getParserInstance();
-    $fetcher_result = new FeedsFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test.html'));
+    $fetcher_result = new RawFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test.html'));
 
-    $parser->setConfig(array(
-      'context' => array(
+    $config = [
+      'context' => [
         'value' => '.post',
-      ),
-      'sources' => array(
-        'title' => array(
+      ],
+      'sources' => [
+        'title' => [
           'name' => 'Title',
           'value' => 'h3',
           'attribute' => 'attr',
-        ),
-        'description' => array(
+        ],
+        'description' => [
           'name' => 'Title',
           'value' => 'p',
           'attribute' => '',
-        ),
-      ),
-    ));
+        ],
+      ],
+    ];
+    $this->parser->setConfiguration($config);
 
-    $result = $parser->parse($this->source, $fetcher_result);
-    $this->assertParserResultItemCount($result, 3);
+    $result = $this->parser->parse($this->feed, $fetcher_result, $this->state);
+    $this->assertSame(count($result), 3);
 
-    foreach ($result->items as $delta => $item) {
-      $this->assertEqual('attribute' . $delta, $item['title']);
-      $this->assertEqual('I am a description' . $delta, $item['description']);
+    foreach ($result as $delta => $item) {
+      $this->assertSame('attribute' . $delta, $item->get('title'));
+      $this->assertSame('I am a description' . $delta, $item->get('description'));
     }
   }
 
@@ -185,33 +178,33 @@ class QueryPathHtmlParserTest extends UnitTestBase {
    * Tests parsing a CP866 (Russian) encoded file.
    */
   public function testCP866Encoded() {
-    $parser = $this->getParserInstance();
-    $fetcher_result = new FeedsFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test_ru.html'));
+    $fetcher_result = new RawFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test_ru.html'));
 
-    $parser->setConfig(array(
-      'context' => array(
+    $config = [
+      'context' => [
         'value' => '.post',
-      ),
-      'sources' => array(
-        'title' => array(
+      ],
+      'sources' => [
+        'title' => [
           'name' => 'Title',
           'value' => 'h3',
           'attribute' => '',
-        ),
-        'description' => array(
+        ],
+        'description' => [
           'name' => 'Title',
           'value' => 'p',
           'attribute' => '',
-        ),
-      ),
-    ));
+        ],
+      ],
+    ];
+    $this->parser->setConfiguration($config);
 
-    $result = $parser->parse($this->source, $fetcher_result);
-    $this->assertParserResultItemCount($result, 3);
+    $result = $this->parser->parse($this->feed, $fetcher_result, $this->state);
+    $this->assertSame(count($result), 3);
 
-    foreach ($result->items as $delta => $item) {
-      $this->assertEqual('Я название' . $delta, $item['title']);
-      $this->assertEqual('Я описание' . $delta, $item['description']);
+    foreach ($result as $delta => $item) {
+      $this->assertSame('Я название' . $delta, $item->get('title'));
+      $this->assertSame('Я описание' . $delta, $item->get('description'));
     }
   }
 
@@ -221,34 +214,34 @@ class QueryPathHtmlParserTest extends UnitTestBase {
    * This implicitly tests Base's encoding conversion.
    */
   public function testEUCJPEncodedNoDeclaration() {
-    $parser = $this->getParserInstance();
-    $fetcher_result = new FeedsFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test_jp.html'));
+    $fetcher_result = new RawFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test_jp.html'));
 
-    $parser->setConfig(array(
-      'context' => array(
+    $config = [
+      'context' => [
         'value' => '.post',
-      ),
-      'sources' => array(
-        'title' => array(
+      ],
+      'sources' => [
+        'title' => [
           'name' => 'Title',
           'value' => 'h3',
           'attribute' => '',
-        ),
-        'description' => array(
+        ],
+        'description' => [
           'name' => 'Title',
           'value' => 'p',
           'attribute' => '',
-        ),
-      ),
-      'source_encoding' => array('EUC-JP'),
-    ));
+        ],
+      ],
+      'source_encoding' => ['EUC-JP'],
+    ];
+    $this->parser->setConfiguration($config);
 
-    $result = $parser->parse($this->source, $fetcher_result);
-    $this->assertParserResultItemCount($result, 3);
+    $result = $this->parser->parse($this->feed, $fetcher_result, $this->state);
+    $this->assertSame(count($result), 3);
 
-    foreach ($result->items as $delta => $item) {
-      $this->assertEqual('私はタイトルです' . $delta, $item['title']);
-      $this->assertEqual('私が説明してい' . $delta, $item['description']);
+    foreach ($result as $delta => $item) {
+      $this->assertSame('私はタイトルです' . $delta, $item->get('title'));
+      $this->assertSame('私が説明してい' . $delta, $item->get('description'));
     }
   }
 
@@ -256,21 +249,8 @@ class QueryPathHtmlParserTest extends UnitTestBase {
    * Tests empty feed handling.
    */
   public function testEmptyFeed() {
-    $parser = $this->getParserInstance();
-    $parser->parse($this->source, new FeedsFetcherResult(' '));
-    $this->assertEmptyFeedMessage($parser->getMessenger()->getMessages());
-  }
-
-  /**
-   * Returns a new instance of the parser.
-   *
-   * @return QueryPathHtml
-   *   A parser instance.
-   */
-  protected function getParserInstance() {
-    $parser = FeedsConfigurable::instance('QueryPathHtml', strtolower($this->randomName()));
-    $parser->setMessenger(new TestMessenger());
-    return $parser;
+    $this->parser->parse($this->feed, new RawFetcherResult(' '), $this->state);
+    $this->assertEmptyFeedMessage($this->parser->getMessenger()->getMessages());
   }
 
 }
