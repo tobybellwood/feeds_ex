@@ -13,11 +13,11 @@ use \SimpleXMLElement;
 use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Logger\RfcLogLevel;
+use Drupal\feeds\Component\XmlParserTrait;
 use Drupal\feeds\FeedInterface;
 use Drupal\feeds\Result\FetcherResultInterface;
 use Drupal\feeds\Result\ParserResultInterface;
 use Drupal\feeds\StateInterface;
-use Drupal\feeds_ex\Utility\XmlUtility;
 use Drupal\feeds_ex\XpathDomXpath;
 
 /**
@@ -30,6 +30,7 @@ use Drupal\feeds_ex\XpathDomXpath;
  * )
  */
 class XmlParser extends ParserBase {
+  use XmlParserTrait;
 
   /**
    * The XpathDomXpath object used for parsing.
@@ -236,13 +237,6 @@ class XmlParser extends ParserBase {
   }
 
   /**
-   * {@inheritdoc}
-   */
-  protected function convertEncoding($data, $encoding = 'UTF-8') {
-    return XmlUtility::convertXmlEncoding($data, $this->configuration['source_encoding']);
-  }
-
-  /**
    * Prepares the DOM document.
    *
    * @param \Drupal\feeds\FeedInterface $feed
@@ -257,12 +251,12 @@ class XmlParser extends ParserBase {
     $raw = $this->prepareRaw($fetcher_result);
     // Remove default namespaces. This has to run after the encoding conversion
     // because a limited set of encodings are supported in regular expressions.
-    $raw = XmlUtility::removeDefaultNamespaces($raw);
+    $raw = $this->removeDefaultNamespaces($raw);
 
     if ($this->configuration['use_tidy'] && extension_loaded('tidy')) {
       $raw = tidy_repair_string($raw, $this->getTidyConfig(), 'utf8');
     }
-    return XmlUtility::createXmlDocument($raw);
+    return $this->getDomDocument($raw);
   }
 
   /**

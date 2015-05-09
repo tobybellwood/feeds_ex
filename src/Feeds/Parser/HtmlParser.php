@@ -38,13 +38,6 @@ class HtmlParser extends XmlParser {
   /**
    * {@inheritdoc}
    */
-  protected function convertEncoding($data, $encoding = 'UTF-8') {
-    return XmlUtility::convertHtmlEncoding($data, $this->configuration['source_encoding']);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   protected function prepareDocument(FeedInterface $feed, FetcherResultInterface $fetcher_result) {
     $raw = $this->prepareRaw($fetcher_result);
     if ($this->configuration['use_tidy'] && extension_loaded('tidy')) {
