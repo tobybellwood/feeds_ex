@@ -7,12 +7,17 @@
 
 namespace Drupal\feeds_ex\Feeds\Parser;
 
+use \RuntimeException;
 use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\feeds\FeedInterface;
 use Drupal\feeds\Result\FetcherResultInterface;
 use Drupal\feeds\Result\ParserResultInterface;
 use Drupal\feeds\StateInterface;
+use Drupal\feeds_ex\JmesRuntimeFactory;
+use Drupal\feeds_ex\JmesRuntimeFactoryInterface;
+use Drupal\feeds_ex\Utility\JsonUtility;
+use JmesPath\SyntaxErrorException;
 
 /**
  * Defines a JSON parser using JMESPath.
@@ -28,64 +33,59 @@ class JmesPathParser extends ParserBase {
   /**
    * The JMESPath parser.
    *
-   * @var \JmesPath\Runtime\RuntimeInterface
+   * @var An object with an __invoke() method.
    */
-  protected $jmesPath;
+  protected $runtime;
 
   /**
-   * The directory JmesPath uses to store generated code.
+   * A factory to generate JMESPath runtime objects.
    *
-   * @var string
+   * @var \Drupal\feeds_ex\JmesRuntimeFactoryInterface
    */
-  protected $compileDirectory;
+  protected $runtimeFactory;
 
   /**
    * {@inheritdoc}
    */
-  protected function setUp(FeedInterface $feed, FetcherResultInterface $fetcher_result, StateInterface $state) {
-    // This is probably overly paranoid, but safety first.
-    if (!$path = $this->getCompileDirectory()) {
-      $path = file_directory_temp() . '/' . drupal_base64_encode(\Drupal\Component\Utility\Crypt::randomBytes(40)) . '_feeds_ex_jmespath_dir';
-    }
-    try {
-      $this->jmesPath = new CompilerRuntime(array('dir' => $path));
-    }
-    catch (RuntimeException $e) {
-      $this->jmesPath = new AstRuntime();
-      $path = FALSE;
-    }
-    $this->setCompileDirectory($path);
+  public function __construct(array $configuration, $plugin_id, array $plugin_definition) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
+
+    // Set default factory.
+    $this->runtimeFactory = new JmesRuntimeFactory();
   }
 
   /**
-   * Returns the compilation directory.
+   * Sets the factory to use for creating JMESPath Runtime objects.
    *
-   * @return string
-   *   The directory JmesPath uses to store generated code.
+   * This is useful in unit tests.
+   *
+   * @param \Drupal\feeds_ex\JmesRuntimeFactoryInterface
+   *   The factory to use.
    */
-  protected function getCompileDirectory() {
-    if (!isset($this->compileDirectory)) {
-      // @FIXME
-// Could not extract the default value because it is either indeterminate, or
-// not scalar. You'll need to provide a default value in
-// config/install/feeds_ex.settings.yml and config/schema/feeds_ex.schema.yml.
-$this->compileDirectory = \Drupal::config('feeds_ex.settings')->get('feeds_ex_jmespath_compile_dir');
-    }
-
-    return $this->compileDirectory;
+  public function setRuntimeFactory(JmesRuntimeFactoryInterface $factory) {
+    $this->runtimeFactory = $factory;
   }
 
   /**
-   * Sets the compilation directory.
+   * Returns data from the input array that matches a JMESPath expression.
    *
-   * @param string $directory
-   *   The directory JmesPath uses to store generated code.
+   * @param string $expression
+   *   JMESPath expression to evaluate.
+   * @param mixed $data
+   *   JSON-like data to search.
+   *
+   * @return mixed|null
+   *   Returns the matching data or null.
    */
-  protected function setCompileDirectory($directory) {
-    if ($this->compileDirectory !== $directory) {
-      $this->compileDirectory = $directory;
-      \Drupal::configFactory()->getEditable('feeds_ex.settings')->set('feeds_ex_jmespath_compile_dir', $directory)->save();
+  protected function search($expression, $data) {
+    if (!isset($this->runtime)) {
+      $this->runtime = $this->runtimeFactory->createRuntime();
     }
+
+    // Stupid PHP.
+    $runtime = $this->runtime;
+
+    return $runtime($expression, $data);
   }
 
   /**
@@ -94,7 +94,7 @@ $this->compileDirectory = \Drupal::config('feeds_ex.settings')->get('feeds_ex_jm
   protected function executeContext(FeedInterface $feed, FetcherResultInterface $fetcher_result, StateInterface $state) {
     $raw = $this->prepareRaw($fetcher_result);
     $parsed = JsonUtility::decodeJsonArray($raw);
-    $parsed = $this->jmesPath->search($this->config['context']['value'], $parsed);
+    $parsed = $this->search($this->configuration['context']['value'], $parsed);
     if (!is_array($parsed)) {
       throw new RuntimeException(t('The context expression must return an object or array.'));
     }
@@ -105,15 +105,17 @@ $this->compileDirectory = \Drupal::config('feeds_ex.settings')->get('feeds_ex_jm
 
     // @todo Consider using array slice syntax when it is supported.
     $start = (int) $state->pointer;
-    $state->pointer = $start + $feed->importer->getLimit();
-    return array_slice($parsed, $start, $feed->importer->getLimit());
+    $state->pointer = $start + $this->configuration['line_limit'];
+    return array_slice($parsed, $start, $this->configuration['line_limit']);
   }
 
   /**
    * {@inheritdoc}
    */
   protected function cleanUp(FeedInterface $feed, ParserResultInterface $result, StateInterface $state) {
-    unset($this->jmesPath);
+    // @todo Verify if this is necessary. Not sure if the runtime keeps a
+    // reference to the input data.
+    unset($this->runtime);
     // Calculate progress.
     $state->progress($state->total, $state->pointer);
   }
@@ -122,7 +124,7 @@ $this->compileDirectory = \Drupal::config('feeds_ex.settings')->get('feeds_ex_jm
    * {@inheritdoc}
    */
   protected function executeSourceExpression($machine_name, $expression, $row) {
-    $result = $this->jmesPath->search($expression, $row);
+    $result = $this->search($expression, $row);
 
     if (is_scalar($result)) {
       return $result;
@@ -141,10 +143,8 @@ $this->compileDirectory = \Drupal::config('feeds_ex.settings')->get('feeds_ex_jm
       return;
     }
 
-    $parser = new AstRuntime();
-
     try {
-      $parser->search($expression, array());
+      $this->search($expression, []);
     }
     catch (SyntaxErrorException $e) {
       // Remove newlines after nl2br() to make testing easier.
@@ -165,30 +165,28 @@ $this->compileDirectory = \Drupal::config('feeds_ex.settings')->get('feeds_ex_jm
    */
   protected function getErrors() {
     if (!function_exists('json_last_error')) {
-      return array();
+      return [];
     }
 
     if (!$error = json_last_error()) {
-      return array();
+      return [];
     }
 
-    $message = array(
+    $message = [
       'message' => JsonUtility::translateError($error),
-      'variables' => array(),
+      'variables' => [],
       'severity' => RfcLogLevel::ERROR,
-    );
-    return array($message);
+    ];
+    return [$message];
   }
 
   /**
    * {@inheritdoc}
    */
   protected function loadLibrary() {
-    if (!$path = feeds_ex_library_path('jmespath.php', 'vendor/autoload.php')) {
+    if (!class_exists('JmesPath\AstRuntime')) {
       throw new RuntimeException(t('The JMESPath library is not installed.'));
     }
-
-    require_once \Drupal::root() . '/' . $path;
   }
 
 }
