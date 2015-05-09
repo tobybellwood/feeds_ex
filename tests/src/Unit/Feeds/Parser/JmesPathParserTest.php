@@ -159,7 +159,7 @@ class JmesPathParserTest extends ParserTestBase {
   }
 
   /**
-     * Tests parsing invalid JSON.
+   * Tests parsing invalid context expression.
    *
    * @expectedException RuntimeException
    * @expectedExceptionMessage The context expression must return an object or array.

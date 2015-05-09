@@ -34,32 +34,6 @@ abstract class UnitTestBase extends FeedsUnitTestCase {
   }
 
   /**
-   * Returns a mocked FeedsSource object.
-   *
-   * @param string $fetcher
-   *   (optional) The fetcher class. Defaults to FeedsFileFetcher
-   * @param string $processor
-   *   (optional) The processor class. Defaults to FeedsNodeProcessor.
-   *
-   * @return FeedsSource
-   *   The mocked FeedsSource object,
-   */
-  protected function getMockFeedsSource($fetcher = 'FeedsFileFetcher', $processor = 'FeedsNodeProcessor') {
-    $importer = $this->newInstanceWithoutConstructor('FeedsImporter');
-
-    $fetcher = $this->newInstanceWithoutConstructor($fetcher);
-    $this->setProperty($importer, 'fetcher', $fetcher);
-
-    $processor = $this->newInstanceWithoutConstructor($processor);
-    $this->setProperty($importer, 'processor', $processor);
-
-    $source = $this->newInstanceWithoutConstructor('TestFeedsSource');
-    $this->setProperty($source, 'importer', $importer);
-
-    return $source;
-  }
-
-  /**
    * Calls a private or protected method on an object.
    *
    * @param object $object
@@ -77,18 +51,6 @@ abstract class UnitTestBase extends FeedsUnitTestCase {
     $reflector = new ReflectionMethod($object, $method);
     $reflector->setAccessible(TRUE);
     return $reflector->invokeArgs($object, $arguments);
-  }
-
-  /**
-   * Asserts that the correct number of items have been parsed.
-   *
-   * @param \Drupal\feeds\Result\ParserResultInterface $result
-   *   The parser result.
-   * @param int $count
-   *   The number of items that should exist.
-   */
-  protected function assertParserResultItemCount(ParserResultInterface $result, $count) {
-    $this->assertSame(count($result->items), $count, SafeMarkup::format('@count items parsed.', ['@count' => count($result->items)]));
   }
 
   /**
