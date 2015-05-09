@@ -7,11 +7,14 @@
 
 namespace Drupal\feeds_ex\Feeds\Parser;
 
+use \RuntimeException;
 use Drupal\feeds\Exception\EmptyFeedException;
 use Drupal\feeds\FeedInterface;
 use Drupal\feeds\Result\FetcherResultInterface;
 use Drupal\feeds\Result\ParserResultInterface;
 use Drupal\feeds\StateInterface;
+use Drupal\feeds_ex\File\LineIterator;
+use Drupal\feeds_ex\Utility\JsonUtility;
 
 /**
  * Defines a JSON Lines parser using JMESPath.
@@ -49,7 +52,7 @@ class JmesPathLinesParser extends JmesPathParser {
       throw new EmptyFeedException();
     }
 
-    $this->iterator->setLineLimit($feed->importer->getLimit());
+    $this->iterator->setLineLimit($this->configuration['line_limit']);
 
     if (!$state->total) {
       $state->total = $this->iterator->getSize();
@@ -61,7 +64,7 @@ class JmesPathLinesParser extends JmesPathParser {
   /**
    * {@inheritdoc}
    */
-  protected function parseItems(FeedInterface $feed, FetcherResultInterface $fetcher_result, ParserResultInterface $result) {
+  protected function parseItems(FeedInterface $feed, FetcherResultInterface $fetcher_result, ParserResultInterface $result, StateInterface $state) {
     $expressions = $this->prepareExpressions();
     $variable_map = $this->prepareVariables($expressions);
 
@@ -76,7 +79,7 @@ class JmesPathLinesParser extends JmesPathParser {
       }
 
       if ($item = $this->executeSources($row, $expressions, $variable_map)) {
-        $result->items[] = $item;
+        $result->addItem($item);
       }
     }
   }
@@ -88,21 +91,6 @@ class JmesPathLinesParser extends JmesPathParser {
     $state->pointer = $this->iterator->ftell();
     unset($this->iterator);
     parent::cleanUp($feed, $result, $state);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function executeSourceExpression($machine_name, $expression, $row) {
-    // Row is a JSON string.
-    $result = $this->jmesPath->search($expression, $row);
-
-    if (is_scalar($result)) {
-      return $result;
-    }
-
-    // Return a single value if there's only one value.
-    return count($result) === 1 ? reset($result) : $result;
   }
 
 }
