@@ -347,7 +347,7 @@ class FeedsExQueryPathXmlUnitTests extends FeedsExUnitTestBase {
    *   A parser instance.
    */
   protected function getParserInstance() {
-    $parser = FeedsConfigurable::instance('FeedsExQueryPathXml', strtolower($this->randomName()));
+    $parser = FeedsPlugin::instance('FeedsExQueryPathXml', strtolower($this->randomName()));
     $parser->setMessenger(new FeedsExTestMessenger());
     return $parser;
   }

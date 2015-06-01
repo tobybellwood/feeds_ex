@@ -172,7 +172,7 @@ class FeedsExJsonPathUnitTests extends FeedsExUnitTestBase {
    *   A parser instance.
    */
   protected function getParserInstance() {
-    $parser = FeedsConfigurable::instance('FeedsExJsonPath', strtolower($this->randomName()));
+    $parser = FeedsPlugin::instance('FeedsExJsonPath', strtolower($this->randomName()));
     $parser->setMessenger(new FeedsExTestMessenger());
     return $parser;
   }
