@@ -20,7 +20,7 @@ class FeedsExJsonUtility {
    *   The JSON parsing error message.
    */
   public static function translateError($error) {
-    // This shouldn't really get called for PHP < 5.3.0.
+    // This shouldn't get called for PHP < 5.3.0.
     if (version_compare(PHP_VERSION, '5.3.0', '<')) {
       return 'Unknown error';
     }
@@ -82,6 +82,28 @@ class FeedsExJsonUtility {
     $parsed = drupal_json_decode($json);
 
     if (!is_array($parsed)) {
+      throw new RuntimeException(t('The JSON is invalid.'));
+    }
+
+    return $parsed;
+  }
+
+  /**
+   * Decodes a JSON string into an object or array.
+   *
+   * @param string $json
+   *   A JSON string.
+   *
+   * @return object|array
+   *   A PHP object or array.
+   *
+   * @throws RuntimeException
+   *   Thrown if the encoded JSON does not result in an array or object.
+   */
+  public static function decodeJsonObject($json) {
+    $parsed = json_decode($json);
+
+    if (!is_array($parsed) && !is_object($parsed)) {
       throw new RuntimeException(t('The JSON is invalid.'));
     }
 

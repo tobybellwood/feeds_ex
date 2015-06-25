@@ -149,11 +149,16 @@ class FeedsExJmesPath extends FeedsExBase {
    * {@inheritdoc}
    */
   protected function executeContext(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
-    $raw = $this->prepareRaw($fetcher_result);
-    $parsed = FeedsExJsonUtility::decodeJsonArray($raw);
+    $parsed = FeedsExJsonUtility::decodeJsonObject($this->prepareRaw($fetcher_result));
     $parsed = $this->search($this->config['context']['value'], $parsed);
-    if (!is_array($parsed)) {
+
+    if (!is_array($parsed) && !is_object($parsed)) {
       throw new RuntimeException(t('The context expression must return an object or array.'));
+    }
+
+    // If an object is returned, consider it one item.
+    if (is_object($parsed)) {
+      return array($parsed);
     }
 
     $state = $source->state(FEEDS_PARSE);
@@ -161,9 +166,9 @@ class FeedsExJmesPath extends FeedsExBase {
       $state->total = count($parsed);
     }
 
-    // @todo Consider using array slice syntax when it is supported.
     $start = (int) $state->pointer;
     $state->pointer = $start + $source->importer->getLimit();
+
     return array_slice($parsed, $start, $source->importer->getLimit());
   }
 

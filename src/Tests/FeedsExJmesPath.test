@@ -153,13 +153,37 @@ class FeedsExJmesPathUnitTests extends FeedsExUnitTestBase {
   }
 
   /**
+   * Tests parsing with a root object.
+   */
+  public function testRootContext() {
+    $parser = $this->getParserInstance();
+    $fetcher_result = new FeedsFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test.json'));
+
+    $parser->setConfig(array(
+      'context' => array(
+        'value' => '@',
+      ),
+      'sources' => array(
+        'title' => array(
+          'name' => 'Title',
+          'value' => 'items[0].title',
+        ),
+      ),
+    ));
+
+    $result = $parser->parse($this->source, $fetcher_result);
+    $this->assertParserResultItemCount($result, 1);
+    $this->assertEqual('I am a title0', $result->items[0]['title']);
+  }
+
+  /**
    * Tests JMESPath validation.
    */
   public function testValidateExpression() {
     // Invalid expression.
     $parser = $this->getParserInstance();
     $expression = array('!! ');
-    $this->assertEqual('Syntax error at character 0<br />!!<br />^<br />Invalid expression', $this->invokeMethod($parser, 'validateExpression', $expression));
+    $this->assertTrue(strpos($this->invokeMethod($parser, 'validateExpression', $expression), 'Syntax error at character 0') !== FALSE);
 
     // Test that value was trimmed.
     $this->assertEqual($expression[0], '!!', 'Value was trimmed.');
