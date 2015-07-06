@@ -110,4 +110,77 @@ class FeedsExJsonUtility {
     return $parsed;
   }
 
+  /**
+   * Returns the path of the JSONPath library.
+   *
+   * @return string|false
+   *   The root-relative path to the JSONPath include, or false on failure.
+   */
+  public static function jsonPathLibraryPath() {
+    $libraries_path = module_exists('libraries') ? libraries_get_path($library) : FALSE;
+    if ($libraries_path && is_dir($libraries_path)) {
+      $path = $libraries_path;
+    }
+    elseif (is_dir(DRUPAL_ROOT . '/sites/all/libraries/jsonpath')) {
+      $path = 'sites/all/libraries/jsonpath';
+    }
+    // This is defined when simpletest downloads the library for us.
+    elseif (defined('FEEDS_EX_LIBRARY_PATH')) {
+      $path = FEEDS_EX_LIBRARY_PATH . '/jsonpath';
+    }
+
+    if (!isset($path)) {
+      return FALSE;
+    }
+
+    // Newer forks of JSONPath are all modern and fancy with their autoloaders.
+    if (is_file($path . '/vendor/autoload.php')) {
+      return $path . '/vendor/autoload.php';
+    }
+    // Old school. Look for multiple versions.
+    $files = glob($path . '/jsonpath*.php');
+
+    return $files ? reset($files) : FALSE;
+  }
+
+  /**
+   * Determines if a JSONPath parser is installed.
+   *
+   * @return bool
+   *   True if a parser is installed, false if not.
+   */
+  public static function jsonPathParserInstalled() {
+    if (class_exists('Flow\JSONPath\JSONPath') || function_exists('jsonPath')) {
+      return TRUE;
+    }
+
+    if (!$path = self::jsonPathLibraryPath()) {
+      return FALSE;
+    }
+
+    require_once DRUPAL_ROOT . '/' . $path;
+
+    return class_exists('Flow\JSONPath\JSONPath') || function_exists('jsonPath');
+  }
+
+  /**
+   * Determines if a JMESPath parser is installed.
+   *
+   * @return bool
+   *   True if a parser is installed, false if not.
+   */
+  public static function jmesPathParserInstalled() {
+    if (class_exists('JmesPath\AstRuntime') || class_exists('JmesPath\Runtime\AstRuntime')) {
+      return TRUE;
+    }
+
+    if (!$path = feeds_ex_library_path('jmespath.php', 'vendor/autoload.php')) {
+      return FALSE;
+    }
+
+    require_once DRUPAL_ROOT . '/' . $path;
+
+    return class_exists('JmesPath\AstRuntime') || class_exists('JmesPath\Runtime\AstRuntime');
+  }
+
 }

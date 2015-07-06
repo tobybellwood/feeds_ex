@@ -266,11 +266,9 @@ class FeedsExJmesPath extends FeedsExBase {
    * {@inheritdoc}
    */
   protected function loadLibrary() {
-    if (!$path = feeds_ex_library_path('jmespath.php', 'vendor/autoload.php')) {
+    if (!FeedsExJsonUtility::jmesPathParserInstalled()) {
       throw new RuntimeException(t('The JMESPath library is not installed.'));
     }
-
-    require_once DRUPAL_ROOT . '/' . $path;
   }
 
 }
