@@ -363,9 +363,13 @@ abstract class FeedsExBase extends FeedsParser {
    *   The prepared raw string.
    */
   protected function prepareRaw(FeedsFetcherResult $fetcher_result) {
-    $raw = trim($this->getEncoder()->convertEncoding($fetcher_result->getRaw()));
+    $raw = $this->getEncoder()->convertEncoding($fetcher_result->getRaw());
 
-    if (!strlen($raw)) {
+    // Strip null bytes.
+    $raw = trim(str_replace("\0", '', $raw));
+
+    // Check that the string has at least one character.
+    if (!isset($raw[0])) {
       throw new FeedsExEmptyException();
     }
 

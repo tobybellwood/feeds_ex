@@ -38,7 +38,12 @@ class FeedsExXmlUnitTests extends FeedsExUnitTestBase {
    */
   public function testSimpleParsing() {
     $parser = $this->getParserInstance();
-    $fetcher_result = new FeedsFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test.xml'));
+    $contents = file_get_contents($this->moduleDir . '/tests/resources/test.xml');
+
+    // Implicitly test that invalid characters are ignored and null bytes are
+    // stripped.
+    $contents = str_replace('I am a description', chr(0) . 'I am a description' . chr(11), $contents);
+    $fetcher_result = new FeedsFetcherResult($contents);
 
     $parser->setConfig(array(
       'context' => array(
