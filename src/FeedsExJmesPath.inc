@@ -180,7 +180,8 @@ class FeedsExJmesPath extends FeedsExBase {
     // reference to the input data.
     unset($this->runtime);
     // Calculate progress.
-    $source->state(FEEDS_PARSE)->progress($state->total, $state->pointer);
+    $state = $source->state(FEEDS_PARSE);
+    $state->progress($state->total, $state->pointer);
   }
 
   /**
