@@ -31,6 +31,28 @@ class FeedsExXmlUtility {
   }
 
   /**
+   * Converts named HTML entities to their UTF-8 equivalent.
+   *
+   * @param string $markup
+   *   The string.
+   *
+   * @return string
+   *   The converted string.
+   */
+  public static function decodeNamedHtmlEntities($markup) {
+    if (version_compare(PHP_VERSION, '5.4.0', '<')) {
+      $map = require dirname(dirname(dirname(__FILE__))) . '/resources/html_entities.php';
+    }
+    else {
+      $map = array_flip(get_html_translation_table(HTML_ENTITIES, ENT_NOQUOTES|ENT_HTML5, 'UTF-8'));
+      unset($map['&amp;'], $map['&lt;'], $map['&gt;']);
+    }
+
+
+    return strtr($markup, $map);
+  }
+
+  /**
    * Creates an XML document.
    *
    * @param string $source

@@ -291,6 +291,15 @@ class FeedsExXmlUnitTests extends FeedsExUnitTestBase {
   }
 
   /**
+   * Tests FeedsExXmlUtility::decodeNamedHtmlEntities().
+   */
+  public function testDecodeNamedHtmlEntities() {
+    $xml = '<root>&Atilde;&amp;&lt;&gt;</root>';
+    $xml = FeedsExXmlUtility::decodeNamedHtmlEntities($xml);
+    $this->assertEqual('<root>Ã&amp;&lt;&gt;</root>', $xml);
+  }
+
+  /**
    * Returns a new instance of the parser.
    *
    * @return FeedsExXml
