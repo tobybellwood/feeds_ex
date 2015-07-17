@@ -11,6 +11,13 @@
 abstract class FeedsExBase extends FeedsParser {
 
   /**
+   * A regular expression that finds four byte UTF-8 chars.
+   *
+   * @var string
+   */
+  protected static $fourByteRegex = '/(?:\xF0[\x90-\xBF][\x80-\xBF]{2}|[\xF1-\xF3][\x80-\xBF]{3}|\xF4[\x80-\x8F][\x80-\xBF]{2})/s';
+
+  /**
    * The object used to display messages to the user.
    *
    * @var FeedsExMessengerInterface
@@ -288,13 +295,17 @@ abstract class FeedsExBase extends FeedsParser {
     $item = array();
     $variables = array();
 
+    $config = $this->getConfig();
+
     foreach ($expressions as $machine_name => $expression) {
       // Variable substitution.
       $expression = strtr($expression, $variables);
 
       $result = $this->executeSourceExpression($machine_name, $expression, $row);
 
-      if (!empty($this->config['sources'][$machine_name]['debug'])) {
+      $result = $this->cleanResultItem($result, $config['sources'][$machine_name]['four_byte']);
+
+      if ($config['sources'][$machine_name]['debug']) {
         $this->debug($result, $machine_name);
       }
 
@@ -421,6 +432,36 @@ abstract class FeedsExBase extends FeedsParser {
     );
   }
 
+  protected function sourceValueDefaults() {
+    return array(
+      'name' => '',
+      'value' => '',
+      'debug' => FALSE,
+      'four_byte' => 'ignore',
+      'weight' => 0,
+    );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function addConfig($config) {
+    parent::addConfig($config);
+    $this->setConfig($this->config);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setConfig($config) {
+    parent::setConfig($config);
+
+    $defaults = $this->sourceValueDefaults();
+    foreach ($this->config['sources'] as $machine_name => $values) {
+      $this->config['sources'][$machine_name] = array_intersect_key($values, $defaults) + $defaults;;
+    }
+  }
+
   /**
    * {@inheritdoc}
    */
@@ -455,6 +496,15 @@ abstract class FeedsExBase extends FeedsParser {
       '#id' => 'feeds-ex-source-table',
     );
 
+    $four_byte_options = array(
+      'ignore' => t('Ignore'),
+      'strip' => t('Strip'),
+      'replace' => t('Replace'),
+    );
+    if (function_exists('transliteration_get')) {
+      $four_byte_options['transliterate'] = t('Transliterate');
+    }
+
     $max_weight = 0;
     foreach ($this->config['sources'] as $machine_name => $source) {
       $form['sources'][$machine_name]['name'] = array(
@@ -487,6 +537,13 @@ abstract class FeedsExBase extends FeedsParser {
         '#title' => t('Debug'),
         '#title_display' => 'invisible',
         '#default_value' => $source['debug'],
+      );
+      $form['sources'][$machine_name]['four_byte'] = array(
+        '#type' => 'select',
+        '#options' => $four_byte_options,
+        '#title' => t('Four byte characters'),
+        '#title_display' => 'invisible',
+        '#default_value' => $source['four_byte'],
       );
       $form['sources'][$machine_name]['remove'] = array(
         '#type' => 'checkbox',
@@ -535,12 +592,19 @@ abstract class FeedsExBase extends FeedsParser {
       '#maxlength' => 1024,
     );
     foreach ($this->configFormTableHeader() as $column => $name) {
-      $form['add'][$column] = $this->configFormTableColumn($form_state, array(), $column, '');
+      $form['add'][$column] = $this->configFormTableColumn($form_state, $this->sourceValueDefaults(), $column, '');
     }
     $form['add']['debug'] = array(
       '#type' => 'checkbox',
       '#title' => t('Debug'),
       '#title_display' => 'invisible',
+    );
+    $form['add']['four_byte'] = array(
+      '#type' => 'select',
+      '#options' => $four_byte_options,
+      '#title' => t('Four byte characters'),
+      '#title_display' => 'invisible',
+      '#default_value' => 'ignore',
     );
     $form['add']['weight'] = array(
       '#type' => 'textfield',
@@ -620,19 +684,6 @@ abstract class FeedsExBase extends FeedsParser {
       else {
         $values['sources'][$values['add']['machine_name']] = $values['add'];
       }
-    }
-
-    // Rebuild sources to keep the configuration values clean.
-    $columns = $this->getFormHeader();
-    unset($columns['remove'], $columns['machine_name']);
-    $columns = array_keys($columns);
-
-    foreach ($values['sources'] as $machine_name => $source) {
-      $new_value = array();
-      foreach ($columns as $column) {
-        $new_value[$column] = $source[$column];
-      }
-      $values['sources'][$machine_name] = $new_value;
     }
 
     // Sort by weight.
@@ -718,6 +769,7 @@ abstract class FeedsExBase extends FeedsParser {
     $header += $this->configFormTableHeader();
     $header += array(
       'debug' => t('Debug'),
+      'four_byte' => t('4 byte'),
       'remove' => t('Remove'),
       'weight' => t('Weight'),
     );
@@ -778,6 +830,122 @@ abstract class FeedsExBase extends FeedsParser {
       $this->encoder = new $class($this->config['source_encoding']);
     }
     return $this->encoder;
+  }
+
+  /**
+   * Removes four-byte characters from a feed item.
+   *
+   * @param mixed $result
+   *   The result item from the parser.
+   *
+   * @return mixed
+   *   The result with 4-byte characters removed.
+   */
+  protected function cleanResultItem($result, $method) {
+    if (is_string($result)) {
+      return $this->cleanString($result, $method);
+    }
+
+    if (!is_array($result)) {
+      return $result;
+    }
+
+    foreach ($result as $key => $value) {
+      if (is_string($value)) {
+        $result[$key] = $this->cleanString($value, $method);
+      }
+    }
+
+    return $result;
+  }
+
+  /**
+   * Cleans a string.
+   *
+   * Removes 4 byte characters.
+   *
+   * @param string $string
+   *   The string to clean.
+   * @param string $method
+   *   The method to use for cleaning.
+   *
+   * @return string
+   *   The cleaned string.
+   */
+  protected function cleanString($string, $method) {
+    switch ($method) {
+      case 'strip':
+        return $this->stripFourBytes($string);
+
+      case 'replace':
+        return $this->replaceFourBytes($string);
+
+      case 'transliterate':
+        return function_exists('transliteration_get') ? $this->transliterateFourBytes($string) : $this->stripFourBytes($string);
+
+      default:
+        return $string;
+    }
+  }
+
+  /**
+   * Strips four byte characters from a string.
+   *
+   * @param string $string
+   *   The input string.
+   *
+   * @return string
+   *   The string with four byte characters removed.
+   */
+  protected function stripFourBytes($string) {
+    return preg_replace(self::$fourByteRegex, '', $string);
+  }
+
+  /**
+   * Replaces four byte characters with their HTML unicode codepoint.
+   *
+   * @param string $string
+   *   The input string.
+   *
+   * @return string
+   *   The string with four byte characters converted.
+   */
+  protected function replaceFourBytes($string) {
+    return preg_replace_callback(self::$fourByteRegex, array($this, 'doFourByteReplace'), $string);
+  }
+
+  /**
+   * Replaces four byte characters via transliteration_get().
+   *
+   * @param string $string
+   *   The input string.
+   *
+   * @return string
+   *   The string with four byte characters converted.
+   */
+  protected function transliterateFourBytes($string) {
+    return preg_replace_callback(self::$fourByteRegex, 'transliteration_get', $string);
+  }
+
+  /**
+   * Callback for convertFourBytes().
+   *
+   * @param array $matches
+   *   The regular expression matches.
+   *
+   * @return string
+   *   A four byte unicode character converted to its HTML representation.
+   */
+  public function doFourByteReplace(array $matches) {
+    $char = $matches[0];
+
+    // Calculate the codepoint of the character.
+    $codepoint = ord($char[0]) - 0xF0 << 18;
+    $codepoint += ord($char[1]) - 0x80 << 12;
+    $codepoint += ord($char[2]) - 0x80 << 6;
+    $codepoint += ord($char[3]) - 0x80;
+
+    return '&#' . $codepoint . ';';
   }
 
 }

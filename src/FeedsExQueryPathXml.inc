@@ -116,6 +116,13 @@ class FeedsExQueryPathXml extends FeedsExXml {
   /**
    * {@inheritdoc}
    */
+  protected function sourceValueDefaults() {
+    return array('attribute' => '') + parent::sourceValueDefaults();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   protected function configFormTableHeader() {
     return array(
       'attribute' => t('Attribute'),
@@ -132,7 +139,7 @@ class FeedsExQueryPathXml extends FeedsExXml {
           '#type' => 'textfield',
           '#title' => t('Attribute name'),
           '#title_display' => 'invisible',
-          '#default_value' => !empty($values['attribute']) ? $values['attribute'] : '',
+          '#default_value' => $values['attribute'],
           '#size' => 10,
           '#maxlength' => 1024,
         );

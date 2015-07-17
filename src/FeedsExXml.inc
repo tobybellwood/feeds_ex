@@ -61,17 +61,19 @@ class FeedsExXml extends FeedsExBase {
    * {@inheritdoc}
    */
   protected function executeContext(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
+    $context = $this->config['context']['value'];
     $state = $source->state(FEEDS_PARSE);
 
     if (!$state->total) {
-      $state->total = $this->xpath->evaluate('count(' . $this->config['context']['value'] . ')');
+      $state->total = $this->xpath->evaluate('count(' . $context . ')');
     }
 
     $start = (int) $state->pointer;
     $state->pointer = $start + $source->importer->getLimit();
 
     // A batched XPath expression.
-    $context_query = '(' . $this->config['context']['value'] . ")[position() > $start and position() <= {$state->pointer}]";
+    $context_query = "($context)[position() > $start and position() <= {$state->pointer}]";
+
     return $this->xpath->query($context_query);
   }
 
@@ -79,6 +81,7 @@ class FeedsExXml extends FeedsExBase {
    * {@inheritdoc}
    */
   protected function executeSourceExpression($machine_name, $expression, $row) {
+    $config = $this->config['sources'][$machine_name];
     $result = $this->xpath->evaluate($expression, $row);
 
     if (!$result instanceof DOMNodeList) {
@@ -89,12 +92,12 @@ class FeedsExXml extends FeedsExBase {
     }
 
     $return = array();
-    if (!empty($this->config['sources'][$machine_name]['inner'])) {
+    if (!empty($config['inner'])) {
       foreach ($result as $node) {
         $return[] = $this->getInnerXml($node);
       }
     }
-    elseif (!empty($this->config['sources'][$machine_name]['raw'])) {
+    elseif (!empty($config['raw'])) {
       foreach ($result as $node) {
         $return[] = $this->getRaw($node);
       }
@@ -116,6 +119,16 @@ class FeedsExXml extends FeedsExBase {
     return array(
       'use_tidy' => FALSE,
     ) + parent::configDefaults();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function sourceValueDefaults() {
+    return array(
+      'raw' => FALSE,
+      'inner' => FALSE,
+    ) + parent::sourceValueDefaults();
   }
 
   /**
@@ -154,7 +167,7 @@ class FeedsExXml extends FeedsExBase {
           '#type' => 'checkbox',
           '#title' => t('Raw value'),
           '#title_display' => 'invisible',
-          '#default_value' => (int) !empty($values['raw']),
+          '#default_value' => (bool) $values['raw'],
           '#id' => $id,
         );
 
@@ -163,7 +176,7 @@ class FeedsExXml extends FeedsExBase {
           '#type' => 'checkbox',
           '#title' => t('Inner XML'),
           '#title_display' => 'invisible',
-          '#default_value' => (int) !empty($values['inner']),
+          '#default_value' => (bool) $values['inner'],
           '#states' => array(
             'visible' => array('#' . $id => array('checked' => TRUE)),
           ),
@@ -212,7 +225,7 @@ class FeedsExXml extends FeedsExBase {
     // Remove values that are inner but not raw.
     foreach ($values['sources'] as $machine_name => $source) {
       if (!empty($source['inner']) && empty($source['raw'])) {
-        unset($values['sources'][$machine_name]['inner']);
+        $values['sources'][$machine_name]['inner'] = FALSE;
       }
     }
   }
