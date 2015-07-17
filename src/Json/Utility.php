@@ -117,7 +117,7 @@ class FeedsExJsonUtility {
    *   The root-relative path to the JSONPath include, or false on failure.
    */
   public static function jsonPathLibraryPath() {
-    $libraries_path = module_exists('libraries') ? libraries_get_path('jsonpath') : FALSE;
+    $libraries_path = module_exists('libraries') ? libraries_get_path($library) : FALSE;
     if ($libraries_path && is_dir($libraries_path)) {
       $path = $libraries_path;
     }
