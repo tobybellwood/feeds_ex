@@ -294,7 +294,7 @@ abstract class FeedsExBase extends FeedsParser {
 
       $result = $this->executeSourceExpression($machine_name, $expression, $row);
 
-      if (!empty($this->config['sources'][$machine_name]['debug'])) {
+      if (!empty($this->config['debug_mode']) && !empty($this->config['sources'][$machine_name]['debug'])) {
         $this->debug($result, $machine_name);
       }
 
