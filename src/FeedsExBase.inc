@@ -185,7 +185,7 @@ abstract class FeedsExBase extends FeedsParser {
     $result = new FeedsParserResult();
     // Set link.
     $fetcher_config = $source->getConfigFor($source->importer->fetcher);
-    $result->link = is_string($fetcher_config['source']) ? $fetcher_config['source'] : '';
+    $result->link = isset($fetcher_config['source']) && is_string($fetcher_config['source']) ? $fetcher_config['source'] : '';
 
     try {
       $this->setUp($source, $fetcher_result);
