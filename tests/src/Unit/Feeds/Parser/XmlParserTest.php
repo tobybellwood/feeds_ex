@@ -256,7 +256,7 @@ class XmlParserTest extends ParserTestBase {
   public function testValidateExpression() {
     // Invalid expression.
     $expression = ['!!'];
-    $this->assertSame('Invalid expression', $this->invokeMethod($this->parser, 'validateExpression', $expression));
+    $this->assertSame('Invalid expression', (string) $this->invokeMethod($this->parser, 'validateExpression', $expression));
 
     // Test that value was trimmed.
     $this->assertSame($expression[0], '!!', 'Value was trimmed.');
@@ -275,7 +275,7 @@ class XmlParserTest extends ParserTestBase {
     $this->parser->parse($this->feed, new RawFetcherResult(' '), $this->state);
     $messages = $this->parser->getMessenger()->getMessages();
     $this->assertSame(1, count($messages), 'The expected number of messages.');
-    $this->assertSame($messages[0]['message'], 'The feed is empty.', 'Message text is correct.');
+    $this->assertSame((string) $messages[0]['message'], 'The feed is empty.', 'Message text is correct.');
     $this->assertSame($messages[0]['type'], 'warning', 'Message type is warning.');
     $this->assertFalse($messages[0]['repeat'], 'Repeat is set to false.');
   }

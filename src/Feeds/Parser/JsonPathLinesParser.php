@@ -95,8 +95,8 @@ class JsonPathLinesParser extends JsonPathParser {
    * {@inheritdoc}
    */
   protected function executeSourceExpression($machine_name, $expression, $row) {
-    $store = new JsonStore($row);
-    $result = $store->get($expression);
+    $store = new JsonStore();
+    $result = $store->get($row, $expression);
 
     if (is_scalar($result)) {
       return $result;

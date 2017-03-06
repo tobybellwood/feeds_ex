@@ -311,7 +311,7 @@ class QueryPathXmlParserTest extends ParserTestBase {
   public function testValidateExpression() {
     // Invalid expression.
     $expression = ['!!'];
-    $this->assertSame('CSS selector is not well formed.', $this->invokeMethod($this->parser, 'validateExpression', $expression));
+    $this->assertSame('CSS selector is not well formed.', (string) $this->invokeMethod($this->parser, 'validateExpression', $expression));
 
     // Test that value was trimmed.
     $this->assertSame($expression[0], '!!', 'Value was trimmed.');

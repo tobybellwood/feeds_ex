@@ -8,6 +8,7 @@
 namespace Drupal\feeds_ex\Feeds\Parser;
 
 use \Exception;
+use \RuntimeException;
 use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Logger\RfcLogLevel;
@@ -28,7 +29,7 @@ use Drupal\feeds_ex\Messenger\MessengerInterface;
 /**
  * The Feeds extensible parser.
  */
-abstract class ParserBase extends ConfigurablePluginBase implements FeedPluginFormInterface, ParserInterface {
+abstract class ParserBase extends ConfigurablePluginBase implements ParserInterface {
 
   /**
    * The object used to display messages to the user.
@@ -209,9 +210,9 @@ abstract class ParserBase extends ConfigurablePluginBase implements FeedPluginFo
     $this->loadLibrary();
     $this->startErrorHandling();
     $result = new ParserResult();
-    // Set link.
-    $fetcher_config = $feed->getConfigurationFor($feed->importer->fetcher);
-    $result->link = is_string($fetcher_config['source']) ? $fetcher_config['source'] : '';
+    // @todo Set link?
+    // $fetcher_config = $feed->getConfigurationFor($feed->importer->fetcher);
+    // $result->link = is_string($fetcher_config['source']) ? $fetcher_config['source'] : '';
 
     try {
       $this->setUp($feed, $fetcher_result, $state);
@@ -426,6 +427,8 @@ abstract class ParserBase extends ConfigurablePluginBase implements FeedPluginFo
    * {@inheritdoc}
    */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
+    return [];
+
     $form = array(
       '#tree' => TRUE,
       '#theme' => 'feeds_ex_configuration_table',

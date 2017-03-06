@@ -33,8 +33,8 @@ class JsonPathParser extends ParserBase {
   protected function executeContext(FeedInterface $feed, FetcherResultInterface $fetcher_result, StateInterface $state) {
     $raw = $this->prepareRaw($fetcher_result);
     $parsed = JsonUtility::decodeJsonArray($raw);
-    $store = new JsonStore($raw);
-    $parsed = $store->get($this->configuration['context']['value']);
+    $store = new JsonStore();
+    $parsed = $store->get($raw, $this->configuration['context']['value']);
 
     if (!$state->total) {
       $state->total = count($parsed);
@@ -57,8 +57,8 @@ class JsonPathParser extends ParserBase {
    * {@inheritdoc}
    */
   protected function executeSourceExpression($machine_name, $expression, $row) {
-    $store = new JsonStore($row);
-    $result = $store->get($expression);
+    $store = new JsonStore();
+    $result = $store->get($row, $expression);
 
     if (is_scalar($result)) {
       return $result;

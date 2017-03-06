@@ -10,8 +10,8 @@
       "source": "http://cgit.drupalcode.org/feeds_ex"
     },
     "require": {
-      "mtdowling/jmespath.php": ">=2.0.0",
-      "peekmo/jsonpath": "dev-master",
-      "querypath/QueryPath": ">=3.0.0"
+      "mtdowling/jmespath.php": "2.*",
+      "peekmo/jsonpath": "1.*",
+      "querypath/QueryPath": "3.*"
     }
 }
