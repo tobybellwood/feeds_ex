@@ -108,7 +108,7 @@ class JsonPathParser extends ParserBase {
    */
   protected function loadLibrary() {
     if (!class_exists('Peekmo\JsonPath\JsonStore')) {
-      throw new RuntimeException(t('The JSONPath library is not installed.'));
+      throw new RuntimeException($this->t('The JSONPath library is not installed.'));
     }
   }
 

@@ -96,7 +96,7 @@ class JmesPathParser extends ParserBase {
     $parsed = JsonUtility::decodeJsonArray($raw);
     $parsed = $this->search($this->configuration['context']['value'], $parsed);
     if (!is_array($parsed)) {
-      throw new RuntimeException(t('The context expression must return an object or array.'));
+      throw new RuntimeException($this->t('The context expression must return an object or array.'));
     }
 
     if (!$state->total) {
@@ -185,7 +185,7 @@ class JmesPathParser extends ParserBase {
    */
   protected function loadLibrary() {
     if (!class_exists('JmesPath\AstRuntime')) {
-      throw new RuntimeException(t('The JMESPath library is not installed.'));
+      throw new RuntimeException($this->t('The JMESPath library is not installed.'));
     }
   }
 

@@ -133,7 +133,7 @@ class QueryPathXmlParser extends XmlParser {
    */
   protected function configFormTableHeader() {
     return array(
-      'attribute' => t('Attribute'),
+      'attribute' => $this->t('Attribute'),
     ) + parent::configFormTableHeader();
   }
 
@@ -145,7 +145,7 @@ class QueryPathXmlParser extends XmlParser {
       case 'attribute':
         return [
           '#type' => 'textfield',
-          '#title' => t('Attribute name'),
+          '#title' => $this->t('Attribute name'),
           '#title_display' => 'invisible',
           '#default_value' => !empty($values['attribute']) ? $values['attribute'] : '',
           '#size' => 10,
@@ -162,7 +162,7 @@ class QueryPathXmlParser extends XmlParser {
    */
   protected function loadLibrary() {
     if (!class_exists('QueryPath')) {
-      throw new RuntimeException(t('The QueryPath library is not installed.'));
+      throw new RuntimeException($this->t('The QueryPath library is not installed.'));
     }
   }
 

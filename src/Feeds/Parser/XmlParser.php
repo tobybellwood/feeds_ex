@@ -145,8 +145,8 @@ class XmlParser extends ParserBase {
     if (extension_loaded('tidy')) {
       $form['use_tidy'] = array(
         '#type' => 'checkbox',
-        '#title' => t('Use tidy'),
-        '#description' => t('The <a href="http://php.net/manual/en/book.tidy.php">Tidy PHP</a> extension has been detected. Select this to clean the markup before parsing.'),
+        '#title' => $this->t('Use tidy'),
+        '#description' => $this->t('The <a href="http://php.net/manual/en/book.tidy.php">Tidy PHP</a> extension has been detected. Select this to clean the markup before parsing.'),
         '#default_value' => $this->configuration['use_tidy'],
       );
     }
@@ -158,7 +158,7 @@ class XmlParser extends ParserBase {
    * {@inheritdoc}
    */
   protected function configFormTableHeader() {
-    return array('raw' => t('Raw'), 'inner' => t('Inner XML'));
+    return array('raw' => $this->t('Raw'), 'inner' => $this->t('Inner XML'));
   }
 
   /**
@@ -171,7 +171,7 @@ class XmlParser extends ParserBase {
       case 'raw':
         return array(
           '#type' => 'checkbox',
-          '#title' => t('Raw value'),
+          '#title' => $this->t('Raw value'),
           '#title_display' => 'invisible',
           '#default_value' => (int) !empty($values['raw']),
           '#id' => $id,
@@ -180,7 +180,7 @@ class XmlParser extends ParserBase {
       case 'inner':
         return array(
           '#type' => 'checkbox',
-          '#title' => t('Inner XML'),
+          '#title' => $this->t('Inner XML'),
           '#title_display' => 'invisible',
           '#default_value' => (int) !empty($values['inner']),
           '#states' => array(

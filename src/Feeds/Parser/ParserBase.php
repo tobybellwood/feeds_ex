@@ -221,7 +221,7 @@ abstract class ParserBase extends ConfigurablePluginBase implements ParserInterf
     }
     catch (EmptyFeedException $e) {
       // The feed is empty.
-      $this->getMessenger()->setMessage(t('The feed is empty.'), 'warning', FALSE);
+      $this->getMessenger()->setMessage($this->t('The feed is empty.'), 'warning', FALSE);
     }
     catch (Exception $exception) {
       // Do nothing. Store for later.
@@ -439,11 +439,11 @@ abstract class ParserBase extends ConfigurablePluginBase implements ParserInterf
     if ($this->hasConfigurableContext()) {
       $form['context']['name'] = array(
         '#type' => 'markup',
-        '#markup' => t('Context'),
+        '#markup' => $this->t('Context'),
       );
       $form['context']['value'] = array(
         '#type' => 'textfield',
-        '#title' => t('Context value'),
+        '#title' => $this->t('Context value'),
         '#title_display' => 'invisible',
         '#default_value' => $this->configuration['context']['value'],
         '#size' => 50,
@@ -463,19 +463,19 @@ abstract class ParserBase extends ConfigurablePluginBase implements ParserInterf
     foreach ($this->configuration['sources'] as $machine_name => $source) {
       $form['sources'][$machine_name]['name'] = array(
         '#type' => 'textfield',
-        '#title' => t('Name'),
+        '#title' => $this->t('Name'),
         '#title_display' => 'invisible',
         '#default_value' => $source['name'],
         '#size' => 20,
       );
       $form['sources'][$machine_name]['machine_name'] = array(
-        '#title' => t('Machine name'),
+        '#title' => $this->t('Machine name'),
         '#title_display' => 'invisible',
         '#markup' => $machine_name,
       );
       $form['sources'][$machine_name]['value'] = array(
         '#type' => 'textfield',
-        '#title' => t('Value'),
+        '#title' => $this->t('Value'),
         '#title_display' => 'invisible',
         '#default_value' => $source['value'],
         '#size' => 50,
@@ -488,13 +488,13 @@ abstract class ParserBase extends ConfigurablePluginBase implements ParserInterf
 
       $form['sources'][$machine_name]['debug'] = array(
         '#type' => 'checkbox',
-        '#title' => t('Debug'),
+        '#title' => $this->t('Debug'),
         '#title_display' => 'invisible',
         '#default_value' => $source['debug'],
       );
       $form['sources'][$machine_name]['remove'] = array(
         '#type' => 'checkbox',
-        '#title' => t('Remove'),
+        '#title' => $this->t('Remove'),
         '#title_display' => 'invisible',
       );
       $form['sources'][$machine_name]['weight'] = array(
@@ -508,13 +508,13 @@ abstract class ParserBase extends ConfigurablePluginBase implements ParserInterf
 
     $form['add']['name'] = array(
       '#type' => 'textfield',
-      '#title' => t('Add new source'),
+      '#title' => $this->t('Add new source'),
       '#id' => 'edit-sources-add-name',
-      '#description' => t('Name'),
+      '#description' => $this->t('Name'),
       '#size' => 20,
     );
     $form['add']['machine_name'] = array(
-      '#title' => t('Machine name'),
+      '#title' => $this->t('Machine name'),
       '#title_display' => 'invisible',
       '#type' => 'machine_name',
       '#machine_name' => array(
@@ -529,11 +529,11 @@ abstract class ParserBase extends ConfigurablePluginBase implements ParserInterf
       '#required' => FALSE,
       '#maxlength' => 32,
       '#size' => 15,
-      '#description' => t('A unique machine-readable name containing letters, numbers, and underscores.'),
+      '#description' => $this->t('A unique machine-readable name containing letters, numbers, and underscores.'),
     );
     $form['add']['value'] = array(
       '#type' => 'textfield',
-      '#description' => t('Value'),
+      '#description' => $this->t('Value'),
       '#title' => '&nbsp;',
       '#size' => 50,
       '#maxlength' => 1024,
@@ -543,7 +543,7 @@ abstract class ParserBase extends ConfigurablePluginBase implements ParserInterf
     }
     $form['add']['debug'] = array(
       '#type' => 'checkbox',
-      '#title' => t('Debug'),
+      '#title' => $this->t('Debug'),
       '#title_display' => 'invisible',
     );
     $form['add']['weight'] = array(
@@ -554,14 +554,14 @@ abstract class ParserBase extends ConfigurablePluginBase implements ParserInterf
     );
     $form['display_errors'] = array(
       '#type' => 'checkbox',
-      '#title' => t('Display errors'),
-      '#description' => t('Display all error messages after parsing. Fatal errors will always be displayed.'),
+      '#title' => $this->t('Display errors'),
+      '#description' => $this->t('Display all error messages after parsing. Fatal errors will always be displayed.'),
       '#default_value' => $this->configuration['display_errors'],
     );
     $form['debug_mode'] = array(
       '#type' => 'checkbox',
-      '#title' => t('Enable debug mode'),
-      '#description' => t('Displays the configuration form on the feed source page to ease figuring out the expressions. Any values entered on that page will be saved here.'),
+      '#title' => $this->t('Enable debug mode'),
+      '#description' => $this->t('Displays the configuration form on the feed source page to ease figuring out the expressions. Any values entered on that page will be saved here.'),
       '#default_value' => $this->configuration['debug_mode'],
     );
 
@@ -714,15 +714,15 @@ abstract class ParserBase extends ConfigurablePluginBase implements ParserInterf
    */
   protected function getFormHeader() {
     $header = array(
-      'name' => t('Name'),
-      'machine_name' => t('Machine name'),
-      'value' => t('Value'),
+      'name' => $this->t('Name'),
+      'machine_name' => $this->t('Machine name'),
+      'value' => $this->t('Value'),
     );
     $header += $this->configFormTableHeader();
     $header += array(
-      'debug' => t('Debug'),
-      'remove' => t('Remove'),
-      'weight' => t('Weight'),
+      'debug' => $this->t('Debug'),
+      'remove' => $this->t('Remove'),
+      'weight' => $this->t('Weight'),
     );
 
     return $header;
