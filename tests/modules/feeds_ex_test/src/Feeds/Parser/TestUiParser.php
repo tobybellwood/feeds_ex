@@ -1,14 +1,10 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\feeds_ex_test\Feeds\Parser\TestUiParser.
- */
-
 namespace Drupal\feeds_ex_test\Feeds\Parser;
 
 use Drupal\feeds\FeedInterface;
 use Drupal\feeds\Result\FetcherResultInterface;
+use Drupal\feeds\StateInterface;
 use Drupal\feeds_ex\Feeds\Parser\ParserBase;
 
 /**
@@ -26,7 +22,7 @@ class TestUiParser extends ParserBase {
    * {@inheritdoc}
    */
   protected function executeContext(FeedInterface $feed, FetcherResultInterface $fetcher_result, StateInterface $state) {
-    return array();
+    return [];
   }
 
   /**
@@ -45,7 +41,7 @@ class TestUiParser extends ParserBase {
    * {@inheritdoc}
    */
   protected function getErrors() {
-    return array();
+    return [];
   }
 
 }
