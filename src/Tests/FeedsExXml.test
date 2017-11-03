@@ -38,12 +38,7 @@ class FeedsExXmlUnitTests extends FeedsExUnitTestBase {
    */
   public function testSimpleParsing() {
     $parser = $this->getParserInstance();
-    $contents = file_get_contents($this->moduleDir . '/tests/resources/test.xml');
-
-    // Implicitly test that invalid characters are ignored and null bytes are
-    // stripped.
-    $contents = str_replace('I am a description', chr(0) . 'I am a description' . chr(11), $contents);
-    $fetcher_result = new FeedsFetcherResult($contents);
+    $fetcher_result = new FeedsFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test.xml'));
 
     $parser->setConfig(array(
       'context' => array(
@@ -291,22 +286,13 @@ class FeedsExXmlUnitTests extends FeedsExUnitTestBase {
   }
 
   /**
-   * Tests FeedsExXmlUtility::decodeNamedHtmlEntities().
-   */
-  public function testDecodeNamedHtmlEntities() {
-    $xml = '<root>&Atilde;&amp;&lt;&gt;</root>';
-    $xml = FeedsExXmlUtility::decodeNamedHtmlEntities($xml);
-    $this->assertEqual('<root>Ã&amp;&lt;&gt;</root>', $xml);
-  }
-
-  /**
    * Returns a new instance of the parser.
    *
    * @return FeedsExXml
    *   A parser instance.
    */
   protected function getParserInstance() {
-    $parser = FeedsPlugin::instance('FeedsExXml', strtolower($this->randomName()));
+    $parser = FeedsConfigurable::instance('FeedsExXml', strtolower($this->randomName()));
     $parser->setMessenger(new FeedsExTestMessenger());
     return $parser;
   }

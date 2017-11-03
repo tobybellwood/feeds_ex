@@ -48,7 +48,7 @@ class FeedsExJsonPathLinesUnitTests extends FeedsExUnitTestBase {
     $this->downloadJsonPath();
 
     $this->source = $this->getMockFeedsSource();
-    $this->parser = FeedsPlugin::instance('FeedsExJsonPathLines', strtolower($this->randomName()));
+    $this->parser = FeedsConfigurable::instance('FeedsExJsonPathLines', strtolower($this->randomName()));
     $this->parser->setMessenger(new FeedsExTestMessenger());
     $this->parser->addConfig(array(
       'sources' => array(

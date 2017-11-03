@@ -239,7 +239,7 @@ class FeedsExHtmlUnitTests extends FeedsExUnitTestBase {
    *   A parser instance.
    */
   protected function getParserInstance() {
-    $parser = FeedsPlugin::instance('FeedsExHtml', strtolower($this->randomName()));
+    $parser = FeedsConfigurable::instance('FeedsExHtml', strtolower($this->randomName()));
     $parser->setMessenger(new FeedsExTestMessenger());
     return $parser;
   }

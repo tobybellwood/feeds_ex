@@ -33,7 +33,7 @@ abstract class FeedsExUnitTestBase extends TUnit {
     require_once $feeds . '/plugins/FeedsProcessor.inc';
     require_once $feeds . '/plugins/FeedsNodeProcessor.inc';
 
-    // This is our test Feeds source.
+    // This is out test feed source.
     require_once dirname(__FILE__) . '/FeedsExTestFeedsSource.inc';
 
     drupal_load('module', 'feeds_ex');
@@ -128,7 +128,7 @@ abstract class FeedsExUnitTestBase extends TUnit {
    *   The number of items that should exist.
    */
   protected function assertParserResultItemCount(FeedsParserResult $result, $count) {
-    $this->assertIdentical(count($result->items), (int) $count, format_string('@count items parsed.', array('@count' => count($result->items))));
+    $this->assertEqual(count($result->items), $count, format_string('@count items parsed.', array('@count' => count($result->items))));
   }
 
   /**

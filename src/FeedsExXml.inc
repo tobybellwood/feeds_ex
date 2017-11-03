@@ -218,6 +218,13 @@ class FeedsExXml extends FeedsExBase {
   }
 
   /**
+   * {@inheritdoc}
+   */
+  protected function convertEncoding($data, $encoding = 'UTF-8') {
+    return FeedsExXmlUtility::convertXmlEncoding($data, $this->config['source_encoding']);
+  }
+
+  /**
    * Prepares the DOM document.
    *
    * @param FeedsSource $source
@@ -237,9 +244,6 @@ class FeedsExXml extends FeedsExBase {
     if ($this->config['use_tidy'] && extension_loaded('tidy')) {
       $raw = tidy_repair_string($raw, $this->getTidyConfig(), 'utf8');
     }
-
-    $raw = FeedsExXmlUtility::decodeNamedHtmlEntities($raw);
-
     return FeedsExXmlUtility::createXmlDocument($raw);
   }
 
@@ -352,8 +356,6 @@ class FeedsExXml extends FeedsExBase {
   protected function getTidyConfig() {
     return array(
       'input-xml' => TRUE,
-      'output-xml' => TRUE,
-      'add-xml-decl' => TRUE,
       'wrap' => 0,
       'tidy-mark' => FALSE,
     );

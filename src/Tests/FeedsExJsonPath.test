@@ -115,30 +115,6 @@ class FeedsExJsonPathUnitTests extends FeedsExUnitTestBase {
   }
 
   /**
-   * Tests parsing with a root object.
-   */
-  public function testRootContext() {
-    $parser = $this->getParserInstance();
-    $fetcher_result = new FeedsFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test.json'));
-
-    $parser->setConfig(array(
-      'context' => array(
-        'value' => '.',
-      ),
-      'sources' => array(
-        'title' => array(
-          'name' => 'Title',
-          'value' => 'items[0].title',
-        ),
-      ),
-    ));
-
-    $result = $parser->parse($this->source, $fetcher_result);
-    $this->assertParserResultItemCount($result, 1);
-    $this->assertEqual('I am a title0', $result->items[0]['title']);
-  }
-
-  /**
    * Tests JSONPath validation.
    *
    * @todo Do real validation.
@@ -196,7 +172,7 @@ class FeedsExJsonPathUnitTests extends FeedsExUnitTestBase {
    *   A parser instance.
    */
   protected function getParserInstance() {
-    $parser = FeedsPlugin::instance('FeedsExJsonPath', strtolower($this->randomName()));
+    $parser = FeedsConfigurable::instance('FeedsExJsonPath', strtolower($this->randomName()));
     $parser->setMessenger(new FeedsExTestMessenger());
     return $parser;
   }

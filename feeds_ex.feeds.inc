@@ -47,7 +47,7 @@ function feeds_ex_feeds_plugins() {
     ),
   );
 
-  if (FeedsExJsonUtility::jmesPathParserInstalled()) {
+  if (feeds_ex_library_path('jmespath.php', 'vendor/autoload.php')) {
     $plugins['FeedsExJmesPath'] = array(
       'name' => 'JSON JMESPath parser',
       'description' => 'Parse JSON with JMESPath.',
@@ -93,7 +93,7 @@ function feeds_ex_feeds_plugins() {
     );
   }
 
-  if (FeedsExJsonUtility::jsonPathParserInstalled()) {
+  if (feeds_ex_jsonpath_library_path()) {
     $plugins['FeedsExJsonPath'] = array(
       'name' => 'JSON JSONPath parser',
       'description' => 'Parse JSON with JSONPath.',
