@@ -83,19 +83,19 @@ class JsonPathParser extends ParserBase {
    */
   protected function getErrors() {
     if (!function_exists('json_last_error')) {
-      return array();
+      return [];
     }
 
     if (!$error = json_last_error()) {
-      return array();
+      return [];
     }
 
-    $message = array(
+    $message = [
       'message' => JsonUtility::translateError($error),
-      'variables' => array(),
+      'variables' => [],
       'severity' => RfcLogLevel::ERROR,
-    );
-    return array($message);
+    ];
+    return [$message];
   }
 
   /**

@@ -42,7 +42,7 @@ abstract class UnitTestBase extends FeedsUnitTestCase {
    * @return mixed
    *   Whatever the method returns.
    */
-  protected function invokeMethod($object, $method, array $arguments = array()) {
+  protected function invokeMethod($object, $method, array $arguments = []) {
     $reflector = new ReflectionMethod($object, $method);
     $reflector->setAccessible(TRUE);
     return $reflector->invokeArgs($object, $arguments);

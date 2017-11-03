@@ -52,7 +52,7 @@ class HtmlParser extends XmlParser {
    * {@inheritdoc}
    */
   protected function getTidyConfig() {
-    return array(
+    return [
       'merge-divs' => FALSE,
       'merge-spans' => FALSE,
       'join-styles' => FALSE,
@@ -61,7 +61,7 @@ class HtmlParser extends XmlParser {
       'tidy-mark' => FALSE,
       'escape-cdata' => TRUE,
       'word-2000' => TRUE,
-    );
+    ];
   }
 
 }

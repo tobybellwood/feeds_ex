@@ -12,7 +12,7 @@ class TestMessenger implements MessengerInterface {
    *
    * @var array
    */
-  protected $messages = array();
+  protected $messages = [];
 
   /**
    * {@inheritdoc}

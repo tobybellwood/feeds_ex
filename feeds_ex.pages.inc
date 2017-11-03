@@ -12,7 +12,7 @@ use Drupal\Component\Utility\Unicode;
  * Autocomplete callback for encodings.
  */
 function feeds_ex_encoding_autocomplete($string = '') {
-  $matches = array();
+  $matches = [];
 
   if (!strlen($string) || Unicode::getStatus() != Unicode::STATUS_MULTIBYTE) {
     drupal_json_output($matches);
@@ -26,7 +26,7 @@ function feeds_ex_encoding_autocomplete($string = '') {
   // Filter out items already added. Do it case insensitively without changing
   // the suggested case.
   $prefix = '';
-  $encodings = array();
+  $encodings = [];
   foreach (mb_list_encodings() as $suggestion) {
     if (in_array(Unicode::strtolower($suggestion), $lower_added)) {
       $prefix .= $suggestion . ', ';

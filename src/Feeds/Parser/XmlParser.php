@@ -102,7 +102,7 @@ class XmlParser extends ParserBase {
       return;
     }
 
-    $return = array();
+    $return = [];
     if (!empty($this->configuration['sources'][$machine_name]['inner'])) {
       foreach ($result as $node) {
         $return[] = $this->getInnerXml($node);
@@ -138,12 +138,12 @@ class XmlParser extends ParserBase {
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
     $form = parent::buildConfigurationForm($form, $form_state);
     if (extension_loaded('tidy')) {
-      $form['use_tidy'] = array(
+      $form['use_tidy'] = [
         '#type' => 'checkbox',
         '#title' => $this->t('Use tidy'),
         '#description' => $this->t('The <a href="http://php.net/manual/en/book.tidy.php">Tidy PHP</a> extension has been detected. Select this to clean the markup before parsing.'),
         '#default_value' => $this->configuration['use_tidy'],
-      );
+      ];
     }
 
     return $form;
@@ -153,7 +153,7 @@ class XmlParser extends ParserBase {
    * {@inheritdoc}
    */
   protected function configFormTableHeader() {
-    return array('raw' => $this->t('Raw'), 'inner' => $this->t('Inner XML'));
+    return ['raw' => $this->t('Raw'), 'inner' => $this->t('Inner XML')];
   }
 
   /**
@@ -164,24 +164,24 @@ class XmlParser extends ParserBase {
 
     switch ($column) {
       case 'raw':
-        return array(
+        return [
           '#type' => 'checkbox',
           '#title' => $this->t('Raw value'),
           '#title_display' => 'invisible',
           '#default_value' => (int) !empty($values['raw']),
           '#id' => $id,
-        );
+        ];
 
       case 'inner':
-        return array(
+        return [
           '#type' => 'checkbox',
           '#title' => $this->t('Inner XML'),
           '#title_display' => 'invisible',
           '#default_value' => (int) !empty($values['inner']),
-          '#states' => array(
-            'visible' => array('#' . $id => array('checked' => TRUE)),
-          ),
-        );
+          '#states' => [
+            'visible' => ['#' . $id => ['checked' => TRUE]],
+          ],
+        ];
     }
   }
 
@@ -318,7 +318,7 @@ class XmlParser extends ParserBase {
    * {@inheritdoc}
    */
   protected function getErrors() {
-    $return = array();
+    $return = [];
     foreach (libxml_get_errors() as $error) {
 
       // Translate error values.
@@ -336,15 +336,15 @@ class XmlParser extends ParserBase {
           break;
       }
 
-      $return[] = array(
+      $return[] = [
         'message' => '%error on line %num. Error code: %code',
-        'variables' => array(
+        'variables' => [
           '%error' => trim($error->message),
           '%num' => $error->line,
           '%code' => $error->code,
-        ),
+        ],
         'severity' => $severity,
-      );
+      ];
     }
 
     return $return;
@@ -361,11 +361,11 @@ class XmlParser extends ParserBase {
    *   The configuration array.
    */
   protected function getTidyConfig() {
-    return array(
+    return [
       'input-xml' => TRUE,
       'wrap' => 0,
       'tidy-mark' => FALSE,
-    );
+    ];
   }
 
 }

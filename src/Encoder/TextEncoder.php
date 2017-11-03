@@ -22,7 +22,7 @@ class TextEncoder implements EncoderInterface {
    *
    * @param array
    */
-  protected static $utf8Compatible = array('utf-8', 'utf8', 'us-ascii', 'ascii');
+  protected static $utf8Compatible = ['utf-8', 'utf8', 'us-ascii', 'ascii'];
 
   /**
    * The list of encodings to search for.
@@ -57,15 +57,15 @@ class TextEncoder implements EncoderInterface {
       return $form;
     }
 
-    $args = array('%encodings' => implode(', ', mb_detect_order()));
-    $form['source_encoding'] = array(
+    $args = ['%encodings' => implode(', ', mb_detect_order())];
+    $form['source_encoding'] = [
       '#type' => 'textfield',
       '#title' => t('Source encoding'),
       '#description' => t('The possible encodings of the source files. auto: %encodings', $args),
       '#default_value' => implode(', ', $this->encodingList),
       '#autocomplete_path' => '_feeds_ex/encoding_autocomplete',
       '#maxlength' => 1024,
-    );
+    ];
     return $form;
   }
 
@@ -80,7 +80,7 @@ class TextEncoder implements EncoderInterface {
     // mb_list_encodings(), but maintain user-defined order.
     $encodings = array_map('strtolower', array_map('trim', explode(',', $values['source_encoding'])));
 
-    $values['source_encoding'] = array();
+    $values['source_encoding'] = [];
     foreach (mb_list_encodings() as $encoding) {
       // Maintain order.
       $pos = array_search(strtolower($encoding), $encodings);

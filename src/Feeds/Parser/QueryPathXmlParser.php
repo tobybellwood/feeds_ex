@@ -127,9 +127,9 @@ class QueryPathXmlParser extends XmlParser {
    * {@inheritdoc}
    */
   protected function configFormTableHeader() {
-    return array(
+    return [
       'attribute' => $this->t('Attribute'),
-    ) + parent::configFormTableHeader();
+    ] + parent::configFormTableHeader();
   }
 
   /**

@@ -176,7 +176,7 @@ abstract class ParserBase extends ConfigurablePluginBase implements ParserInterf
    *   A list of header names keyed by the form keys.
    */
   protected function configFormTableHeader() {
-    return array();
+    return [];
   }
 
   /**
@@ -195,7 +195,7 @@ abstract class ParserBase extends ConfigurablePluginBase implements ParserInterf
    *   A single form element.
    */
   protected function configFormTableColumn(FormStateInterface $form_state, array $values, $column, $machine_name) {
-    return array();
+    return [];
   }
 
   /**
@@ -267,7 +267,7 @@ abstract class ParserBase extends ConfigurablePluginBase implements ParserInterf
    *   A map of machine name to expression.
    */
   protected function prepareExpressions() {
-    $expressions = array();
+    $expressions = [];
     foreach ($this->configuration['sources'] as $machine_name => $source) {
       if (strlen($source['value'])) {
         $expressions[$machine_name] = $source['value'];
@@ -287,7 +287,7 @@ abstract class ParserBase extends ConfigurablePluginBase implements ParserInterf
    *   A map of machine name to variable name.
    */
   protected function prepareVariables(array $expressions) {
-    $variable_map = array();
+    $variable_map = [];
     foreach ($expressions as $machine_name => $expression) {
       $variable_map[$machine_name] = '$' . $machine_name;
     }
@@ -309,7 +309,7 @@ abstract class ParserBase extends ConfigurablePluginBase implements ParserInterf
    */
   protected function executeSources($row, array $expressions, array $variable_map) {
     $item = new DynamicItem();
-    $variables = array();
+    $variables = [];
 
     foreach ($expressions as $machine_name => $expression) {
       // Variable substitution.
@@ -387,11 +387,11 @@ abstract class ParserBase extends ConfigurablePluginBase implements ParserInterf
     }
 
     $output = '<strong>' . $name . ':</strong>';
-    $data = is_array($data) ? $data : array($data);
+    $data = is_array($data) ? $data : [$data];
     foreach ($data as $key => $value) {
       $data[$key] = SafeMarkup::checkPlain($value);
     }
-    $output .= _theme('item_list', array('items' => $data));
+    $output .= _theme('item_list', ['items' => $data]);
     $this->getMessenger()->setMessage($output);
   }
 
@@ -424,19 +424,19 @@ abstract class ParserBase extends ConfigurablePluginBase implements ParserInterf
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
     return [];
 
-    $form = array(
+    $form = [
       '#tree' => TRUE,
       '#theme' => 'feeds_ex_configuration_table',
       '#prefix' => '<div id="feeds-ex-configuration-wrapper">',
       '#suffix' => '</div>',
-    );
+    ];
 
     if ($this->hasConfigurableContext()) {
-      $form['context']['name'] = array(
+      $form['context']['name'] = [
         '#type' => 'markup',
         '#markup' => $this->t('Context'),
-      );
-      $form['context']['value'] = array(
+      ];
+      $form['context']['value'] = [
         '#type' => 'textfield',
         '#title' => $this->t('Context value'),
         '#title_display' => 'invisible',
@@ -445,79 +445,79 @@ abstract class ParserBase extends ConfigurablePluginBase implements ParserInterf
         '#required' => TRUE,
         // We're hiding the title, so add a little hint.
         '#description' => '<span class="form-required">*</span>',
-        '#attributes' => array('class' => array('feeds-ex-context-value')),
+        '#attributes' => ['class' => ['feeds-ex-context-value']],
         '#maxlength' => 1024,
-      );
+      ];
     }
 
-    $form['sources'] = array(
+    $form['sources'] = [
       '#id' => 'feeds-ex-source-table',
-    );
+    ];
 
     $max_weight = 0;
     foreach ($this->configuration['sources'] as $machine_name => $source) {
-      $form['sources'][$machine_name]['name'] = array(
+      $form['sources'][$machine_name]['name'] = [
         '#type' => 'textfield',
         '#title' => $this->t('Name'),
         '#title_display' => 'invisible',
         '#default_value' => $source['name'],
         '#size' => 20,
-      );
-      $form['sources'][$machine_name]['machine_name'] = array(
+      ];
+      $form['sources'][$machine_name]['machine_name'] = [
         '#title' => $this->t('Machine name'),
         '#title_display' => 'invisible',
         '#markup' => $machine_name,
-      );
-      $form['sources'][$machine_name]['value'] = array(
+      ];
+      $form['sources'][$machine_name]['value'] = [
         '#type' => 'textfield',
         '#title' => $this->t('Value'),
         '#title_display' => 'invisible',
         '#default_value' => $source['value'],
         '#size' => 50,
         '#maxlength' => 1024,
-      );
+      ];
 
       foreach ($this->configFormTableHeader() as $column => $name) {
         $form['sources'][$machine_name][$column] = $this->configFormTableColumn($form_state, $source, $column, $machine_name);
       }
 
-      $form['sources'][$machine_name]['debug'] = array(
+      $form['sources'][$machine_name]['debug'] = [
         '#type' => 'checkbox',
         '#title' => $this->t('Debug'),
         '#title_display' => 'invisible',
         '#default_value' => $source['debug'],
-      );
-      $form['sources'][$machine_name]['remove'] = array(
+      ];
+      $form['sources'][$machine_name]['remove'] = [
         '#type' => 'checkbox',
         '#title' => $this->t('Remove'),
         '#title_display' => 'invisible',
-      );
-      $form['sources'][$machine_name]['weight'] = array(
+      ];
+      $form['sources'][$machine_name]['weight'] = [
         '#type' => 'textfield',
         '#default_value' => $source['weight'],
         '#size' => 3,
-        '#attributes' => array('class' => array('feeds-ex-source-weight')),
-      );
+        '#attributes' => ['class' => ['feeds-ex-source-weight']],
+      ];
       $max_weight = $source['weight'];
     }
 
-    $form['add']['name'] = array(
+    $form['add']['name'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Add new source'),
       '#id' => 'edit-sources-add-name',
       '#description' => $this->t('Name'),
       '#size' => 20,
-    );
-    $form['add']['machine_name'] = array(
+    ];
+    $form['add']['machine_name'] = [
       '#title' => $this->t('Machine name'),
       '#title_display' => 'invisible',
       '#type' => 'machine_name',
-      '#machine_name' => array(
+      '#machine_name' => [
         'exists' => 'feeds_ex_source_exists',
-        'source' => array('add', 'name'),
+        'source' => ['add', 'name'],
         'standalone' => TRUE,
         'label' => '',
-      ),
+      ],
       '#field_prefix' => '<span dir="ltr">',
       '#field_suffix' => '</span>&lrm;',
       '#feeds_importer' => $this->id,
@@ -525,49 +525,49 @@ abstract class ParserBase extends ConfigurablePluginBase implements ParserInterf
       '#maxlength' => 32,
       '#size' => 15,
       '#description' => $this->t('A unique machine-readable name containing letters, numbers, and underscores.'),
-    );
-    $form['add']['value'] = array(
+    ];
+    $form['add']['value'] = [
       '#type' => 'textfield',
       '#description' => $this->t('Value'),
       '#title' => '&nbsp;',
       '#size' => 50,
       '#maxlength' => 1024,
-    );
+    ];
     foreach ($this->configFormTableHeader() as $column => $name) {
-      $form['add'][$column] = $this->configFormTableColumn($form_state, array(), $column, '');
+      $form['add'][$column] = $this->configFormTableColumn($form_state, [], $column, '');
     }
-    $form['add']['debug'] = array(
+    $form['add']['debug'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Debug'),
       '#title_display' => 'invisible',
-    );
-    $form['add']['weight'] = array(
+    ];
+    $form['add']['weight'] = [
       '#type' => 'textfield',
       '#default_value' => ++$max_weight,
       '#size' => 3,
-      '#attributes' => array('class' => array('feeds-ex-source-weight')),
-    );
-    $form['display_errors'] = array(
+      '#attributes' => ['class' => ['feeds-ex-source-weight']],
+    ];
+    $form['display_errors'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Display errors'),
       '#description' => $this->t('Display all error messages after parsing. Fatal errors will always be displayed.'),
       '#default_value' => $this->configuration['display_errors'],
-    );
-    $form['debug_mode'] = array(
+    ];
+    $form['debug_mode'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Enable debug mode'),
       '#description' => $this->t('Displays the configuration form on the feed source page to ease figuring out the expressions. Any values entered on that page will be saved here.'),
       '#default_value' => $this->configuration['debug_mode'],
-    );
+    ];
 
     $form = $this->getEncoder()->buildConfigurationForm($form, $form_state);
 
-    $form['#attached']['drupal_add_tabledrag'][] = array(
+    $form['#attached']['drupal_add_tabledrag'][] = [
       'feeds-ex-source-table',
       'order',
       'sibling',
       'feeds-ex-source-weight',
-    );
+    ];
     $form['#attached']['css'][] = drupal_get_path('module', 'feeds_ex') . '/feeds_ex.css';
     $form['#header'] = $this->getFormHeader();
 
@@ -627,7 +627,7 @@ abstract class ParserBase extends ConfigurablePluginBase implements ParserInterf
     $columns = array_keys($columns);
 
     foreach ($values['sources'] as $machine_name => $source) {
-      $new_value = array();
+      $new_value = [];
       foreach ($columns as $column) {
         $new_value[$column] = $source[$column];
       }
@@ -652,7 +652,7 @@ abstract class ParserBase extends ConfigurablePluginBase implements ParserInterf
    * {@inheritdoc}
    */
   public function sourceDefaults() {
-    return array();
+    return [];
   }
 
   /**
@@ -660,16 +660,16 @@ abstract class ParserBase extends ConfigurablePluginBase implements ParserInterf
    */
   public function buildFeedForm(array $form, FormStateInterface $form_state, FeedInterface $feed) {
     if (!$this->hasSourceConfig()) {
-      return array();
+      return [];
     }
 
     $form = $this->buildConfigurationForm($form, $form_state);
-    $form['add']['machine_name']['#machine_name']['source'] = array(
+    $form['add']['machine_name']['#machine_name']['source'] = [
       'feeds',
       get_class($this),
       'add',
       'name',
-    );
+    ];
 
     return $form;
   }
@@ -686,7 +686,7 @@ abstract class ParserBase extends ConfigurablePluginBase implements ParserInterf
    */
   public function sourceSave(FeedInterface $feed) {
     $config = $feed->getConfigurationFor($this);
-    $feed->setConfigFor($this, array());
+    $feed->setConfigFor($this, []);
 
     if ($this->hasSourceConfig() && $config) {
       $this->setConfig($config);
@@ -708,17 +708,17 @@ abstract class ParserBase extends ConfigurablePluginBase implements ParserInterf
    *   The header array.
    */
   protected function getFormHeader() {
-    $header = array(
+    $header = [
       'name' => $this->t('Name'),
       'machine_name' => $this->t('Machine name'),
       'value' => $this->t('Value'),
-    );
+    ];
     $header += $this->configFormTableHeader();
-    $header += array(
+    $header += [
       'debug' => $this->t('Debug'),
       'remove' => $this->t('Remove'),
       'weight' => $this->t('Weight'),
-    );
+    ];
 
     return $header;
   }

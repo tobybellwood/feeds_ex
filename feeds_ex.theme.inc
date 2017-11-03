@@ -11,11 +11,11 @@
 function theme_feeds_ex_configuration_table(array $variables) {
   $element = $variables['element'];
 
-  $rows = array();
+  $rows = [];
 
   // Render the context at the top. Context is optional.
   if (!empty($element['context'])) {
-    $context_row = array();
+    $context_row = [];
     foreach (array_keys($element['#header']) as $column) {
       $context_row[] = drupal_render($element['context'][$column]);
     }
@@ -25,29 +25,29 @@ function theme_feeds_ex_configuration_table(array $variables) {
   // Render the sources.
   foreach (\Drupal\Core\Render\Element::children($element['sources']) as $source_key) {
     $source = $element['sources'][$source_key];
-    $row = array();
+    $row = [];
     foreach (array_keys($element['#header']) as $column) {
       $row[] = drupal_render($element['sources'][$source_key][$column]);
     }
-    $rows[] = array('data' => $row, 'class' => array('draggable'));
+    $rows[] = ['data' => $row, 'class' => ['draggable']];
   }
 
   // Render the add row.
-  $add_row = array();
+  $add_row = [];
   foreach (array_keys($element['#header']) as $column) {
-    $add_row[] = array(
+    $add_row[] = [
       'data' => drupal_render($element['add'][$column]),
-      'class' => array('feeds-ex-add-' . $column),
-    );
+      'class' => ['feeds-ex-add-' . $column],
+    ];
   }
 
-  $rows[] = array('data' => $add_row, 'class' => array('draggable'));
+  $rows[] = ['data' => $add_row, 'class' => ['draggable']];
 
-  $output = _theme('table', array(
+  $output = _theme('table', [
     'header' => $element['#header'],
     'rows' => $rows,
-    'attributes' => array('id' => $element['sources']['#id']),
-  ));
+    'attributes' => ['id' => $element['sources']['#id']],
+  ]);
   $output .= drupal_render_children($element);
 
   return $output;

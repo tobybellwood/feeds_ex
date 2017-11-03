@@ -10,7 +10,7 @@
  * We use the hard-coded map here for PHP < 5.4.
  */
 
-return array(
+return [
   '&Tab;' => "\t",
   '&NewLine;' => "\n",
   '&excl;' => '!',
@@ -1517,4 +1517,4 @@ return array(
   '&xopf;' => '𝕩',
   '&yopf;' => '𝕪',
   '&zopf;' => '𝕫',
-);
+];
