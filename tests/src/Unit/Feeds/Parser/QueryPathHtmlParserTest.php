@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\feeds_ex\Unit\Feeds\Parser\QueryPathHtmlParserTest.
- */
-
 namespace Drupal\Tests\feeds_ex\Unit\Feeds\Parser;
 
 use Drupal\feeds\Result\RawFetcherResult;

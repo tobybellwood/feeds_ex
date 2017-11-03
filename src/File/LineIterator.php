@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\feeds_ex\File\LineIterator.
- */
-
 namespace Drupal\feeds_ex\File;
 
 use \SplFileObject;

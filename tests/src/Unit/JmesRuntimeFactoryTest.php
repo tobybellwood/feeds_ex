@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\feeds_ex\Unit\JmesRuntimeFactoryTest.
- */
-
 namespace Drupal\Tests\feeds_ex\Unit;
 
 use Drupal\feeds_ex\JmesRuntimeFactory;

@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\feeds_ex\Feeds\Parser\JsonPathLinesParser.
- */
-
 namespace Drupal\feeds_ex\Feeds\Parser;
 
 use Drupal\feeds\Exception\EmptyFeedException;

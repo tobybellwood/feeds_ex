@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\feeds_ex\Encoder\TextEncoder.
- */
-
 namespace Drupal\feeds_ex\Encoder;
 
 use Drupal\Component\Utility\Unicode;

@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\feeds_ex\Feeds\Parser\HtmlParser.
- */
-
 namespace Drupal\feeds_ex\Feeds\Parser;
 
 use \DOMNode;

@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\feeds_ex\Feeds\Parser\ParserBase.
- */
-
 namespace Drupal\feeds_ex\Feeds\Parser;
 
 use \Exception;

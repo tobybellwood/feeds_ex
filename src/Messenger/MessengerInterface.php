@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\feeds_ex\Messenger\MessengerInterface.
- */
-
 namespace Drupal\feeds_ex\Messenger;
 
 /**

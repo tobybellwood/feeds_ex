@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\feeds_ex\Encoder\XmlEncoder.
- */
-
 namespace Drupal\feeds_ex\Encoder;
 
 /**

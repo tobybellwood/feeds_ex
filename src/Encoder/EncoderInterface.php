@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\feeds_ex\Encoder\EncoderInterface.
- */
-
 namespace Drupal\feeds_ex\Encoder;
 
 use Drupal\Core\Form\FormStateInterface;

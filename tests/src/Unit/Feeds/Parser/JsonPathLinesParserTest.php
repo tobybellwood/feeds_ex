@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\feeds_ex\Unit\Feeds\Parser\JsonPathLinesParserTest.
- */
-
 namespace Drupal\Tests\feeds_ex\Unit\Feeds\Parser;
 
 use Drupal\feeds\Result\FetcherResult;

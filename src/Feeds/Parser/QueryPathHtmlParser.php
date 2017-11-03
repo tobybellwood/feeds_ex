@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\feeds_ex\Feeds\Parser\QueryPathHtmlParser.
- */
-
 namespace Drupal\feeds_ex\Feeds\Parser;
 
 use Drupal\feeds\FeedInterface;

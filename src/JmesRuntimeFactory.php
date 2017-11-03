@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\feeds_ex\JmesRuntimeFactory.
- */
-
 namespace Drupal\feeds_ex;
 
 use \RuntimeException;

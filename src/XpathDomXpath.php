@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\feeds_ex\XpathDomXpath.
- */
-
 namespace Drupal\feeds_ex;
 
 use \DOMDocument;

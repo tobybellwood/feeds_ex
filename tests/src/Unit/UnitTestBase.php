@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\feeds_ex\Unit\UnitTestBase.
- */
-
 namespace Drupal\Tests\feeds_ex\Unit;
 
 use \ReflectionMethod;

@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\feeds_ex\Unit\File\LineIteratorTest.
- */
-
 namespace Drupal\Tests\feeds_ex\Unit\File;
 
 use Drupal\Component\Serialization\Json;

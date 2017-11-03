@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\feeds_ex\Utility\JsonUtility.
- */
-
 namespace Drupal\feeds_ex\Utility;
 
 use \RuntimeException;

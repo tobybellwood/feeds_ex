@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\feeds_ex\Unit\Feeds\Parser\JsonPathParserTest.
- */
-
 namespace Drupal\Tests\feeds_ex\Unit\Feeds\Parser;
 
 use \Exception;

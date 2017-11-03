@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\feeds_ex\Feeds\Parser\JmesPathParser.
- */
-
 namespace Drupal\feeds_ex\Feeds\Parser;
 
 use \RuntimeException;
