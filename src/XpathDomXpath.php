@@ -14,7 +14,7 @@ class XpathDomXpath {
   /**
    * The XPath query object.
    *
-   * @var DOMXPath
+   * @var \DOMXPath
    */
   protected $xpath;
 

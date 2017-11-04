@@ -425,7 +425,13 @@ abstract class ParserBase extends ConfigurablePluginBase implements ParserInterf
   }
 
   /**
-   * @todo fix the code below.
+   * Builds configuration form for the parser settings.
+   *
+   * @todo The code below is still D7 code and does not work in D8 yet. Also,
+   * it's likely that most of the code below is no longer needed as the parser
+   * UI is planned to be implemented in a completely different way.
+   *
+   * @see https://www.drupal.org/node/2917924
    */
   public function _buildConfigurationForm(array $form, FormStateInterface $form_state) {
 
@@ -734,7 +740,7 @@ abstract class ParserBase extends ConfigurablePluginBase implements ParserInterf
   /**
    * Sets the messenger to be used to display messages.
    *
-   * @param MessengerInterface $messenger
+   * @param \Drupal\feeds_ex\Messenger\MessengerInterface $messenger
    *   The messenger.
    *
    * @return $this
@@ -748,7 +754,7 @@ abstract class ParserBase extends ConfigurablePluginBase implements ParserInterf
   /**
    * Returns the messenger.
    *
-   * @return MessengerInterface
+   * @return \Drupal\feeds_ex\Messenger\MessengerInterface
    *   The messenger.
    */
   public function getMessenger() {

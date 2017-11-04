@@ -72,7 +72,7 @@ class JmesPathParserTest extends ParserTestBase {
    *
    * This implicitly tests Base's encoding conversion.
    */
-  public function testEUCJPEncoded() {
+  public function testEucJpEncoded() {
     $fetcher_result = new RawFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test_jp.json'));
 
     $config = [

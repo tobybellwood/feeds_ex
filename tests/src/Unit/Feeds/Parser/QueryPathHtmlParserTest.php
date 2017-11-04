@@ -172,7 +172,7 @@ class QueryPathHtmlParserTest extends ParserTestBase {
   /**
    * Tests parsing a CP866 (Russian) encoded file.
    */
-  public function testCP866Encoded() {
+  public function testCp866Encoded() {
     $fetcher_result = new RawFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test_ru.html'));
 
     $config = [
@@ -208,7 +208,7 @@ class QueryPathHtmlParserTest extends ParserTestBase {
    *
    * This implicitly tests Base's encoding conversion.
    */
-  public function testEUCJPEncodedNoDeclaration() {
+  public function testEucJpEncodedNoDeclaration() {
     $fetcher_result = new RawFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test_jp.html'));
 
     $config = [

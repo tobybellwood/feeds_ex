@@ -29,9 +29,11 @@ class JmesPathParser extends ParserBase {
    * The JMESPath parser.
    *
    * This is an object with an __invoke() method.
-   * @todo add interface?
    *
    * @var object
+   *
+   * @todo add interface so checking for an object with an __invoke() method
+   * becomes explicit?
    */
   protected $runtime;
 
