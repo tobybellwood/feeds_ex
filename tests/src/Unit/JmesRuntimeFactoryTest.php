@@ -49,4 +49,5 @@ class JmesRuntimeFactoryTest extends UnitTestBase {
     $runtime = $this->factory->createCompilerRuntime($stream->url());
     $this->assertInstanceOf('JmesPath\CompilerRuntime', $runtime);
   }
+
 }

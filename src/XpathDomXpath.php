@@ -2,9 +2,9 @@
 
 namespace Drupal\feeds_ex;
 
-use \DOMDocument;
-use \DOMNode;
-use \DOMXPath;
+use DOMDocument;
+use DOMNode;
+use DOMXPath;
 
 /**
  * Wraps DOMXPath simplifying usage.
@@ -21,7 +21,7 @@ class XpathDomXpath {
   /**
    * Constructs a XpathDomXpath object.
    *
-   * @param DOMDocument $document
+   * @param \DOMDocument $document
    *   The DOM document to parse.
    *
    * @todo Add an option to force a deep scan of namespaces.
@@ -48,7 +48,7 @@ class XpathDomXpath {
    *
    * @param string $expression
    *   The XPath expression to execute.
-   * @param DOMNode $context_node
+   * @param \DOMNode $context_node
    *   (optional) The optional contextnode can be specified for doing relative
    *   XPath queries. Defaults to the root element.
    *
@@ -66,7 +66,7 @@ class XpathDomXpath {
    *
    * @param string $expression
    *   The XPath expression to execute.
-   * @param DOMNode $context_node
+   * @param \DOMNode $context_node
    *   (optional) The optional contextnode can be specified for doing relative
    *   XPath queries. Defaults to the root element.
    *

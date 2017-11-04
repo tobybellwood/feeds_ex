@@ -2,9 +2,9 @@
 
 namespace Drupal\feeds_ex\Feeds\Parser;
 
-use \DOMNode;
-use \DOMNodeList;
-use \SimpleXMLElement;
+use DOMNode;
+use DOMNodeList;
+use SimpleXMLElement;
 use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Logger\RfcLogLevel;
@@ -30,7 +30,7 @@ class XmlParser extends ParserBase {
   /**
    * The XpathDomXpath object used for parsing.
    *
-   * @var XpathDomXpath
+   * @var \Drupal\feeds_ex\XpathDomXpath
    */
   protected $xpath;
 
@@ -353,8 +353,7 @@ class XmlParser extends ParserBase {
   /**
    * Returns the options for phptidy.
    *
-   * http://php.net/manual/en/book.tidy.php
-   *
+   * @see http://php.net/manual/en/book.tidy.php
    * @see tidy_repair_string()
    *
    * @return array

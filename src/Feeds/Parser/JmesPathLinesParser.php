@@ -2,7 +2,7 @@
 
 namespace Drupal\feeds_ex\Feeds\Parser;
 
-use \RuntimeException;
+use RuntimeException;
 use Drupal\feeds\Exception\EmptyFeedException;
 use Drupal\feeds\FeedInterface;
 use Drupal\feeds\Result\FetcherResultInterface;
@@ -25,7 +25,7 @@ class JmesPathLinesParser extends JmesPathParser {
   /**
    * The file iterator.
    *
-   * @var LineIterator
+   * @var \Drupal\feeds_ex\File\LineIterator
    */
   protected $iterator;
 

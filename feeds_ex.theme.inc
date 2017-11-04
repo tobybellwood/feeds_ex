@@ -5,6 +5,8 @@
  * Theme callbacks for feeds_ex.
  */
 
+use Drupal\Core\Render\Element;
+
 /**
  * Themes the parser configuration table.
  */
@@ -23,7 +25,7 @@ function theme_feeds_ex_configuration_table(array $variables) {
   }
 
   // Render the sources.
-  foreach (\Drupal\Core\Render\Element::children($element['sources']) as $source_key) {
+  foreach (Element::children($element['sources']) as $source_key) {
     $source = $element['sources'][$source_key];
     $row = [];
     foreach (array_keys($element['#header']) as $column) {

@@ -2,9 +2,7 @@
 
 namespace Drupal\Tests\feeds_ex\Unit;
 
-use \ReflectionMethod;
-use Drupal\Component\Utility\SafeMarkup;
-use Drupal\feeds\Result\ParserResultInterface;
+use ReflectionMethod;
 use Drupal\Tests\feeds\Unit\FeedsUnitTestCase;
 
 /**

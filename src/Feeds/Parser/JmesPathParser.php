@@ -2,7 +2,7 @@
 
 namespace Drupal\feeds_ex\Feeds\Parser;
 
-use \RuntimeException;
+use RuntimeException;
 use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\feeds\FeedInterface;
@@ -28,7 +28,10 @@ class JmesPathParser extends ParserBase {
   /**
    * The JMESPath parser.
    *
-   * @var An object with an __invoke() method.
+   * This is an object with an __invoke() method.
+   * @todo add interface?
+   *
+   * @var object
    */
   protected $runtime;
 
@@ -54,7 +57,7 @@ class JmesPathParser extends ParserBase {
    *
    * This is useful in unit tests.
    *
-   * @param \Drupal\feeds_ex\JmesRuntimeFactoryInterface
+   * @param \Drupal\feeds_ex\JmesRuntimeFactoryInterface $factory
    *   The factory to use.
    */
   public function setRuntimeFactory(JmesRuntimeFactoryInterface $factory) {

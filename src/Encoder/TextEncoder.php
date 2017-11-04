@@ -20,7 +20,7 @@ class TextEncoder implements EncoderInterface {
   /**
    * The set of encodings compatible with UTF-8.
    *
-   * @param array
+   * @var array
    */
   protected static $utf8Compatible = ['utf-8', 'utf8', 'us-ascii', 'ascii'];
 

@@ -2,7 +2,7 @@
 
 namespace Drupal\feeds_ex;
 
-use \RuntimeException;
+use RuntimeException;
 use Drupal\Component\Utility\Crypt;
 use JmesPath\AstRuntime;
 use JmesPath\CompilerRuntime;
@@ -100,4 +100,5 @@ class JmesRuntimeFactory implements JmesRuntimeFactoryInterface {
 
     return file_prepare_directory($directory, FILE_CREATE_DIRECTORY | FILE_MODIFY_PERMISSIONS);
   }
+
 }

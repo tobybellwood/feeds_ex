@@ -11,7 +11,10 @@ use Drupal\Core\Controller\ControllerBase;
  */
 class DefaultController extends ControllerBase {
 
-  public function feeds_ex_encoding_autocomplete($string = '') {
+  /**
+   * Autocomplete callback for encodings.
+   */
+  public function encodingAutocomplete($string = '') {
     $matches = [];
 
     if (!strlen($string) || Unicode::getStatus() != Unicode::STATUS_MULTIBYTE) {

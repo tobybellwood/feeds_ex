@@ -2,8 +2,8 @@
 
 namespace Drupal\feeds_ex\Feeds\Parser;
 
-use \Exception;
-use \RuntimeException;
+use Exception;
+use RuntimeException;
 use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Logger\RfcLogLevel;
@@ -11,7 +11,6 @@ use Drupal\feeds\Exception\EmptyFeedException;
 use Drupal\feeds\FeedInterface;
 use Drupal\feeds\Feeds\Item\DynamicItem;
 use Drupal\feeds\Plugin\Type\ConfigurablePluginBase;
-use Drupal\feeds\Plugin\Type\FeedPluginFormInterface;
 use Drupal\feeds\Plugin\Type\Parser\ParserInterface;
 use Drupal\feeds\Result\FetcherResultInterface;
 use Drupal\feeds\Result\ParserResult;
@@ -29,7 +28,7 @@ abstract class ParserBase extends ConfigurablePluginBase implements ParserInterf
   /**
    * The object used to display messages to the user.
    *
-   * @var MessengerInterface
+   * @var \Drupal\feeds_ex\Messenger\MessengerInterface
    */
   protected $messenger;
 
@@ -43,7 +42,7 @@ abstract class ParserBase extends ConfigurablePluginBase implements ParserInterf
   /**
    * The encoder used to convert encodings.
    *
-   * @var EncoderInterface
+   * @var \Drupal\feeds_ex\Encoder\EncoderInterface
    */
   protected $encoder;
 
@@ -349,7 +348,7 @@ abstract class ParserBase extends ConfigurablePluginBase implements ParserInterf
       if ($error['severity'] > $severity) {
         continue;
       }
-      $this->getMessenger()->setMessage(t($error['message'], $error['variables']), $error['severity'] <= RfcLogLevel::ERROR ? 'error' : 'warning', FALSE);
+      $this->getMessenger()->setMessage($this->t($error['message'], $error['variables']), $error['severity'] <= RfcLogLevel::ERROR ? 'error' : 'warning', FALSE);
     }
   }
 
@@ -423,6 +422,12 @@ abstract class ParserBase extends ConfigurablePluginBase implements ParserInterf
    */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
     return [];
+  }
+
+  /**
+   * @todo fix the code below.
+   */
+  public function _buildConfigurationForm(array $form, FormStateInterface $form_state) {
 
     $form = [
       '#tree' => TRUE,
@@ -452,6 +457,9 @@ abstract class ParserBase extends ConfigurablePluginBase implements ParserInterf
 
     $form['sources'] = [
       '#id' => 'feeds-ex-source-table',
+      '#attributes' => [
+        'class' => ['feeds-ex-source-table'],
+      ],
     ];
 
     $max_weight = 0;

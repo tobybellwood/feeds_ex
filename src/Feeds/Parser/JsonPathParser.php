@@ -2,7 +2,7 @@
 
 namespace Drupal\feeds_ex\Feeds\Parser;
 
-use \RuntimeException;
+use RuntimeException;
 use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\feeds\FeedInterface;
 use Drupal\feeds\Result\FetcherResultInterface;

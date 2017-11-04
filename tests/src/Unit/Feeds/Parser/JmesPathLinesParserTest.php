@@ -10,6 +10,9 @@ use JmesPath\AstRuntime;
 /**
  * @coversDefaultClass \Drupal\feeds_ex\Feeds\Parser\JmesPathLinesParser
  * @group feeds_ex
+ *
+ * The test methods are in
+ * \Drupal\Tests\feeds_ex\Unit\Feeds\Parser\JsonPathLinesParserTest.
  */
 class JmesPathLinesParserTest extends JsonPathLinesParserTest {
 
@@ -39,14 +42,13 @@ class JmesPathLinesParserTest extends JsonPathLinesParserTest {
     $factoryMock->expects($this->any())
       ->method('createRuntime')
       ->will($this->returnCallback(
-        function() {
+        function () {
           return new AstRuntime();
         }
       ));
     $this->parser->setRuntimeFactory($factoryMock);
 
     $this->fetcherResult = new FetcherResult($this->moduleDir . '/tests/resources/test.jsonl');
-    // Tests are in \Drupal\Tests\feeds_ex\Unit\Feeds\Parser\JsonPathLinesParserTest.
   }
 
 }

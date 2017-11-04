@@ -197,7 +197,9 @@ class HtmlParserTest extends ParserTestBase {
   }
 
   /**
-   * Tests that the link propery is set.
+   * Tests that the link property is set.
+   *
+   * @todo turned off, because unsure if this is still needed.
    */
   public function _testLinkIsSet() {
     $this->setProperty($this->feed, 'config', [

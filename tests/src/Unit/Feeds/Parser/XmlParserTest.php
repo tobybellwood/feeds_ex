@@ -227,7 +227,7 @@ class XmlParserTest extends ParserTestBase {
   }
 
   /**
-   * Tests that the link propery is set.
+   * Tests that the link property is set.
    *
    * @todo replace setProperty().
    */

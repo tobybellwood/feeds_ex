@@ -29,7 +29,7 @@ class JmesPathParserTest extends ParserTestBase {
     $factoryMock->expects($this->any())
       ->method('createRuntime')
       ->will($this->returnCallback(
-        function() {
+        function () {
           return new AstRuntime();
         }
       ));

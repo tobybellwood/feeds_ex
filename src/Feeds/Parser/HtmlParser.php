@@ -2,7 +2,7 @@
 
 namespace Drupal\feeds_ex\Feeds\Parser;
 
-use \DOMNode;
+use DOMNode;
 use Drupal\feeds\FeedInterface;
 use Drupal\feeds\Result\FetcherResultInterface;
 use Drupal\feeds_ex\Utility\XmlUtility;

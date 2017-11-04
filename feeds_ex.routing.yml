@@ -2,6 +2,6 @@ feeds_ex.encoding_autocomplete:
   path: /_feeds_ex/encoding_autocomplete
   defaults:
     _title: 'Encoding autocomplete'
-    _controller: '\Drupal\feeds_ex\Controller\DefaultController::feeds_ex_encoding_autocomplete'
+    _controller: '\Drupal\feeds_ex\Controller\DefaultController::encodingAutocomplete'
   requirements:
     _permission: 'administer feeds'

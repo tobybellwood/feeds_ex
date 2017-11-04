@@ -11,21 +11,29 @@ use Drupal\Tests\feeds_ex\Unit\UnitTestBase;
 abstract class ParserTestBase extends UnitTestBase {
 
   /**
+   * The Feeds parser plugin.
+   *
    * @var \Drupal\feeds_ex\Feeds\Parser\ParserBase
    */
   protected $parser;
 
   /**
+   * The feed type entity.
+   *
    * @var \Drupal\feeds\FeedTypeInterface
    */
   protected $feedType;
 
   /**
+   * The feed entity.
+   *
    * @var \Drupal\feeds\FeedInterface
    */
   protected $feed;
 
   /**
+   * The state object.
+   *
    * @var \Drupal\feeds\State
    */
   protected $state;

@@ -54,4 +54,5 @@ class XmlEncoder extends TextEncoder {
 
     return $data;
   }
+
 }

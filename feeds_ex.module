@@ -16,4 +16,3 @@ function feeds_ex_theme() {
     ],
   ];
 }
-

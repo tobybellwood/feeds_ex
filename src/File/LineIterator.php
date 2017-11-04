@@ -2,7 +2,7 @@
 
 namespace Drupal\feeds_ex\File;
 
-use \SplFileObject;
+use SplFileObject;
 
 /**
  * Text lines from file iterator.

@@ -2,7 +2,7 @@
 
 namespace Drupal\feeds_ex\Utility;
 
-use \RuntimeException;
+use RuntimeException;
 use Drupal\Component\Serialization\Json;
 
 /**

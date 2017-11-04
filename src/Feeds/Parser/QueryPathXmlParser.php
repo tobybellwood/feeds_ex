@@ -2,8 +2,8 @@
 
 namespace Drupal\feeds_ex\Feeds\Parser;
 
-use \RuntimeException;
-use \QueryPath;
+use RuntimeException;
+use QueryPath;
 use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\feeds\FeedInterface;

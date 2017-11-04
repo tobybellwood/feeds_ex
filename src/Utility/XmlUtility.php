@@ -2,8 +2,8 @@
 
 namespace Drupal\feeds_ex\Utility;
 
-use \DOMDocument;
-use \RuntimeException;
+use DOMDocument;
+use RuntimeException;
 
 /**
  * Simple XML helpers.
@@ -18,10 +18,10 @@ class XmlUtility {
    * @param int $options
    *   (optional) Bitwise OR of the libxml option constants. Defaults to 0.
    *
-   * @return DOMDocument
+   * @return \DOMDocument
    *   The newly created DOMDocument.
    *
-   * @throws RuntimeException
+   * @throws \RuntimeException
    *   Thrown if there is a fatal error parsing the XML.
    */
   public static function createHtmlDocument($source, $options = 0) {
@@ -50,7 +50,7 @@ class XmlUtility {
   /**
    * Builds a DOMDocument setting some default values.
    *
-   * @return DOMDocument
+   * @return \DOMDocument
    *   A new DOMDocument.
    */
   protected static function buildDomDocument() {
