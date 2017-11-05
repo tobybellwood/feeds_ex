@@ -4,11 +4,14 @@ namespace Drupal\feeds_ex\Utility;
 
 use RuntimeException;
 use Drupal\Component\Serialization\Json;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
  * Various helpers for handling JSON.
  */
 class JsonUtility {
+
+  use StringTranslationTrait;
 
   /**
    * Translates an error message.
@@ -19,7 +22,7 @@ class JsonUtility {
    * @return string
    *   The JSON parsing error message.
    */
-  public static function translateError($error) {
+  public function translateError($error) {
     if (version_compare(PHP_VERSION, '5.5.0', '>=')) {
       switch ($error) {
         case JSON_ERROR_RECURSION:
@@ -69,11 +72,11 @@ class JsonUtility {
    * @throws RuntimeException
    *   Thrown if the encoded JSON does not result in an array.
    */
-  public static function decodeJsonArray($json) {
+  public function decodeJsonArray($json) {
     $parsed = Json::decode($json);
 
     if (!is_array($parsed)) {
-      throw new RuntimeException(t('The JSON is invalid.'));
+      throw new RuntimeException($this->t('The JSON is invalid.'));
     }
 
     return $parsed;

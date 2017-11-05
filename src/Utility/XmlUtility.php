@@ -4,11 +4,14 @@ namespace Drupal\feeds_ex\Utility;
 
 use DOMDocument;
 use RuntimeException;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
  * Simple XML helpers.
  */
 class XmlUtility {
+
+  use StringTranslationTrait;
 
   /**
    * Creates an HTML document.
@@ -24,10 +27,10 @@ class XmlUtility {
    * @throws \RuntimeException
    *   Thrown if there is a fatal error parsing the XML.
    */
-  public static function createHtmlDocument($source, $options = 0) {
+  public function createHtmlDocument($source, $options = 0) {
     // Fun hack to force parsing as utf-8.
     $source = '<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />' . "\n" . $source;
-    $document = self::buildDomDocument();
+    $document = $this->buildDomDocument();
     // Pass in options if available.
     if (version_compare(PHP_VERSION, '5.4.0', '>=')) {
       $options = $options | LIBXML_NOENT | LIBXML_NONET | defined('LIBXML_COMPACT') ? LIBXML_COMPACT : 0;
@@ -42,7 +45,7 @@ class XmlUtility {
     }
 
     if (!$success) {
-      throw new RuntimeException(t('There was an error parsing the HTML document.'));
+      throw new RuntimeException($this->t('There was an error parsing the HTML document.'));
     }
     return $document;
   }
@@ -53,7 +56,7 @@ class XmlUtility {
    * @return \DOMDocument
    *   A new DOMDocument.
    */
-  protected static function buildDomDocument() {
+  protected function buildDomDocument() {
     $document = new DOMDocument('1.0', 'UTF-8');
     $document->strictErrorChecking = FALSE;
     $document->resolveExternals = FALSE;

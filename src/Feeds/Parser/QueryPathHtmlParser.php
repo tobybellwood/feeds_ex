@@ -5,7 +5,6 @@ namespace Drupal\feeds_ex\Feeds\Parser;
 use Drupal\feeds\FeedInterface;
 use Drupal\feeds\Result\FetcherResultInterface;
 use Drupal\feeds\StateInterface;
-use Drupal\feeds_ex\Utility\XmlUtility;
 use QueryPath\DOMQuery;
 
 /**
@@ -17,7 +16,8 @@ use QueryPath\DOMQuery;
  * @FeedsParser(
  *   id = "querypathhtml",
  *   title = @Translation("QueryPath HTML"),
- *   description = @Translation("Parse HTML with QueryPath.")
+ *   description = @Translation("Parse HTML with QueryPath."),
+ *   arguments = {"@feeds_ex.xml_utility"}
  * )
  */
 class QueryPathHtmlParser extends QueryPathXmlParser {
@@ -50,7 +50,7 @@ class QueryPathHtmlParser extends QueryPathXmlParser {
     if ($this->configuration['use_tidy'] && extension_loaded('tidy')) {
       $raw = tidy_repair_string($raw, $this->getTidyConfig(), 'utf8');
     }
-    return XmlUtility::createHtmlDocument($raw);
+    return $this->utility->createHtmlDocument($raw);
   }
 
   /**

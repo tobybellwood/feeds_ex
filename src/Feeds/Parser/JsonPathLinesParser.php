@@ -8,7 +8,6 @@ use Drupal\feeds\Result\FetcherResultInterface;
 use Drupal\feeds\Result\ParserResultInterface;
 use Drupal\feeds\StateInterface;
 use Drupal\feeds_ex\File\LineIterator;
-use Drupal\feeds_ex\Utility\JsonUtility;
 use Peekmo\JsonPath\JsonStore;
 
 /**
@@ -17,7 +16,8 @@ use Peekmo\JsonPath\JsonStore;
  * @FeedsParser(
  *   id = "jsonpathlines",
  *   title = @Translation("JSON Lines JSONPath"),
- *   description = @Translation("Parse JSON Lines with JSONPath.")
+ *   description = @Translation("Parse JSON Lines with JSONPath."),
+ *   arguments = {"@feeds_ex.json_utility"}
  * )
  */
 class JsonPathLinesParser extends JsonPathParser {
@@ -64,7 +64,7 @@ class JsonPathLinesParser extends JsonPathParser {
     foreach ($this->iterator as $row) {
       $row = $this->getEncoder()->convertEncoding($row);
       try {
-        $row = JsonUtility::decodeJsonArray($row);
+        $row = $this->utility->decodeJsonArray($row);
       }
       catch (RuntimeException $e) {
         // An array wasn't returned. Skip this item.

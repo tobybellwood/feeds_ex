@@ -20,10 +20,11 @@ use JmesPath\SyntaxErrorException;
  * @FeedsParser(
  *   id = "jmespath",
  *   title = @Translation("JSON JMESPath"),
- *   description = @Translation("Parse JSON with JMESPath.")
+ *   description = @Translation("Parse JSON with JMESPath."),
+ *   arguments = {"@feeds_ex.json_utility"}
  * )
  */
-class JmesPathParser extends ParserBase {
+class JmesPathParser extends JsonParserBase {
 
   /**
    * The JMESPath parser.
@@ -47,8 +48,8 @@ class JmesPathParser extends ParserBase {
   /**
    * {@inheritdoc}
    */
-  public function __construct(array $configuration, $plugin_id, array $plugin_definition) {
-    parent::__construct($configuration, $plugin_id, $plugin_definition);
+  public function __construct(array $configuration, $plugin_id, array $plugin_definition, JsonUtility $utility) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition, $utility);
 
     // Set default factory.
     $this->runtimeFactory = new JmesRuntimeFactory();
@@ -93,7 +94,7 @@ class JmesPathParser extends ParserBase {
    */
   protected function executeContext(FeedInterface $feed, FetcherResultInterface $fetcher_result, StateInterface $state) {
     $raw = $this->prepareRaw($fetcher_result);
-    $parsed = JsonUtility::decodeJsonArray($raw);
+    $parsed = $this->utility->decodeJsonArray($raw);
     $parsed = $this->search($this->configuration['context']['value'], $parsed);
     if (!is_array($parsed)) {
       throw new RuntimeException($this->t('The context expression must return an object or array.'));
@@ -173,7 +174,7 @@ class JmesPathParser extends ParserBase {
     }
 
     $message = [
-      'message' => JsonUtility::translateError($error),
+      'message' => $this->utility->translateError($error),
       'variables' => [],
       'severity' => RfcLogLevel::ERROR,
     ];

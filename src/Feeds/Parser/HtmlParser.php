@@ -5,7 +5,6 @@ namespace Drupal\feeds_ex\Feeds\Parser;
 use DOMNode;
 use Drupal\feeds\FeedInterface;
 use Drupal\feeds\Result\FetcherResultInterface;
-use Drupal\feeds_ex\Utility\XmlUtility;
 
 /**
  * Defines a HTML parser using XPath.
@@ -13,7 +12,8 @@ use Drupal\feeds_ex\Utility\XmlUtility;
  * @FeedsParser(
  *   id = "html",
  *   title = @Translation("HTML"),
- *   description = @Translation("Parse HTML with XPath.")
+ *   description = @Translation("Parse HTML with XPath."),
+ *   arguments = {"@feeds_ex.xml_utility"}
  * )
  */
 class HtmlParser extends XmlParser {
@@ -38,7 +38,7 @@ class HtmlParser extends XmlParser {
     if ($this->configuration['use_tidy'] && extension_loaded('tidy')) {
       $raw = tidy_repair_string($raw, $this->getTidyConfig(), 'utf8');
     }
-    return XmlUtility::createHtmlDocument($raw);
+    return $this->utility->createHtmlDocument($raw);
   }
 
   /**

@@ -8,7 +8,6 @@ use Drupal\feeds\FeedInterface;
 use Drupal\feeds\Result\FetcherResultInterface;
 use Drupal\feeds\Result\ParserResultInterface;
 use Drupal\feeds\StateInterface;
-use Drupal\feeds_ex\Utility\JsonUtility;
 use Peekmo\JsonPath\JsonStore;
 
 /**
@@ -17,19 +16,20 @@ use Peekmo\JsonPath\JsonStore;
  * @FeedsParser(
  *   id = "jsonpath",
  *   title = @Translation("JsonPath"),
- *   description = @Translation("Parse JSON with JSONPath.")
+ *   description = @Translation("Parse JSON with JSONPath."),
+ *   arguments = {"@feeds_ex.json_utility"}
  * )
  */
-class JsonPathParser extends ParserBase {
+class JsonPathParser extends JsonParserBase {
 
   /**
    * {@inheritdoc}
    */
   protected function executeContext(FeedInterface $feed, FetcherResultInterface $fetcher_result, StateInterface $state) {
     $raw = $this->prepareRaw($fetcher_result);
-    $parsed = JsonUtility::decodeJsonArray($raw);
+    $parsed = $this->utility->decodeJsonArray($raw);
     $store = new JsonStore();
-    $parsed = $store->get($raw, $this->configuration['context']['value']);
+    $parsed = $store->get($parsed, $this->configuration['context']['value']);
 
     if (!$state->total) {
       $state->total = count($parsed);
@@ -91,7 +91,7 @@ class JsonPathParser extends ParserBase {
     }
 
     $message = [
-      'message' => JsonUtility::translateError($error),
+      'message' => $this->utility->translateError($error),
       'variables' => [],
       'severity' => RfcLogLevel::ERROR,
     ];

@@ -13,6 +13,7 @@ use Drupal\feeds\FeedInterface;
 use Drupal\feeds\Result\FetcherResultInterface;
 use Drupal\feeds\Result\ParserResultInterface;
 use Drupal\feeds\StateInterface;
+use Drupal\feeds_ex\Utility\XmlUtility;
 use Drupal\feeds_ex\XpathDomXpath;
 
 /**
@@ -21,7 +22,8 @@ use Drupal\feeds_ex\XpathDomXpath;
  * @FeedsParser(
  *   id = "xml",
  *   title = @Translation("XML"),
- *   description = @Translation("Parse XML with XPath.")
+ *   description = @Translation("Parse XML with XPath."),
+ *   arguments = {"@feeds_ex.xml_utility"}
  * )
  */
 class XmlParser extends ParserBase {
@@ -52,6 +54,30 @@ class XmlParser extends ParserBase {
    * {@inheritdoc}
    */
   protected $encoderClass = '\Drupal\feeds_ex\Encoder\XmlEncoder';
+
+  /**
+   * The XML helper class.
+   *
+   * @var \Drupal\feeds_ex\Utility\XmlUtility
+   */
+  protected $utility;
+
+  /**
+   * Constructs a JsonParserBase object.
+   *
+   * @param array $configuration
+   *   The plugin configuration.
+   * @param string $plugin_id
+   *   The plugin id.
+   * @param array $plugin_definition
+   *   The plugin definition.
+   * @param \Drupal\feeds_ex\Utility\XmlUtility $utility
+   *   The XML helper class.
+   */
+  public function __construct(array $configuration, $plugin_id, array $plugin_definition, XmlUtility $utility) {
+    $this->utility = $utility;
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
+  }
 
   /**
    * {@inheritdoc}

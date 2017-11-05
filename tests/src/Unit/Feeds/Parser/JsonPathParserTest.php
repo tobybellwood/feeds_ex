@@ -6,6 +6,7 @@ use Exception;
 use Drupal\feeds\Result\RawFetcherResult;
 use Drupal\feeds_ex\Feeds\Parser\JsonPathParser;
 use Drupal\feeds_ex\Messenger\TestMessenger;
+use Drupal\feeds_ex\Utility\JsonUtility;
 
 /**
  * @coversDefaultClass \Drupal\feeds_ex\Feeds\Parser\JsonPathParser
@@ -20,7 +21,9 @@ class JsonPathParserTest extends ParserTestBase {
     parent::setUp();
 
     $configuration = ['feed_type' => $this->feedType];
-    $this->parser = new JsonPathParser($configuration, 'jsonpath', []);
+    $utility = new JsonUtility();
+    $utility->setStringTranslation($this->getStringTranslationStub());
+    $this->parser = new JsonPathParser($configuration, 'jsonpath', [], $utility);
     $this->parser->setStringTranslation($this->getStringTranslationStub());
     $this->parser->setMessenger(new TestMessenger());
   }

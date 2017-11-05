@@ -18,7 +18,8 @@ use QueryPath\CSS\ParseException;
  * @FeedsParser(
  *   id = "querypathxml",
  *   title = @Translation("QueryPath XML"),
- *   description = @Translation("Parse XML with QueryPath.")
+ *   description = @Translation("Parse XML with QueryPath."),
+ *   arguments = {"@feeds_ex.xml_utility"}
  * )
  */
 class QueryPathXmlParser extends XmlParser {
