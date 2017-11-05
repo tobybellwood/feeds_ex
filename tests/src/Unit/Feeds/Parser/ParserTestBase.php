@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\feeds_ex\Unit\Feeds\Parser;
 
+use Drupal\Component\Utility\Unicode;
 use Drupal\feeds\State;
 use Drupal\Tests\feeds_ex\Unit\UnitTestBase;
 
@@ -52,6 +53,9 @@ abstract class ParserTestBase extends UnitTestBase {
     $this->feed->expects($this->any())
       ->method('getType')
       ->will($this->returnValue($this->feedType));
+
+    // Attempt to setup multibyte support.
+    Unicode::check();
   }
 
 }
