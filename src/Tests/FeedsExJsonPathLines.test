@@ -45,8 +45,6 @@ class FeedsExJsonPathLinesUnitTests extends FeedsExUnitTestBase {
     require_once $this->moduleDir . '/src/FeedsExJsonPath.inc';
     require_once $this->moduleDir . '/src/FeedsExJsonPathLines.inc';
 
-    $this->downloadJsonPath();
-
     $this->source = $this->getMockFeedsSource();
     $this->parser = FeedsPlugin::instance('FeedsExJsonPathLines', strtolower($this->randomName()));
     $this->parser->setMessenger(new FeedsExTestMessenger());
