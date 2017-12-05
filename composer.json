@@ -10,12 +10,8 @@
       "source": "http://cgit.drupalcode.org/feeds_ex"
     },
     "require": {
-      "drupal/feeds": "~2.0",
       "mtdowling/jmespath.php": "2.*",
-      "peekmo/jsonpath": "1.*",
-      "querypath/QueryPath": "3.*"
-    },
-    "require-dev": {
-      "drupal/tunit": "~1.0"
+      "flow/jsonpath": "0.3.*",
+      "querypath/querypath": "3.*"
     }
 }
