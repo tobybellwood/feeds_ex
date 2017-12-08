@@ -1,4 +1,5 @@
 name = Feeds extensible parser tests
+description = Test module for Feeds extensible parsers.
 package = Testing
 hidden = TRUE
 dependencies[] = feeds_ex

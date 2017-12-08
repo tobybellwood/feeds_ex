@@ -24,7 +24,12 @@ class FeedsExJmesPath extends FeedsExBase {
   /**
    * The JMESPath parser.
    *
-   * @var An object with an __invoke() method.
+   * This is an object with an __invoke() method.
+   *
+   * @var object
+   *
+   * @todo add interface so checking for an object with an __invoke() method
+   * becomes explicit?
    */
   protected $runtime;
 
@@ -282,7 +287,7 @@ class FeedsExJmesPathV1Wrapper {
   /**
    * The version 1 runtime.
    *
-   * @var \JmesPath\Runtime\RuntimeInterface.
+   * @var \JmesPath\Runtime\RuntimeInterface
    */
   protected $runtime;
 

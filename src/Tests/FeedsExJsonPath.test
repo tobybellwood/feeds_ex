@@ -17,6 +17,9 @@ class FeedsExJsonPathUnitTests extends FeedsExUnitTestBase {
    */
   protected $source;
 
+  /**
+   * {@inheritdoc}
+   */
   public static function getInfo() {
     return array(
       'name' => 'JSONPath parser unit tests',
@@ -25,6 +28,9 @@ class FeedsExJsonPathUnitTests extends FeedsExUnitTestBase {
     );
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function setUp() {
     parent::setUp();
     require_once $this->moduleDir . '/src/FeedsExJsonPath.inc';

@@ -342,8 +342,7 @@ class FeedsExXml extends FeedsExBase {
   /**
    * Returns the options for phptidy.
    *
-   * http://php.net/manual/en/book.tidy.php
-   *
+   * @see http://php.net/manual/en/book.tidy.php
    * @see tidy_repair_string()
    *
    * @return array

@@ -17,6 +17,9 @@ class FeedsExJmesPathUnitTests extends FeedsExUnitTestBase {
    */
   protected $source;
 
+  /**
+   * {@inheritdoc}
+   */
   public static function getInfo() {
     return array(
       'name' => 'JMESPath parser unit tests',
@@ -25,6 +28,9 @@ class FeedsExJmesPathUnitTests extends FeedsExUnitTestBase {
     );
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function setUp() {
     parent::setUp();
     require_once $this->moduleDir . '/src/FeedsExJmesPath.inc';
@@ -84,7 +90,7 @@ class FeedsExJmesPathUnitTests extends FeedsExUnitTestBase {
    *
    * This implicitly tests FeedsExBase's encoding conversion.
    */
-  public function testEUCJPEncoded() {
+  public function testEucJpEncoded() {
     $parser = $this->getParserInstance();
     $fetcher_result = new FeedsFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test_jp.json'));
 

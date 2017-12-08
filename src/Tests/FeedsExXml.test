@@ -17,6 +17,9 @@ class FeedsExXmlUnitTests extends FeedsExUnitTestBase {
    */
   protected $source;
 
+  /**
+   * {@inheritdoc}
+   */
   public static function getInfo() {
     return array(
       'name' => 'XML parser unit tests',
@@ -25,6 +28,9 @@ class FeedsExXmlUnitTests extends FeedsExUnitTestBase {
     );
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function setUp() {
     parent::setUp();
 
@@ -140,7 +146,7 @@ class FeedsExXmlUnitTests extends FeedsExUnitTestBase {
   /**
    * Tests parsing a CP866 (Russian) encoded file.
    */
-  public function testCP866Encoded() {
+  public function testCp866Encoded() {
     $parser = $this->getParserInstance();
     $fetcher_result = new FeedsFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test_ru.xml'));
 
@@ -174,7 +180,7 @@ class FeedsExXmlUnitTests extends FeedsExUnitTestBase {
    *
    * This implicitly tests FeedsExBase's encoding conversion.
    */
-  public function testEUCJPEncodedNoDeclaration() {
+  public function testEucJpEncodedNoDeclaration() {
     $parser = $this->getParserInstance();
     $fetcher_result = new FeedsFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test_jp.xml'));
 

@@ -17,6 +17,9 @@ abstract class FeedsExUnitTestBase extends TUnit {
    */
   protected $moduleDir;
 
+  /**
+   * {@inheritdoc}
+   */
   public function setUp() {
     parent::setUp();
 
@@ -62,7 +65,7 @@ abstract class FeedsExUnitTestBase extends TUnit {
    * Returns a mocked FeedsSource object.
    *
    * @param string $fetcher
-   *   (optional) The fetcher class. Defaults to FeedsFileFetcher
+   *   (optional) The fetcher class. Defaults to FeedsFileFetcher.
    * @param string $processor
    *   (optional) The processor class. Defaults to FeedsNodeProcessor.
    *
@@ -115,6 +118,10 @@ abstract class FeedsExUnitTestBase extends TUnit {
  * Tests stripping default namespaces.
  */
 class FeedsExRemoveDefaultNamespaces extends DrupalUnitTestCase {
+
+  /**
+   * {@inheritdoc}
+   */
   public static function getInfo() {
     return array(
       'name' => 'Strip default namespaces',
@@ -123,6 +130,9 @@ class FeedsExRemoveDefaultNamespaces extends DrupalUnitTestCase {
     );
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function setUp() {
     parent::setUp();
     require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'feeds_ex') . '/src/Text/Utility.php';
@@ -177,6 +187,9 @@ class FeedsExLineIteratorUnitTests extends DrupalUnitTestCase {
    */
   protected $moduleDir;
 
+  /**
+   * {@inheritdoc}
+   */
   public static function getInfo() {
     return array(
       'name' => 'Unit tests for the line reading iterator',
@@ -185,6 +198,9 @@ class FeedsExLineIteratorUnitTests extends DrupalUnitTestCase {
     );
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function setUp() {
     parent::setUp();
     $this->moduleDir = drupal_get_path('module', 'feeds_ex');

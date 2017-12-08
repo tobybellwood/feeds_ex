@@ -31,6 +31,9 @@ class FeedsExJsonPathLinesUnitTests extends FeedsExUnitTestBase {
    */
   protected $fetcherResult;
 
+  /**
+   * {@inheritdoc}
+   */
   public static function getInfo() {
     return array(
       'name' => 'JSONPath JSON lines parser unit tests',
@@ -39,6 +42,9 @@ class FeedsExJsonPathLinesUnitTests extends FeedsExUnitTestBase {
     );
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function setUp() {
     parent::setUp();
 

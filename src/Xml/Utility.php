@@ -44,10 +44,9 @@ class FeedsExXmlUtility {
       $map = require dirname(dirname(dirname(__FILE__))) . '/resources/html_entities.php';
     }
     else {
-      $map = array_flip(get_html_translation_table(HTML_ENTITIES, ENT_NOQUOTES|ENT_HTML5, 'UTF-8'));
+      $map = array_flip(get_html_translation_table(HTML_ENTITIES, ENT_NOQUOTES | ENT_HTML5, 'UTF-8'));
       unset($map['&amp;'], $map['&lt;'], $map['&gt;']);
     }
-
 
     return strtr($markup, $map);
   }
@@ -188,6 +187,7 @@ class FeedsExXmlEncoder extends FeedsExTextEncoder {
 
     return $data;
   }
+
 }
 
 /**
