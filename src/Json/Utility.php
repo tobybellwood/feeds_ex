@@ -113,8 +113,8 @@ class FeedsExJsonUtility {
   /**
    * Returns the path of the JSONPath library.
    *
-   * @return string|false
-   *   The root-relative path to the JSONPath include, or false on failure.
+   * @return string|false|array
+   *   The root-relative path to the JSONPath include(s), or false on failure.
    */
   public static function jsonPathLibraryPath() {
     $libraries_path = module_exists('libraries') ? libraries_get_path('jsonpath') : FALSE;
@@ -124,18 +124,24 @@ class FeedsExJsonUtility {
     elseif (is_dir(DRUPAL_ROOT . '/sites/all/libraries/jsonpath')) {
       $path = 'sites/all/libraries/jsonpath';
     }
-    // This is defined when simpletest downloads the library for us.
-    elseif (defined('FEEDS_EX_LIBRARY_PATH')) {
-      $path = FEEDS_EX_LIBRARY_PATH . '/jsonpath';
-    }
 
     if (!isset($path)) {
+      if (is_file(DRUPAL_ROOT . '/vendor/autoload.php')) {
+        // This can exist when running tests on drupal.org.
+        return 'vendor/autoload.php';
+      }
       return FALSE;
     }
 
     // Newer forks of JSONPath are all modern and fancy with their autoloaders.
     if (is_file($path . '/vendor/autoload.php')) {
       return $path . '/vendor/autoload.php';
+    }
+    if (is_file($path . '/src/Peekmo/JsonPath/JsonStore.php')) {
+      return array(
+        $path . '/src/Peekmo/JsonPath/JsonStore.php',
+        $path . '/src/Peekmo/JsonPath/JsonPath.php',
+      );
     }
     // Old school. Look for multiple versions.
     $files = glob($path . '/jsonpath*.php');
@@ -150,17 +156,25 @@ class FeedsExJsonUtility {
    *   True if a parser is installed, false if not.
    */
   public static function jsonPathParserInstalled() {
-    if (class_exists('Flow\JSONPath\JSONPath') || function_exists('jsonPath')) {
+    if (class_exists('Flow\JSONPath\JSONPath') || class_exists('Peekmo\JsonPath\JsonStore') || function_exists('jsonPath')) {
       return TRUE;
     }
 
-    if (!$path = self::jsonPathLibraryPath()) {
+    $path = self::jsonPathLibraryPath();
+    if (!$path) {
       return FALSE;
     }
 
-    require_once DRUPAL_ROOT . '/' . $path;
+    if (is_array($path)) {
+      foreach ($path as $subpath) {
+        require_once DRUPAL_ROOT . '/' . $subpath;
+      }
+    }
+    else {
+      require_once DRUPAL_ROOT . '/' . $path;
+    }
 
-    return class_exists('Flow\JSONPath\JSONPath') || function_exists('jsonPath');
+    return class_exists('Flow\JSONPath\JSONPath') || class_exists('Peekmo\JsonPath\JsonStore') || function_exists('jsonPath');
   }
 
   /**

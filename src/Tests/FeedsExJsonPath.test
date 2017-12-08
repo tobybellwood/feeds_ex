@@ -145,11 +145,11 @@ class FeedsExJsonPathUnitTests extends FeedsExUnitTestBase {
   public function testValidateExpression() {
     // Invalid expression.
     $parser = $this->getParserInstance();
-    $expression = array('!! ');
-    $this->assertEqual(NULL, $this->invokeMethod($parser, 'validateExpression', $expression));
+    $expression = '!! ';
+    $this->assertEqual('Unable to parse token !! in expression: .!!', $this->invokeMethod($parser, 'validateExpression', array(&$expression)));
 
     // Test that value was trimmed.
-    $this->assertEqual($expression[0], '!!', 'Value was trimmed.');
+    $this->assertEqual($expression, '!!', 'Value was trimmed.');
   }
 
   /**

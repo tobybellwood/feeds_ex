@@ -5,6 +5,8 @@
  * Contains FeedsExJsonPath.
  */
 
+use Peekmo\JsonPath\JsonStore;
+
 /**
  * Parses JSON via JSONPath.
  */
@@ -24,7 +26,7 @@ class FeedsExJsonPath extends FeedsExBase {
     $raw = $this->prepareRaw($fetcher_result);
     $parsed = FeedsExJsonUtility::decodeJsonArray($raw);
     $parsed = $this->getParser()->search($parsed, $this->config['context']['value']);
-    if (!is_array($parsed)) {
+    if (!is_array($parsed) || empty($parsed)) {
       throw new RuntimeException(t('The context expression must return an object or array.'));
     }
 
@@ -133,6 +135,9 @@ class FeedsExJsonPath extends FeedsExBase {
       if (class_exists('Flow\JSONPath\JSONPath')) {
         $this->parser = new FeedsExJsonPathParserFlow();
       }
+      elseif (class_exists('Peekmo\JsonPath\JsonStore')) {
+        $this->parser = new FeedsExJsonPathParserPeekmo();
+      }
       elseif (function_exists('jsonPath')) {
         $this->parser = new FeedsExJsonPathParser();
       }
@@ -191,6 +196,21 @@ class FeedsExJsonPathParserFlow implements FeedsExJsonPathParserInterface {
     $json_path = new $class($data);
 
     return $json_path->find($expression)->data();
+  }
+
+}
+
+/**
+ * Wraps the Peekmo JSONPath implementation.
+ */
+class FeedsExJsonPathParserPeekmo implements FeedsExJsonPathParserInterface {
+
+  /**
+   * {@inheritdoc}
+   */
+  public function search(array $data, $expression) {
+    $store = new JsonStore();
+    return $store->get($data, $expression);
   }
 
 }

@@ -20,6 +20,10 @@ abstract class FeedsExUnitTestBase extends TUnit {
   public function setUp() {
     parent::setUp();
 
+    // Unregister Drupal autoload functions.
+    // @see https://www.drupal.org/node/1916328
+    spl_autoload_unregister('drupal_autoload_trait');
+
     // Isn't this fun!
     drupal_load('module', 'feeds');
     $feeds = DRUPAL_ROOT . '/' . drupal_get_path('module', 'feeds');
@@ -43,6 +47,15 @@ abstract class FeedsExUnitTestBase extends TUnit {
     require_once $this->moduleDir . '/src/Xml/Utility.php';
     require_once $this->moduleDir . '/src/File/FeedsExLineIterator.php';
     require_once $this->moduleDir . '/src/FeedsExBase.inc';
+  }
+
+  /**
+   * Tears down this test!
+   */
+  public function tearDown() {
+    // Restore Drupal's autoloader.
+    spl_autoload_register('drupal_autoload_trait');
+    parent::tearDown();
   }
 
   /**
