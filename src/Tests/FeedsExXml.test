@@ -270,17 +270,19 @@ class FeedsExXmlUnitTests extends FeedsExUnitTestBase {
   public function testValidateExpression() {
     // Invalid expression.
     $parser = $this->getParserInstance();
-    $expression = array('!!');
-    $this->assertEqual('Invalid expression', $this->invokeMethod($parser, 'validateExpression', $expression));
+    $expression = '!! ';
+    $this->assertEqual('Invalid expression', $this->invokeMethod($parser, 'validateExpression', array(&$expression)));
 
     // Test that value was trimmed.
-    $this->assertEqual($expression[0], '!!', 'Value was trimmed.');
+    $this->assertEqual($expression, '!!', 'Value was trimmed.');
 
     // Unknown namespace.
-    $this->assertEqual(NULL, $this->invokeMethod($parser, 'validateExpression', array('thing:asdf')));
+    $unknown = 'thing:asdf';
+    $this->assertEqual(NULL, $this->invokeMethod($parser, 'validateExpression', array(&$unknown)));
 
     // Empty.
-    $this->assertEqual(NULL, $this->invokeMethod($parser, 'validateExpression', array('')));
+    $empty = '';
+    $this->assertEqual(NULL, $this->invokeMethod($parser, 'validateExpression', array(&$empty)));
   }
 
   /**

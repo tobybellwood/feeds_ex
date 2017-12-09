@@ -327,14 +327,15 @@ class FeedsExQueryPathXmlUnitTests extends FeedsExUnitTestBase {
   public function testValidateExpression() {
     // Invalid expression.
     $parser = $this->getParserInstance();
-    $expression = array('!!');
-    $this->assertEqual('CSS selector is not well formed.', $this->invokeMethod($parser, 'validateExpression', $expression));
+    $expression = '!! ';
+    $this->assertEqual('CSS selector is not well formed.', $this->invokeMethod($parser, 'validateExpression', array(&$expression)));
 
     // Test that value was trimmed.
-    $this->assertEqual($expression[0], '!!', 'Value was trimmed.');
+    $this->assertEqual($expression, '!!', 'Value was trimmed.');
 
     // Empty.
-    $this->assertEqual(NULL, $this->invokeMethod($parser, 'validateExpression', array('')));
+    $empty = '';
+    $this->assertEqual(NULL, $this->invokeMethod($parser, 'validateExpression', array(&$empty)));
   }
 
   /**
