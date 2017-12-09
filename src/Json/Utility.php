@@ -188,7 +188,12 @@ class FeedsExJsonUtility {
       return TRUE;
     }
 
-    if (!$path = feeds_ex_library_path('jmespath.php', 'vendor/autoload.php')) {
+    $path = feeds_ex_library_path('jmespath.php', 'vendor/autoload.php');
+    if (!$path && is_file(DRUPAL_ROOT . '/vendor/autoload.php')) {
+      // This can exist when running tests on drupal.org.
+      $path = 'vendor/autoload.php';
+    }
+    if (!$path) {
       return FALSE;
     }
 

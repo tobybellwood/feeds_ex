@@ -26,6 +26,8 @@ files[] = src/Xml/Utility.php
 ; Tests.
 files[] = src/Tests/FeedsExUnitTests.test
 files[] = src/Tests/FeedsExHtml.test
+files[] = src/Tests/FeedsExJmesPath.test
+files[] = src/Tests/FeedsExJmesPathLines.test
 files[] = src/Tests/FeedsExJsonPath.test
 files[] = src/Tests/FeedsExJsonPathLines.test
 files[] = src/Tests/FeedsExQueryPathHtml.test

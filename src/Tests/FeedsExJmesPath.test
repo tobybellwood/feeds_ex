@@ -188,14 +188,15 @@ class FeedsExJmesPathUnitTests extends FeedsExUnitTestBase {
   public function testValidateExpression() {
     // Invalid expression.
     $parser = $this->getParserInstance();
-    $expression = array('!! ');
-    $this->assertTrue(strpos($this->invokeMethod($parser, 'validateExpression', $expression), 'Syntax error at character 0') !== FALSE);
+    $expression = '!! ';
+    $this->assertTrue(strpos($this->invokeMethod($parser, 'validateExpression', array(&$expression)), 'Syntax error at character') !== FALSE);
 
     // Test that value was trimmed.
-    $this->assertEqual($expression[0], '!!', 'Value was trimmed.');
+    $this->assertEqual($expression, '!!', 'Value was trimmed.');
 
     // Empty string.
-    $this->assertEqual(NULL, $this->invokeMethod($parser, 'validateExpression', array('')));
+    $empty = '';
+    $this->assertEqual(NULL, $this->invokeMethod($parser, 'validateExpression', array(&$empty)));
   }
 
   /**
