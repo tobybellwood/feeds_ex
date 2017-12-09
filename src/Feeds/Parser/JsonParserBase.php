@@ -33,4 +33,12 @@ abstract class JsonParserBase extends ParserBase {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  protected function startErrorHandling() {
+    // Clear the json errors from previous parsing.
+    json_decode('{}');
+  }
+
 }

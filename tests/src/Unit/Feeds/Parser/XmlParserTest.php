@@ -253,17 +253,19 @@ class XmlParserTest extends ParserTestBase {
    */
   public function testValidateExpression() {
     // Invalid expression.
-    $expression = ['!!'];
-    $this->assertSame('Invalid expression', (string) $this->invokeMethod($this->parser, 'validateExpression', $expression));
+    $expression = '!! ';
+    $this->assertSame('Invalid expression', (string) $this->invokeMethod($this->parser, 'validateExpression', [&$expression]));
 
     // Test that value was trimmed.
-    $this->assertSame($expression[0], '!!', 'Value was trimmed.');
+    $this->assertSame($expression, '!!', 'Value was trimmed.');
 
     // Unknown namespace.
-    $this->assertSame(NULL, $this->invokeMethod($this->parser, 'validateExpression', ['thing:asdf']));
+    $unknown = 'thing:asdf';
+    $this->assertSame(NULL, $this->invokeMethod($this->parser, 'validateExpression', [&$unknown]));
 
     // Empty.
-    $this->assertSame(NULL, $this->invokeMethod($this->parser, 'validateExpression', ['']));
+    $empty = '';
+    $this->assertSame(NULL, $this->invokeMethod($this->parser, 'validateExpression', [&$empty]));
   }
 
   /**

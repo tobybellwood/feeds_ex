@@ -146,14 +146,15 @@ class JmesPathParserTest extends ParserTestBase {
    */
   public function testValidateExpression() {
     // Invalid expression.
-    $expression = ['!! '];
-    $this->assertStringStartsWith('Syntax error at character', $this->invokeMethod($this->parser, 'validateExpression', $expression));
+    $expression = '!! ';
+    $this->assertStringStartsWith('Syntax error at character', $this->invokeMethod($this->parser, 'validateExpression', [&$expression]));
 
     // Test that value was trimmed.
-    $this->assertSame($expression[0], '!!', 'Value was trimmed.');
+    $this->assertSame($expression, '!!', 'Value was trimmed.');
 
     // Empty string.
-    $this->assertSame(NULL, $this->invokeMethod($this->parser, 'validateExpression', ['']));
+    $empty = '';
+    $this->assertSame(NULL, $this->invokeMethod($this->parser, 'validateExpression', [&$empty]));
   }
 
   /**

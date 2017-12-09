@@ -114,11 +114,11 @@ class JsonPathParserTest extends ParserTestBase {
    */
   public function testValidateExpression() {
     // Invalid expression.
-    $expression = ['!! '];
-    $this->assertSame(NULL, $this->invokeMethod($this->parser, 'validateExpression', $expression));
+    $expression = '!! ';
+    $this->assertSame(NULL, $this->invokeMethod($this->parser, 'validateExpression', [&$expression]));
 
     // Test that value was trimmed.
-    $this->assertSame($expression[0], '!!', 'Value was trimmed.');
+    $this->assertSame($expression, '!!', 'Value was trimmed.');
   }
 
   /**
