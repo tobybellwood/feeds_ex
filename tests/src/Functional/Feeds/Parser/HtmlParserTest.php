@@ -8,11 +8,31 @@ namespace Drupal\Tests\feeds_ex\Functional\Feeds\Parser;
  */
 class HtmlParserTest extends ParserTestBase {
 
+  use ContextTestTrait;
+
   /**
    * The ID of the parser to test.
    *
    * @var string
    */
   protected $parserId = 'html';
+
+  /**
+   * {@inheritdoc}
+   */
+  public function dataProviderValidContext() {
+    return [
+      ['//div[@class="post"]'],
+    ];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function dataProviderInvalidContext() {
+    return [
+      ['!! ', 'Invalid expression'],
+    ];
+  }
 
 }

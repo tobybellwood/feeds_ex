@@ -15,4 +15,13 @@ class JmesPathLinesParserTest extends ParserTestBase {
    */
   protected $parserId = 'jmespathlines';
 
+  /**
+   * Placeholder test.
+   *
+   * @todo remove when tests are implemented for this parser.
+   */
+  public function test() {
+    $this->drupalGet('/admin/structure/feeds/manage/' . $this->feedType->id() . '/mapping');
+  }
+
 }

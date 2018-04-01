@@ -35,13 +35,4 @@ abstract class ParserTestBase extends FeedsExBrowserTestBase {
     ]);
   }
 
-  /**
-   * Placeholder test.
-   *
-   * @todo remove when tests are implemented for each parser.
-   */
-  public function test() {
-    $this->drupalGet('/admin/structure/feeds/manage/' . $this->feedType->id() . '/mapping');
-  }
-
 }

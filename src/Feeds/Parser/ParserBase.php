@@ -7,10 +7,12 @@ use RuntimeException;
 use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Logger\RfcLogLevel;
+use Drupal\Core\Render\Element;
 use Drupal\feeds\Exception\EmptyFeedException;
 use Drupal\feeds\FeedInterface;
 use Drupal\feeds\Feeds\Item\DynamicItem;
 use Drupal\feeds\Plugin\Type\ConfigurablePluginBase;
+use Drupal\feeds\Plugin\Type\MappingPluginFormInterface;
 use Drupal\feeds\Plugin\Type\Parser\ParserInterface;
 use Drupal\feeds\Result\FetcherResultInterface;
 use Drupal\feeds\Result\ParserResult;
@@ -23,7 +25,7 @@ use Drupal\feeds_ex\Messenger\MessengerInterface;
 /**
  * The Feeds extensible parser.
  */
-abstract class ParserBase extends ConfigurablePluginBase implements ParserInterface {
+abstract class ParserBase extends ConfigurablePluginBase implements ParserInterface, MappingPluginFormInterface {
 
   /**
    * The object used to display messages to the user.
@@ -169,7 +171,17 @@ abstract class ParserBase extends ConfigurablePluginBase implements ParserInterf
   }
 
   /**
-   * Reuturns the list of table headers.
+   * Returns the label for single source.
+   *
+   * @return \Drupal\Core\StringTranslation\TranslatableMarkup|null
+   *   A translated string if the source has a special name. Null otherwise.
+   */
+  protected function configSourceLabel() {
+    return NULL;
+  }
+
+  /**
+   * Returns the list of table headers.
    *
    * @return array
    *   A list of header names keyed by the form keys.
@@ -425,6 +437,102 @@ abstract class ParserBase extends ConfigurablePluginBase implements ParserInterf
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public function mappingFormAlter(array &$form, FormStateInterface $form_state) {
+    if ($this->hasConfigurableContext()) {
+      $form['context'] = [
+        '#type' => 'textfield',
+        '#title' => $this->t('Context'),
+        '#default_value' => $this->configuration['context']['value'],
+        '#description' => $this->t('The base query to run.'),
+        '#size' => 50,
+        '#required' => TRUE,
+        '#maxlength' => 1024,
+        '#weight' => -50,
+      ];
+    }
+
+    // Override the label for adding new sources, so it is more clear what the
+    // source value represents.
+    $source_label = $this->configSourceLabel();
+    if ($source_label) {
+      foreach (Element::children($form['mappings']) as $i) {
+        if (!isset($form['mappings'][$i]['map'])) {
+          continue;
+        }
+        foreach (Element::children($form['mappings'][$i]['map']) as $subtarget) {
+          $form['mappings'][$i]['map'][$subtarget]['select']['#options']['__new'] = $this->t('New @label...', [
+            '@label' => $source_label,
+          ]);
+        }
+      }
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function mappingFormValidate(array &$form, FormStateInterface $form_state) {
+    // Validate context.
+    if ($this->hasConfigurableContext()) {
+      if ($message = $this->validateExpression($form_state->getValue('context'))) {
+        $form_state->setErrorByName('context', $message);
+      }
+    }
+
+    // Validate new sources.
+    $mappings = $form_state->getValue('mappings');
+    foreach ($mappings as $i => $mapping) {
+      foreach ($mapping['map'] as $subtarget => $map) {
+        if ($map['select'] == '__new' && isset($map['__new']['value'])) {
+          if ($message = $this->validateExpression($map['__new']['value'])) {
+            $form_state->setErrorByName("mappings][$i][map][$subtarget][__new][value", $message);
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function mappingFormSubmit(array &$form, FormStateInterface $form_state) {
+    $config = [];
+
+    // Set context.
+    $config['context'] = [
+      'value' => $form_state->getValue('context'),
+    ];
+
+    // Set sources.
+    // @todo refactor to let parsers use custom sources directly.
+    $config['sources'] = [];
+    $mappings = $form_state->getValue('mappings');
+    foreach ($mappings as $i => $mapping) {
+      foreach ($mapping['map'] as $subtarget => $map) {
+        if (empty($map['select'])) {
+          continue;
+        }
+        if ($map['select'] == '__new') {
+          $name = $map['__new']['machine_name'];
+        }
+        else {
+          $name = $map['select'];
+        }
+
+        $source = $this->feedType->getCustomSource($name);
+        if ($source) {
+          unset($source['machine_name']);
+          $config['sources'][$name] = $source;
+        }
+      }
+    }
+
+    $this->setConfiguration($config);
+  }
+
+  /**
    * Builds configuration form for the parser settings.
    *
    * @todo The code below is still D7 code and does not work in D8 yet. Also,
@@ -441,25 +549,6 @@ abstract class ParserBase extends ConfigurablePluginBase implements ParserInterf
       '#prefix' => '<div id="feeds-ex-configuration-wrapper">',
       '#suffix' => '</div>',
     ];
-
-    if ($this->hasConfigurableContext()) {
-      $form['context']['name'] = [
-        '#type' => 'markup',
-        '#markup' => $this->t('Context'),
-      ];
-      $form['context']['value'] = [
-        '#type' => 'textfield',
-        '#title' => $this->t('Context value'),
-        '#title_display' => 'invisible',
-        '#default_value' => $this->configuration['context']['value'],
-        '#size' => 50,
-        '#required' => TRUE,
-        // We're hiding the title, so add a little hint.
-        '#description' => '<span class="form-required">*</span>',
-        '#attributes' => ['class' => ['feeds-ex-context-value']],
-        '#maxlength' => 1024,
-      ];
-    }
 
     $form['sources'] = [
       '#id' => 'feeds-ex-source-table',
@@ -608,20 +697,6 @@ abstract class ParserBase extends ConfigurablePluginBase implements ParserInterf
     foreach ($values['sources'] as $machine_name => $source) {
       if (!empty($source['remove'])) {
         unset($values['sources'][$machine_name]);
-      }
-    }
-
-    // Validate context.
-    if ($this->hasConfigurableContext()) {
-      if ($message = $this->validateExpression($values['context']['value'])) {
-        form_set_error('context', $message);
-      }
-    }
-
-    // Validate expressions.
-    foreach (array_keys($values['sources']) as $machine_name) {
-      if ($message = $this->validateExpression($values['sources'][$machine_name]['value'])) {
-        form_set_error('sources][' . $machine_name . '][value', $message);
       }
     }
 

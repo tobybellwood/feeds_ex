@@ -15,4 +15,13 @@ class JsonPathLinesParserTest extends ParserTestBase {
    */
   protected $parserId = 'jsonpathlines';
 
+  /**
+   * Placeholder test.
+   *
+   * @todo remove when tests are implemented for this parser.
+   */
+  public function test() {
+    $this->drupalGet('/admin/structure/feeds/manage/' . $this->feedType->id() . '/mapping');
+  }
+
 }

@@ -178,6 +178,13 @@ class XmlParser extends ParserBase {
   /**
    * {@inheritdoc}
    */
+  protected function configSourceLabel() {
+    return $this->t('xpath source');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   protected function configFormTableHeader() {
     return ['raw' => $this->t('Raw'), 'inner' => $this->t('Inner XML')];
   }

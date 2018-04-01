@@ -15,4 +15,31 @@ class JmesPathParserTest extends ParserTestBase {
    */
   protected $parserId = 'jmespath';
 
+  /**
+   * Placeholder test.
+   *
+   * @todo remove when tests are implemented for this parser.
+   */
+  public function test() {
+    $this->drupalGet('/admin/structure/feeds/manage/' . $this->feedType->id() . '/mapping');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function dataProviderValidContext() {
+    return [
+      ['items'],
+    ];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function dataProviderInvalidContext() {
+    return [
+      ['!! ', 'Syntax error at character'],
+    ];
+  }
+
 }
