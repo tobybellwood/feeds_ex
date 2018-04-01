@@ -7,9 +7,9 @@ http://drupal.org/project/feeds_ex
 Provided parsers
 ================
 - XPath XML & HTML
-- QueryPath XML & HTML (requires the QueryPath module)
-- JSONPath JSON & JSON lines parser (requires JSONPath)
-- JMESPath JSON & JSON linesparser (requires JMESPath and PHP 5.4)
+- QueryPath XML & HTML (requires the QueryPath library)
+- JSONPath JSON & JSON lines parser (requires a JSONPath library)
+- JMESPath JSON & JSON linesparser (requires the JMESPath library)
 
 Requirements
 ============
@@ -24,44 +24,38 @@ Installation
 
 QueryPath
 =========
-To use the QueryPath parsers, download and enable the QueryPath module.
-http://drupal.org/project/querypath
+To use the QueryPath parsers, you will need the QueryPath library. If you
+installed this module through composer, you already have this library. Else you
+would need to require it with composer:
+
+$ composer require querypath/QueryPath:^3.0
+
+The source code for this library can be found at:
+https://github.com/technosophos/querypath
 
 JSONPath
 ========
-To use the JSONPath parser, download
-https://jsonpath.googlecode.com/svn/trunk/src/php/jsonpath.php
-into sites/all/libraries/jsonpath and clear the cache.
-Note: The JMESPath parser is preferred if you can meet the requirements.
+To use the JSONPath parsers, you will need a JSONPath library. If you
+installed this module through composer, you already have this library. Else you
+would need to require it with composer:
+
+$ composer require peekmo/jsonpath:^1.0
+
+The source code for this library can be found at:
+https://github.com/Peekmo/JsonPath
+
+The plan is to support the JSONPath library from Flow communications in the
+future as well and use this as the default one. The source code for this library
+can be found at:
+https://github.com/FlowCommunications/JSONPath
 
 JMESPath
 ========
-To use the JMESPath parsers, you'll need Composer, and PHP >= 5.4.
-In sites/all/libraries:
+To use the JMESPath parsers, you will need the JMESPath library. If you
+installed this module through composer, you already have this library. Else you
+would need to require it with composer:
 
-$ git clone https://github.com/mtdowling/jmespath.php.git
-$ cd jmespath.php
-$ composer install
-$ drush cc all # Or just clear the cache however you normally would.
+$ composer require mtdowling/jmespath.php:^2.0
 
-Development
-===========
-To run tests locally, the TUnit module is required.
-http://drupal.org/project/tunit
-One of the goals of this module is to allow other developers to easily create
-certain types of parsers. For example, it should be trivial to create a parser
-for a specific XML format.
-Documention to come.
-
-History
-=======
-This is the new home for:
-- Feeds XPath Parser
-- Feeds JSONPath Parser
-- Feeds QueryPath Parser
-The above modules are all in various states of maintenance. This project is
-meant to combine them so that they can benefit from each other's development and
-simplify maintenance. There are also some major architectural changes.
-
-There is no upgrade path for the old modules. It remains on the table, but those
-modules are still maintained and should continue to work.
+The source code for this library can be found at
+https://github.com/jmespath/jmespath.php
