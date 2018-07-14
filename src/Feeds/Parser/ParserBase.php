@@ -19,20 +19,14 @@ use Drupal\feeds\Result\ParserResult;
 use Drupal\feeds\Result\ParserResultInterface;
 use Drupal\feeds\StateInterface;
 use Drupal\feeds_ex\Encoder\EncoderInterface;
-use Drupal\feeds_ex\Messenger\Messenger;
-use Drupal\feeds_ex\Messenger\MessengerInterface;
+use Drupal\Core\Messenger\MessengerTrait;
 
 /**
  * The Feeds extensible parser.
  */
 abstract class ParserBase extends ConfigurablePluginBase implements ParserInterface, MappingPluginFormInterface {
 
-  /**
-   * The object used to display messages to the user.
-   *
-   * @var \Drupal\feeds_ex\Messenger\MessengerInterface
-   */
-  protected $messenger;
+  use MessengerTrait;
 
   /**
    * The class used as the text encoder.
@@ -227,7 +221,7 @@ abstract class ParserBase extends ConfigurablePluginBase implements ParserInterf
     }
     catch (EmptyFeedException $e) {
       // The feed is empty.
-      $this->getMessenger()->setMessage($this->t('The feed is empty.'), 'warning', FALSE);
+      $this->messenger()->addMessage($this->t('The feed is empty.'), 'warning', FALSE);
     }
     catch (Exception $exception) {
       // Do nothing. Store for later.
@@ -360,7 +354,7 @@ abstract class ParserBase extends ConfigurablePluginBase implements ParserInterf
       if ($error['severity'] > $severity) {
         continue;
       }
-      $this->getMessenger()->setMessage($this->t($error['message'], $error['variables']), $error['severity'] <= RfcLogLevel::ERROR ? 'error' : 'warning', FALSE);
+      $this->messenger()->addMessage($this->t($error['message'], $error['variables']), $error['severity'] <= RfcLogLevel::ERROR ? 'error' : 'warning', FALSE);
     }
   }
 
@@ -403,7 +397,7 @@ abstract class ParserBase extends ConfigurablePluginBase implements ParserInterf
       $data[$key] = SafeMarkup::checkPlain($value);
     }
     $output .= _theme('item_list', ['items' => $data]);
-    $this->getMessenger()->setMessage($output);
+    $this->messenger()->addMessage($output);
   }
 
   /**
@@ -686,7 +680,7 @@ abstract class ParserBase extends ConfigurablePluginBase implements ParserInterf
       $this->loadLibrary();
     }
     catch (RuntimeException $e) {
-      $this->getMessenger()->setMessage($e->getMessage(), 'error', FALSE);
+      $this->messenger()->addMessage($e->getMessage(), 'error', FALSE);
       return;
     }
 
@@ -810,33 +804,6 @@ abstract class ParserBase extends ConfigurablePluginBase implements ParserInterf
     ];
 
     return $header;
-  }
-
-  /**
-   * Sets the messenger to be used to display messages.
-   *
-   * @param \Drupal\feeds_ex\Messenger\MessengerInterface $messenger
-   *   The messenger.
-   *
-   * @return $this
-   *   The parser object.
-   */
-  public function setMessenger(MessengerInterface $messenger) {
-    $this->messenger = $messenger;
-    return $this;
-  }
-
-  /**
-   * Returns the messenger.
-   *
-   * @return \Drupal\feeds_ex\Messenger\MessengerInterface
-   *   The messenger.
-   */
-  public function getMessenger() {
-    if (!isset($this->messenger)) {
-      $this->messenger = new Messenger();
-    }
-    return $this->messenger;
   }
 
   /**

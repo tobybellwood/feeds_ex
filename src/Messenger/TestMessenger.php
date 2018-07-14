@@ -2,10 +2,12 @@
 
 namespace Drupal\feeds_ex\Messenger;
 
+use Drupal\Core\Messenger\Messenger;
+
 /**
  * Stores messages without calling drupal_set_mesage().
  */
-class TestMessenger implements MessengerInterface {
+class TestMessenger extends Messenger {
 
   /**
    * The messages that have been set.
@@ -15,9 +17,14 @@ class TestMessenger implements MessengerInterface {
   protected $messages = [];
 
   /**
+   * Constructs a new TestMessenger.
+   */
+  public function __construct() {}
+
+  /**
    * {@inheritdoc}
    */
-  public function setMessage($message = NULL, $type = 'status', $repeat = TRUE) {
+  public function addMessage($message, $type = self::TYPE_STATUS, $repeat = FALSE) {
     $this->messages[] = [
       'message' => $message,
       'type' => $type,

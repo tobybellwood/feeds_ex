@@ -222,7 +222,7 @@ class HtmlParserTest extends ParserTestBase {
    */
   public function testEmptyFeed() {
     $this->parser->parse($this->feed, new RawFetcherResult(' '), $this->state);
-    $this->assertEmptyFeedMessage($this->parser->getMessenger()->getMessages());
+    $this->assertEmptyFeedMessage($this->parser->messenger()->getMessages());
   }
 
 }

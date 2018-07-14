@@ -273,7 +273,7 @@ class XmlParserTest extends ParserTestBase {
    */
   public function testEmptyFeed() {
     $this->parser->parse($this->feed, new RawFetcherResult(' '), $this->state);
-    $messages = $this->parser->getMessenger()->getMessages();
+    $messages = $this->parser->messenger()->getMessages();
     $this->assertSame(1, count($messages), 'The expected number of messages.');
     $this->assertSame((string) $messages[0]['message'], 'The feed is empty.', 'Message text is correct.');
     $this->assertSame($messages[0]['type'], 'warning', 'Message type is warning.');

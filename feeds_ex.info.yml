@@ -5,3 +5,4 @@ core: 8.x
 package: Feeds
 dependencies:
   - feeds
+  - drupal:system (>=8.5.0)

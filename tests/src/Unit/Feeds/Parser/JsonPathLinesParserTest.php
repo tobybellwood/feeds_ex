@@ -89,7 +89,7 @@ class JsonPathLinesParserTest extends ParserTestBase {
    */
   public function testEmptyFeed() {
     $this->parser->parse($this->feed, new FetcherResult($this->moduleDir . '/tests/resources/empty.txt'), $this->state);
-    $this->assertEmptyFeedMessage($this->parser->getMessenger()->getMessages());
+    $this->assertEmptyFeedMessage($this->parser->messenger()->getMessages());
   }
 
 }
