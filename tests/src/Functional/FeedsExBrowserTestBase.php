@@ -3,17 +3,24 @@
 namespace Drupal\Tests\feeds_ex\Functional;
 
 use Drupal\Tests\feeds\Functional\FeedsBrowserTestBase;
+use Drupal\Tests\feeds_ex\Traits\FeedsExCommonTrait;
 
 /**
  * Base class for Feeds extensible parser functional tests.
  */
 abstract class FeedsExBrowserTestBase extends FeedsBrowserTestBase {
 
+  use FeedsExCommonTrait;
+
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
-  public static $modules = ['feeds_ex'];
+  public static $modules = [
+    'feeds',
+    'feeds_ex',
+    'node',
+    'user',
+    'file',
+  ];
 
 }

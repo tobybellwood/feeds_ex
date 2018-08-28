@@ -433,6 +433,19 @@ abstract class ParserBase extends ConfigurablePluginBase implements ParserInterf
   /**
    * {@inheritdoc}
    */
+  public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
+    // Preserve some configuration.
+    $config = array_merge([
+      'context' => $this->getConfiguration('context'),
+      'sources' => $this->getConfiguration('sources'),
+    ], $form_state->getValues());
+
+    $this->setConfiguration($config);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function mappingFormAlter(array &$form, FormStateInterface $form_state) {
     if ($this->hasConfigurableContext()) {
       $form['context'] = [
