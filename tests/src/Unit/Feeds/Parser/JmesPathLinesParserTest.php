@@ -28,7 +28,7 @@ class JmesPathLinesParserTest extends JsonPathLinesParserTest {
     $utility->setStringTranslation($this->getStringTranslationStub());
     $this->parser = new JmesPathLinesParser($configuration, 'jmespathlines', [], $utility);
     $this->parser->setStringTranslation($this->getStringTranslationStub());
-    $this->parser->setMessenger(new TestMessenger());
+    $this->parser->setFeedsExMessenger(new TestMessenger());
 
     $config = [
       'sources' => [

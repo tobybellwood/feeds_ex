@@ -25,7 +25,7 @@ class JmesPathParserTest extends ParserTestBase {
     $utility->setStringTranslation($this->getStringTranslationStub());
     $this->parser = new JmesPathParser($configuration, 'jmespath', [], $utility);
     $this->parser->setStringTranslation($this->getStringTranslationStub());
-    $this->parser->setMessenger(new TestMessenger());
+    $this->parser->setFeedsExMessenger(new TestMessenger());
 
     // Set JMESPath runtime factory.
     $factoryMock = $this->getMock('Drupal\feeds_ex\JmesRuntimeFactoryInterface');
@@ -198,7 +198,7 @@ class JmesPathParserTest extends ParserTestBase {
    */
   public function testEmptyFeed() {
     $this->parser->parse($this->feed, new RawFetcherResult(' '), $this->state);
-    $this->assertEmptyFeedMessage($this->parser->messenger()->getMessages());
+    $this->assertEmptyFeedMessage($this->parser->getMessenger()->getMessages());
   }
 
 }

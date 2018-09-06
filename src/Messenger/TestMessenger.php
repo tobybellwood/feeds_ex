@@ -5,7 +5,7 @@ namespace Drupal\feeds_ex\Messenger;
 use Drupal\Core\Messenger\Messenger;
 
 /**
- * Stores messages without calling drupal_set_mesage().
+ * Stores messages without calling drupal_set_message().
  */
 class TestMessenger extends Messenger {
 

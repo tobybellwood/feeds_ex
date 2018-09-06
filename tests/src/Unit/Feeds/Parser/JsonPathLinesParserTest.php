@@ -31,7 +31,7 @@ class JsonPathLinesParserTest extends ParserTestBase {
     $utility->setStringTranslation($this->getStringTranslationStub());
     $this->parser = new JsonPathLinesParser($configuration, 'jsonpathlines', [], $utility);
     $this->parser->setStringTranslation($this->getStringTranslationStub());
-    $this->parser->setMessenger(new TestMessenger());
+    $this->parser->setFeedsExMessenger(new TestMessenger());
 
     $config = [
       'sources' => [
@@ -89,7 +89,7 @@ class JsonPathLinesParserTest extends ParserTestBase {
    */
   public function testEmptyFeed() {
     $this->parser->parse($this->feed, new FetcherResult($this->moduleDir . '/tests/resources/empty.txt'), $this->state);
-    $this->assertEmptyFeedMessage($this->parser->messenger()->getMessages());
+    $this->assertEmptyFeedMessage($this->parser->getMessenger()->getMessages());
   }
 
 }

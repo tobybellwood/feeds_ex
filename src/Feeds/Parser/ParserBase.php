@@ -7,6 +7,7 @@ use RuntimeException;
 use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Logger\RfcLogLevel;
+use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\Render\Element;
 use Drupal\feeds\Exception\EmptyFeedException;
 use Drupal\feeds\FeedInterface;
@@ -19,14 +20,18 @@ use Drupal\feeds\Result\ParserResult;
 use Drupal\feeds\Result\ParserResultInterface;
 use Drupal\feeds\StateInterface;
 use Drupal\feeds_ex\Encoder\EncoderInterface;
-use Drupal\Core\Messenger\MessengerTrait;
 
 /**
  * The Feeds extensible parser.
  */
 abstract class ParserBase extends ConfigurablePluginBase implements ParserInterface, MappingPluginFormInterface {
 
-  use MessengerTrait;
+  /**
+   * The messenger, for compatibility with Drupal 8.5.
+   *
+   * @var \Drupal\Core\Messenger\MessengerInterface
+   */
+  protected $feedsExMessenger;
 
   /**
    * The class used as the text encoder.
@@ -221,7 +226,7 @@ abstract class ParserBase extends ConfigurablePluginBase implements ParserInterf
     }
     catch (EmptyFeedException $e) {
       // The feed is empty.
-      $this->messenger()->addMessage($this->t('The feed is empty.'), 'warning', FALSE);
+      $this->getMessenger()->addMessage($this->t('The feed is empty.'), 'warning', FALSE);
     }
     catch (Exception $exception) {
       // Do nothing. Store for later.
@@ -354,7 +359,7 @@ abstract class ParserBase extends ConfigurablePluginBase implements ParserInterf
       if ($error['severity'] > $severity) {
         continue;
       }
-      $this->messenger()->addMessage($this->t($error['message'], $error['variables']), $error['severity'] <= RfcLogLevel::ERROR ? 'error' : 'warning', FALSE);
+      $this->getMessenger()->addMessage($this->t($error['message'], $error['variables']), $error['severity'] <= RfcLogLevel::ERROR ? 'error' : 'warning', FALSE);
     }
   }
 
@@ -397,7 +402,7 @@ abstract class ParserBase extends ConfigurablePluginBase implements ParserInterf
       $data[$key] = SafeMarkup::checkPlain($value);
     }
     $output .= _theme('item_list', ['items' => $data]);
-    $this->messenger()->addMessage($output);
+    $this->getMessenger()->addMessage($output);
   }
 
   /**
@@ -693,7 +698,7 @@ abstract class ParserBase extends ConfigurablePluginBase implements ParserInterf
       $this->loadLibrary();
     }
     catch (RuntimeException $e) {
-      $this->messenger()->addMessage($e->getMessage(), 'error', FALSE);
+      $this->getMessenger()->addMessage($e->getMessage(), 'error', FALSE);
       return;
     }
 
@@ -845,6 +850,42 @@ abstract class ParserBase extends ConfigurablePluginBase implements ParserInterf
       $this->encoder = new $class($this->configuration['source_encoding']);
     }
     return $this->encoder;
+  }
+
+  /**
+   * Sets the messenger.
+   *
+   * For compatibility with both Drupal 8.5 and Drupal 8.6.
+   * Basically only useful for automated tests.
+   *
+   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
+   *   The messenger.
+   */
+  public function setFeedsExMessenger(MessengerInterface $messenger) {
+    if (method_exists($this, 'setMessenger')) {
+      $this->setMessenger($messenger);
+    }
+    else {
+      $this->feedsExMessenger = $messenger;
+    }
+  }
+
+  /**
+   * Gets the messenger.
+   *
+   * For compatibility with both Drupal 8.5 and Drupal 8.6.
+   *
+   * @return \Drupal\Core\Messenger\MessengerInterface
+   *   The messenger.
+   */
+  public function getMessenger() {
+    if (method_exists($this, 'messenger')) {
+      return $this->messenger();
+    }
+    if (isset($this->feedsExMessenger)) {
+      return $this->feedsExMessenger;
+    }
+    return \Drupal::messenger();
   }
 
 }

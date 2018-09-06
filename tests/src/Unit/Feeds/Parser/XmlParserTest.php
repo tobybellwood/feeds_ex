@@ -24,7 +24,7 @@ class XmlParserTest extends ParserTestBase {
     $utility->setStringTranslation($this->getStringTranslationStub());
     $this->parser = new XmlParser($configuration, 'xml', [], $utility);
     $this->parser->setStringTranslation($this->getStringTranslationStub());
-    $this->parser->setMessenger(new TestMessenger());
+    $this->parser->setFeedsExMessenger(new TestMessenger());
   }
 
   /**
@@ -273,7 +273,7 @@ class XmlParserTest extends ParserTestBase {
    */
   public function testEmptyFeed() {
     $this->parser->parse($this->feed, new RawFetcherResult(' '), $this->state);
-    $messages = $this->parser->messenger()->getMessages();
+    $messages = $this->parser->getMessenger()->getMessages();
     $this->assertSame(1, count($messages), 'The expected number of messages.');
     $this->assertSame((string) $messages[0]['message'], 'The feed is empty.', 'Message text is correct.');
     $this->assertSame($messages[0]['type'], 'warning', 'Message type is warning.');

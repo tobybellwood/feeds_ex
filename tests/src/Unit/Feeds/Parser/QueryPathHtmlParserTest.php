@@ -24,7 +24,7 @@ class QueryPathHtmlParserTest extends ParserTestBase {
     $utility->setStringTranslation($this->getStringTranslationStub());
     $this->parser = new QueryPathHtmlParser($configuration, 'querypathhtml', [], $utility);
     $this->parser->setStringTranslation($this->getStringTranslationStub());
-    $this->parser->setMessenger(new TestMessenger());
+    $this->parser->setFeedsExMessenger(new TestMessenger());
   }
 
   /**
@@ -248,7 +248,7 @@ class QueryPathHtmlParserTest extends ParserTestBase {
    */
   public function testEmptyFeed() {
     $this->parser->parse($this->feed, new RawFetcherResult(' '), $this->state);
-    $this->assertEmptyFeedMessage($this->parser->messenger()->getMessages());
+    $this->assertEmptyFeedMessage($this->parser->getMessenger()->getMessages());
   }
 
 }
