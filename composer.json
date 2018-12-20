@@ -13,5 +13,8 @@
       "mtdowling/jmespath.php": "2.*",
       "peekmo/jsonpath": "1.*",
       "querypath/QueryPath": "3.*"
+    },
+    "require-dev": {
+      "drupal/feeds": "3.x-dev"
     }
 }
