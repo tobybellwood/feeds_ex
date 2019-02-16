@@ -31,7 +31,7 @@ class QueryPathXmlParserTest extends ParserTestBase {
    * Tests simple parsing.
    */
   public function testSimpleParsing() {
-    $fetcher_result = new RawFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test.xml'));
+    $fetcher_result = new RawFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test.xml'), $this->fileSystem);
 
     $config = [
       'context' => [
@@ -65,7 +65,7 @@ class QueryPathXmlParserTest extends ParserTestBase {
    * Tests raw parsing.
    */
   public function testRaw() {
-    $fetcher_result = new RawFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test.xml'));
+    $fetcher_result = new RawFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test.xml'), $this->fileSystem);
 
     $config = [
       'context' => [
@@ -100,7 +100,7 @@ class QueryPathXmlParserTest extends ParserTestBase {
    * Tests inner xml.
    */
   public function testInner() {
-    $fetcher_result = new RawFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test.xml'));
+    $fetcher_result = new RawFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test.xml'), $this->fileSystem);
 
     $config = [
       'context' => [
@@ -136,7 +136,7 @@ class QueryPathXmlParserTest extends ParserTestBase {
    * Tests grabbing an attribute.
    */
   public function testAttributeParsing() {
-    $fetcher_result = new RawFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test.xml'));
+    $fetcher_result = new RawFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test.xml'), $this->fileSystem);
 
     $config = [
       'context' => [
@@ -170,7 +170,7 @@ class QueryPathXmlParserTest extends ParserTestBase {
    * Tests grabbing multiple attributes.
    */
   public function testMultipleAttributeParsing() {
-    $fetcher_result = new RawFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test.xml'));
+    $fetcher_result = new RawFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test.xml'), $this->fileSystem);
 
     $config = [
       'context' => [
@@ -199,7 +199,7 @@ class QueryPathXmlParserTest extends ParserTestBase {
    * Tests parsing a CP866 (Russian) encoded file.
    */
   public function testCp866Encoded() {
-    $fetcher_result = new RawFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test_ru.xml'));
+    $fetcher_result = new RawFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test_ru.xml'), $this->fileSystem);
 
     $config = [
       'context' => [
@@ -235,7 +235,7 @@ class QueryPathXmlParserTest extends ParserTestBase {
    * This implicitly tests Base's encoding conversion.
    */
   public function testEucJpEncodedNoDeclaration() {
-    $fetcher_result = new RawFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test_jp.xml'));
+    $fetcher_result = new RawFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test_jp.xml'), $this->fileSystem);
 
     $config = [
       'context' => [
@@ -270,7 +270,7 @@ class QueryPathXmlParserTest extends ParserTestBase {
    * Tests that batch parsing works.
    */
   public function testBatchParsing() {
-    $fetcher_result = new RawFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test.xml'));
+    $fetcher_result = new RawFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test.xml'), $this->fileSystem);
 
     $config = [
       'context' => [
@@ -323,7 +323,7 @@ class QueryPathXmlParserTest extends ParserTestBase {
    * Tests empty feed handling.
    */
   public function testEmptyFeed() {
-    $this->parser->parse($this->feed, new RawFetcherResult(' '), $this->state);
+    $this->parser->parse($this->feed, new RawFetcherResult(' ', $this->fileSystem), $this->state);
     $this->assertEmptyFeedMessage($this->parser->getMessenger()->getMessages());
   }
 

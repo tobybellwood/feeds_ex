@@ -31,7 +31,7 @@ class HtmlParserTest extends ParserTestBase {
    * Tests simple parsing.
    */
   public function testSimpleParsing() {
-    $fetcher_result = new RawFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test.html'));
+    $fetcher_result = new RawFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test.html'), $this->fileSystem);
 
     $config = [
       'context' => [
@@ -65,7 +65,7 @@ class HtmlParserTest extends ParserTestBase {
    * Tests getting the raw value.
    */
   public function testRaw() {
-    $fetcher_result = new RawFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test.html'));
+    $fetcher_result = new RawFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test.html'), $this->fileSystem);
 
     $config = [
       'context' => [
@@ -100,7 +100,7 @@ class HtmlParserTest extends ParserTestBase {
    * Tests innerxml.
    */
   public function testInner() {
-    $fetcher_result = new RawFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test.html'));
+    $fetcher_result = new RawFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test.html'), $this->fileSystem);
 
     $config = [
       'context' => [
@@ -136,7 +136,7 @@ class HtmlParserTest extends ParserTestBase {
    * Tests parsing a CP866 (Russian) encoded file.
    */
   public function testCp866Encoded() {
-    $fetcher_result = new RawFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test_ru.html'));
+    $fetcher_result = new RawFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test_ru.html'), $this->fileSystem);
 
     $config = [
       'context' => [
@@ -170,7 +170,7 @@ class HtmlParserTest extends ParserTestBase {
    * This implicitly tests Base's encoding conversion.
    */
   public function testEucJpEncodedNoDeclaration() {
-    $fetcher_result = new RawFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test_jp.html'));
+    $fetcher_result = new RawFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test_jp.html'), $this->fileSystem);
 
     $config = [
       'context' => [
@@ -213,7 +213,7 @@ class HtmlParserTest extends ParserTestBase {
 
     $config = ['context' => ['value' => '/beep']];
 
-    $result = $this->parser->parse($this->feed, new RawFetcherResult('<?xml version="1.0" encoding="UTF-8"?><item></item>'));
+    $result = $this->parser->parse($this->feed, new RawFetcherResult('<?xml version="1.0" encoding="UTF-8"?><item></item>', $this->fileSystem));
     $this->assertSame($result->link, 'file fetcher source path');
   }
 
@@ -221,7 +221,7 @@ class HtmlParserTest extends ParserTestBase {
    * Tests empty feed handling.
    */
   public function testEmptyFeed() {
-    $this->parser->parse($this->feed, new RawFetcherResult(' '), $this->state);
+    $this->parser->parse($this->feed, new RawFetcherResult(' ', $this->fileSystem), $this->state);
     $this->assertEmptyFeedMessage($this->parser->getMessenger()->getMessages());
   }
 

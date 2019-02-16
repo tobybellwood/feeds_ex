@@ -43,7 +43,7 @@ class JmesPathParserTest extends ParserTestBase {
    * Tests simple parsing.
    */
   public function testSimpleParsing() {
-    $fetcher_result = new RawFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test.json'));
+    $fetcher_result = new RawFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test.json'), $this->fileSystem);
 
     $config = [
       'context' => [
@@ -76,7 +76,7 @@ class JmesPathParserTest extends ParserTestBase {
    * This implicitly tests Base's encoding conversion.
    */
   public function testEucJpEncoded() {
-    $fetcher_result = new RawFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test_jp.json'));
+    $fetcher_result = new RawFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test_jp.json'), $this->fileSystem);
 
     $config = [
       'context' => [
@@ -109,7 +109,7 @@ class JmesPathParserTest extends ParserTestBase {
    * Tests batch parsing.
    */
   public function testBatchParsing() {
-    $fetcher_result = new RawFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test.json'));
+    $fetcher_result = new RawFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test.json'), $this->fileSystem);
 
     $config = [
       'context' => [
@@ -172,7 +172,7 @@ class JmesPathParserTest extends ParserTestBase {
     ];
     $this->parser->setConfiguration($config);
 
-    $this->parser->parse($this->feed, new RawFetcherResult('{"items": "not an array"}'), $this->state);
+    $this->parser->parse($this->feed, new RawFetcherResult('{"items": "not an array"}', $this->fileSystem), $this->state);
   }
 
   /**
@@ -190,14 +190,14 @@ class JmesPathParserTest extends ParserTestBase {
     ];
     $this->parser->setConfiguration($config);
 
-    $this->parser->parse($this->feed, new RawFetcherResult('invalid json'), $this->state);
+    $this->parser->parse($this->feed, new RawFetcherResult('invalid json', $this->fileSystem), $this->state);
   }
 
   /**
    * Tests empty feed handling.
    */
   public function testEmptyFeed() {
-    $this->parser->parse($this->feed, new RawFetcherResult(' '), $this->state);
+    $this->parser->parse($this->feed, new RawFetcherResult(' ', $this->fileSystem), $this->state);
     $this->assertEmptyFeedMessage($this->parser->getMessenger()->getMessages());
   }
 

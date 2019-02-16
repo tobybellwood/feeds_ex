@@ -18,12 +18,21 @@ abstract class UnitTestBase extends FeedsUnitTestCase {
   protected $moduleDir;
 
   /**
+   * A mocked file system.
+   *
+   * @var \Drupal\Core\File\FileSystemInterface
+   */
+  protected $fileSystem;
+
+  /**
    * {@inheritdoc}
    */
   public function setUp() {
     $this->moduleDir = dirname(dirname(dirname(dirname(__FILE__))));
 
     parent::setUp();
+
+    $this->fileSystem = $this->getMockFileSystem();
   }
 
   /**

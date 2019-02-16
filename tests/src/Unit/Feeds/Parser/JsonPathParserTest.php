@@ -32,7 +32,7 @@ class JsonPathParserTest extends ParserTestBase {
    * Tests simple parsing.
    */
   public function testSimpleParsing() {
-    $fetcher_result = new RawFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test.json'));
+    $fetcher_result = new RawFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test.json'), $this->fileSystem);
 
     $config = [
       'context' => [
@@ -75,7 +75,7 @@ class JsonPathParserTest extends ParserTestBase {
    * Tests batch parsing.
    */
   public function testBatchParsing() {
-    $fetcher_result = new RawFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test.json'));
+    $fetcher_result = new RawFetcherResult(file_get_contents($this->moduleDir . '/tests/resources/test.json'), $this->fileSystem);
 
     $config = [
       'context' => [
@@ -135,7 +135,7 @@ class JsonPathParserTest extends ParserTestBase {
     ] + $this->parser->defaultConfiguration();
     $this->parser->setConfiguration($config);
 
-    $this->parser->parse($this->feed, new RawFetcherResult('invalid json'), $this->state);
+    $this->parser->parse($this->feed, new RawFetcherResult('invalid json', $this->fileSystem), $this->state);
   }
 
   /**
@@ -152,7 +152,7 @@ class JsonPathParserTest extends ParserTestBase {
     $this->parser->setConfiguration($config);
 
     try {
-      $this->parser->parse($this->feed, new RawFetcherResult('invalid json'), $this->state);
+      $this->parser->parse($this->feed, new RawFetcherResult('invalid json', $this->fileSystem), $this->state);
     }
     catch (Exception $e) {
       // Ignore any exceptions.
@@ -169,7 +169,7 @@ class JsonPathParserTest extends ParserTestBase {
    * Tests empty feed handling.
    */
   public function testEmptyFeed() {
-    $this->parser->parse($this->feed, new RawFetcherResult(' '), $this->state);
+    $this->parser->parse($this->feed, new RawFetcherResult(' ', $this->fileSystem), $this->state);
     $this->assertEmptyFeedMessage($this->parser->getMessenger()->getMessages());
   }
 
